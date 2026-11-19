@@ -2195,7 +2195,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden">
             <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between"><h3 class="font-bold text-base">試合情報・ルール設定</h3><button onclick="closeModal('modal-game-info')"><i data-lucide="x" class="w-5 h-5"></i></button></div>
             <div class="p-5 space-y-4 text-sm">
-                <div><label class="block text-xs font-bold text-slate-600 mb-1">大会名</label><input type="text" id="inp-tournament" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">大会名</label>
+                    <select id="inp-tournament" onchange="onTournamentSelectChange('inp-tournament','inp-tournament-custom')" class="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white"></select>
+                    <input type="text" id="inp-tournament-custom" placeholder="大会名を入力（その他）" class="hidden w-full border border-slate-300 rounded-lg px-3 py-2 mt-2">
+                </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-xs font-bold text-slate-600 mb-1">開催日</label><input type="date" id="inp-date" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                     <div><label class="block text-xs font-bold text-slate-600 mb-1">球場名</label><input type="text" id="inp-stadium" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
@@ -3020,6 +3024,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <div class="p-5 space-y-4 text-sm">
                 <div id="end-game-score-summary" class="text-center space-y-1"></div>
                 <p class="text-xs text-slate-500 text-center leading-relaxed">試合を終了し、記録を保存します。</p>
+                <div class="space-y-1.5">
+                    <label for="end-game-tournament" class="text-xs font-bold text-slate-700">大会名</label>
+                    <select id="end-game-tournament" onchange="onTournamentSelectChange('end-game-tournament','end-game-tournament-custom')" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-800 bg-white"></select>
+                    <input type="text" id="end-game-tournament-custom" placeholder="大会名を入力（その他）" class="hidden w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                </div>
                 <div id="end-game-reason-box" class="space-y-1.5">
                     <label for="end-game-reason" class="text-xs font-bold text-slate-700">終了理由</label>
                     <select id="end-game-reason" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-800 bg-white">
@@ -3514,7 +3523,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-1">大会名</label>
-                            <input type="text" id="setup-tournament" value="練習試合・公式戦" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold">
+                            <select id="setup-tournament" onchange="onTournamentSelectChange('setup-tournament','setup-tournament-custom')" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold bg-white"></select>
+                            <input type="text" id="setup-tournament-custom" placeholder="大会名を入力（その他）" class="hidden w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold mt-1.5">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-1">開催日</label>
@@ -3791,8 +3801,101 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             showToast('保存済みデータを削除しました', 'info');
         }
 
+        // ================= 大会名プルダウン =================
+        // 大会名は選択式にする。年度を反映する大会（春季2種・秋季2種・新人戦・
+        // 春日部市内大会）は「選択中の年度（未選択なら今年度）」を自動で付け、
+        // 高等学校野球選手権埼玉大会は 2026年度＝第108回 を基準に年度ごとに
+        // 1回ずつ加算して自動計算する。「その他」は自由記述。
+        // 保存される大会名は従来どおり文字列そのもの（データ形式は変えない）。
+        const TOURNAMENT_YEAR_TYPES = ['春季地区大会', '春季県大会', '秋季地区大会', '秋季県大会', '新人戦', '春日部市内大会'];
+
+        function tournamentFiscalYear() {
+            return selectedFiscalYear || currentFiscalYearDefault();
+        }
+
+        // 選手権の回数：2026年度＝第108回、年度が1増えるごとに+1回
+        function senshukenEdition(year) {
+            return 108 + (year - 2026);
+        }
+
+        function senshukenName(year) {
+            return '第' + senshukenEdition(year) + '回高等学校野球選手権埼玉大会';
+        }
+
+        // 選択肢（option）のHTMLを、現在の年度で組み立てる
+        function buildTournamentOptionsHTML() {
+            const y = tournamentFiscalYear();
+            let html = '<option value="練習試合">練習試合</option>';
+            html += '<option value="春季地区大会">' + y + '年度 春季地区大会</option>';
+            html += '<option value="春季県大会">' + y + '年度 春季県大会</option>';
+            html += '<option value="__senshuken__">' + senshukenName(y) + '</option>';
+            html += '<option value="新人戦">' + y + '年度 新人戦</option>';
+            html += '<option value="秋季地区大会">' + y + '年度 秋季地区大会</option>';
+            html += '<option value="秋季県大会">' + y + '年度 秋季県大会</option>';
+            html += '<option value="春日部市内大会">' + y + '年度 春日部市内大会</option>';
+            html += '<option value="__other__">その他（記述式）</option>';
+            return html;
+        }
+
+        // 既存の大会名文字列を、プルダウンの選択値＋自由記述に振り分ける。
+        // 選択肢に一致しない既存の大会名は「その他」の自由記述として保持し、
+        // 既存データを上書きしない。
+        function parseTournamentName(name) {
+            const n = String(name || '').trim();
+            if (!n || n === '練習試合') return { value: '練習試合', custom: '' };
+            if (/^第\d+回高等学校野球選手権埼玉大会$/.test(n)) return { value: '__senshuken__', custom: '' };
+            const m = n.match(/^\d{4}年度\s*(春季地区大会|春季県大会|秋季地区大会|秋季県大会|新人戦|春日部市内大会)$/);
+            if (m) return { value: m[1], custom: '' };
+            if (TOURNAMENT_YEAR_TYPES.indexOf(n) !== -1) return { value: n, custom: '' };
+            return { value: '__other__', custom: n };
+        }
+
+        // プルダウン＋自由記述欄を、指定した大会名で初期化する。
+        // 既存の大会名は select の data 属性に保持し、選択を変えずに保存した
+        // 場合は元の大会名のままにする（既存データを上書きしないため）。
+        function setupTournamentControls(selId, customId, currentName) {
+            const sel = document.getElementById(selId);
+            const custom = document.getElementById(customId);
+            if (!sel) return;
+            sel.innerHTML = buildTournamentOptionsHTML();
+            const parsed = parseTournamentName(currentName);
+            sel.value = parsed.value;
+            if (sel.dataset) {
+                sel.dataset.originalName = String(currentName || '');
+                sel.dataset.originalValue = parsed.value;
+            }
+            if (custom) {
+                custom.value = parsed.custom || '';
+                custom.classList.toggle('hidden', parsed.value !== '__other__');
+            }
+        }
+
+        // 「その他」を選んだときだけ自由記述欄を表示する
+        function onTournamentSelectChange(selId, customId) {
+            const sel = document.getElementById(selId);
+            const custom = document.getElementById(customId);
+            if (custom) custom.classList.toggle('hidden', !sel || sel.value !== '__other__');
+        }
+
+        // プルダウンの選択から、保存する大会名文字列を組み立てる
+        function resolveTournamentFromControls(selId, customId) {
+            const sel = document.getElementById(selId);
+            const custom = document.getElementById(customId);
+            if (!sel) return '';
+            const v = sel.value;
+            // 既存の大会名と同じ種別が選ばれたままなら、元の大会名をそのまま返す
+            // （例：2026年度の大会名を別年度で開いても、無変更なら上書きしない）
+            if (sel.dataset && sel.dataset.originalName && v === sel.dataset.originalValue && v !== '__other__') {
+                return sel.dataset.originalName;
+            }
+            if (v === '__other__') return (custom ? custom.value.trim() : '') || 'その他';
+            if (v === '__senshuken__') return senshukenName(tournamentFiscalYear());
+            if (TOURNAMENT_YEAR_TYPES.indexOf(v) !== -1) return tournamentFiscalYear() + '年度 ' + v;
+            return v;
+        }
+
         function openGameInfoModal() {
-            document.getElementById('inp-tournament').value = gameState.meta.tournament || '';
+            setupTournamentControls('inp-tournament', 'inp-tournament-custom', gameState.meta.tournament || '');
             document.getElementById('inp-date').value = gameState.meta.date || '';
             document.getElementById('inp-stadium').value = gameState.meta.stadium || '';
             document.getElementById('inp-away-name').value = gameState.teams.away.name || '';
@@ -3805,7 +3908,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         function saveGameInfo() {
             pushUndoState();
-            gameState.meta.tournament = document.getElementById('inp-tournament').value.trim() || '公式戦';
+            gameState.meta.tournament = resolveTournamentFromControls('inp-tournament', 'inp-tournament-custom') || '公式戦';
             gameState.meta.date = document.getElementById('inp-date').value;
             gameState.meta.stadium = document.getElementById('inp-stadium').value.trim() || '球場';
             gameState.teams.away.name = document.getElementById('inp-away-name').value.trim() || '先攻チーム';
@@ -3872,6 +3975,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <div class="text-lg font-extrabold font-mono text-slate-900">${gameState.teams.away.name} ${awayR} - ${homeR} ${gameState.teams.home.name}</div>
                 <div class="text-xs font-bold text-slate-600">${getInningLabel()} 時点</div>
             `;
+            setupTournamentControls('end-game-tournament', 'end-game-tournament-custom', gameState.meta.tournament || '');
             const reasonBox = document.getElementById('end-game-reason-box');
             if (mode === 'manual') {
                 reasonBox.classList.remove('hidden');
@@ -3892,6 +3996,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const homeR = gameState.teams.home.innings.reduce((a, b) => a + (b || 0), 0);
             const reasonEl = document.getElementById('end-game-reason');
             const reason = (reasonEl && reasonEl.value) || '試合終了';
+
+            // 大会名はモーダルのプルダウン選択を反映してから保存する
+            const endTournament = resolveTournamentFromControls('end-game-tournament', 'end-game-tournament-custom');
+            if (endTournament) gameState.meta.tournament = endTournament;
 
             // ① 現在の試合データをアーカイブへ保存する
             const archives = getArchivedGames();
@@ -7165,6 +7273,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function openNewGameSetupModal() {
+            setupTournamentControls('setup-tournament', 'setup-tournament-custom', '練習試合');
             document.getElementById('setup-date').value = new Date().toISOString().split('T')[0];
             const rosterSelect = document.getElementById('setup-my-team-roster');
             const ownKey = getOwnTeamKey();
@@ -7503,7 +7612,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
             gameState = {
                 meta: {
-                    tournament: document.getElementById('setup-tournament').value.trim() || '練習試合・公式戦',
+                    tournament: resolveTournamentFromControls('setup-tournament', 'setup-tournament-custom') || '練習試合',
                     date: document.getElementById('setup-date').value || new Date().toISOString().split('T')[0],
                     stadium: document.getElementById('setup-stadium').value.trim() || 'グラウンド',
                     useDH: !!(myDH || oppDH || myTwoWay || oppTwoWay),
