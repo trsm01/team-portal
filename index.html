@@ -644,8 +644,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             header [class*="space-x-3"] > :not([hidden]) ~ :not([hidden]) { margin-left: 8px; }
         }
         @media (max-width: 480px) {
-            /* 狭幅ではアイコンタイルを畳み、タイトルとボタンの幅を確保する */
-            header > div[class] > div:first-child > div:first-child { display: none; }
+            /* 狭幅ではロゴチップを小さくし（.team-logo-chip の指定）、タイトルとボタンの幅を確保する */
             header h1 { font-size: 13px; }
         }
 
@@ -655,6 +654,49 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         #screen-login { z-index: 100; }
         #screen-login .login-wrap { min-height: 100%; padding: 2.5rem 1rem; }
         #screen-login .login-head { margin-bottom: 2rem; }
+
+        /* --- チームロゴ（Showa BASEBALL TEAM／白背景を透過処理したPNG） ---
+           配置場所：ヘッダー（白チップ上）／ログイン選択画面（ロゴ＋透かし）／
+           ホーム画面ヒーロー／体力測定画面の見出しバー／ランキング表の見出し。
+           いずれも文字やボタンの上に重ねず、操作・可読性を妨げない位置に置く。 */
+        .team-logo-img { display: block; width: auto; }
+        /* ヘッダー：濃色バーの上でもロゴの黒文字が読めるよう白チップに載せる */
+        .team-logo-chip {
+            background: #ffffff; border-radius: 10px; padding: 4px 9px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); flex-shrink: 0;
+            display: flex; align-items: center;
+        }
+        .team-logo-chip img { height: 30px; }
+        @media (max-width: 480px) {
+            .team-logo-chip { padding: 3px 6px; border-radius: 8px; }
+            .team-logo-chip img { height: 22px; }
+        }
+        /* ログイン選択画面：見出しの上に大きく配置 */
+        .logo-login { width: min(280px, 74vw); height: auto; margin: 0 auto 1.4rem; }
+        /* ログイン選択画面の透かし：右下に薄く敷く（操作には影響させない） */
+        .logo-watermark-login {
+            position: absolute; right: -30px; bottom: 10px; width: min(430px, 88vw); height: auto;
+            opacity: 0.055; transform: rotate(-7deg); pointer-events: none; user-select: none;
+        }
+        #screen-login .login-wrap { position: relative; z-index: 1; }
+        /* ホーム画面ヒーロー */
+        .logo-home-hero {
+            width: min(330px, 78vw); height: auto; margin: 0 auto;
+            filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.14));
+        }
+        .home-hero-rule {
+            width: 120px; height: 3px; border-radius: 9999px; margin: 14px auto 12px;
+            background: linear-gradient(90deg, #1e3a8a 0%, #c9a227 55%, #0f172a 100%);
+        }
+        /* 体力測定：見出しバー右端のロゴ */
+        .logo-phys { height: 42px; width: auto; flex-shrink: 0; }
+        @media (max-width: 640px) { .logo-phys { height: 32px; } }
+        /* ランキング表（画面・印刷共通）の見出しロゴ */
+        .ranking-doc-head-main { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .ranking-doc-logo { height: 36px; width: auto; flex-shrink: 0; }
+        .ranking-doc[data-density="5"] .ranking-doc-logo,
+        .ranking-doc[data-density="6"] .ranking-doc-logo { height: 27px; }
+        @media (max-width: 640px) { .ranking-doc-logo { height: 28px; } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
@@ -665,8 +707,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
          パスワードはまだ無し（ボタンだけで役割を選ぶ）。照合は JS 側の
          checkLoginPassword() に集約してあるので、後からそこへ追加する。 -->
     <div id="screen-login" class="fixed inset-0 bg-slate-100 overflow-y-auto">
+        <img src="assets/team-logo.png" alt="" aria-hidden="true" class="logo-watermark-login">
         <div class="login-wrap flex items-center justify-center">
             <div class="w-full max-w-md">
+                <img src="assets/team-logo.png" alt="Showa BASEBALL TEAM ロゴ" class="team-logo-img logo-login">
                 <div class="login-head text-center">
                     <h2 class="text-2xl font-extrabold text-slate-900">ログイン方法を選んでください</h2>
                     <p class="text-[13px] text-slate-600 mt-2 leading-relaxed">指導者と部員で、使える機能が変わります。</p>
@@ -705,8 +749,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
             <div onclick="navigateApp('home')" class="flex items-center space-x-3 cursor-pointer hover:opacity-90 transition">
-                <div class="bg-emerald-600 p-1.5 rounded-lg flex items-center justify-center">
-                    <i data-lucide="clipboard-list" class="w-5 h-5 text-white"></i>
+                <div class="team-logo-chip">
+                    <img src="assets/team-logo.png" alt="Showa BASEBALL TEAM" class="team-logo-img">
                 </div>
                 <div>
                     <h1 class="text-base sm:text-lg font-bold tracking-tight leading-none">庄和高校野球部　チームポータル</h1>
@@ -756,7 +800,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
     <!-- ================= APP SCREEN 1: ホーム画面 ================= -->
     <div id="screen-home" class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
-        <div class="text-center space-y-2">
+        <div class="text-center">
+            <img src="assets/team-logo.png" alt="Showa BASEBALL TEAM ロゴ" class="team-logo-img logo-home-hero">
+            <div class="home-hero-rule" aria-hidden="true"></div>
             <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">BASEBALL ANALYTICS & SCOREBOOK</span>
         </div>
 
@@ -1113,6 +1159,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </h2>
 
             </div>
+            <img src="assets/team-logo.png" alt="Showa BASEBALL TEAM ロゴ" class="team-logo-img logo-phys">
         </div>
 
         <!-- 選手選択（記録入力ページ以外で表示。記録入力は表の行が選手になるため隠す） -->
@@ -5809,7 +5856,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // サマリーや注記などの説明書きは置かない（簡素化）。
         function rankingSheetHead(title) {
             return '<div class="ranking-doc-head">'
-                + '<p class="ranking-doc-title">体力測定 ' + physicalEscapeHtml(title) + '</p>'
+                + '<div class="ranking-doc-head-main"><img src="assets/team-logo.png" alt="" class="ranking-doc-logo">'
+                + '<p class="ranking-doc-title">体力測定 ' + physicalEscapeHtml(title) + '</p></div>'
                 + '<p class="ranking-doc-meta">' + rankingMeasurementMonthLabel() + '</p>'
                 + '</div>';
         }
@@ -6122,9 +6170,103 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 return '<row r="' + r + '"' + attrs + '>' + styled + '</row>';
             });
         }
+        // --- チームロゴ（assets/team-logo.png）の読み込み ---
+        // PDF（Canvas描画）用に Image として、Excel（.xlsxへ画像を埋め込む）用に
+        // PNGバイト列として読み込む。どちらも失敗した場合はロゴなしで続行し、
+        // ダウンロード自体は必ず成功させる（呼び出し側で null を許容する）。
+        let __teamLogoImgCache = null;
+        function __loadTeamLogoImage() {
+            if (__teamLogoImgCache) return Promise.resolve(__teamLogoImgCache);
+            return new Promise(resolve => {
+                try {
+                    const img = new Image();
+                    img.onload = () => { __teamLogoImgCache = img; resolve(img); };
+                    img.onerror = () => resolve(null);
+                    img.src = 'assets/team-logo.png';
+                } catch (e) { resolve(null); }
+            });
+        }
+        let __teamLogoPngCache = null;
+        async function __teamLogoPngBytes() {
+            if (__teamLogoPngCache) return __teamLogoPngCache;
+            try {
+                const res = await fetch('assets/team-logo.png');
+                if (!res || !res.ok) return null;
+                const buf = await res.arrayBuffer();
+                if (!buf || buf.byteLength === 0) return null;
+                __teamLogoPngCache = new Uint8Array(buf);
+                return __teamLogoPngCache;
+            } catch (e) { return null; }
+        }
+        // 生成済み .xlsx へチームロゴ画像を埋め込む（zip後加工）。
+        // SheetJS（同梱のCE版）は画像を書き出せないため、印刷設定の差し込みと
+        // 同じ仕組みで media／drawings パーツと関係（rels）・[Content_Types] を
+        // 追加し、シートXMLの末尾へ <drawing> を差し込む。画像はシート先頭の
+        // ロゴ専用行（1行目）の左上に oneCellAnchor で配置する。
+        // 途中で失敗した場合は元のデータをそのまま返す。
+        async function __xlsxAddLogoImage(arrayBuffer) {
+            try {
+                const png = await __teamLogoPngBytes();
+                if (!png) return arrayBuffer;
+                const entries = __zipReadEntries(arrayBuffer);
+                if (!entries) return arrayBuffer;
+                const files = [];
+                for (let i = 0; i < entries.length; i++) {
+                    files.push({ name: entries[i].name, data: await __zipEntryPlain(entries[i]) });
+                }
+                const dec = new TextDecoder('utf-8');
+                const enc = new TextEncoder();
+                const ctIdx = files.findIndex(f => f.name === '[Content_Types].xml');
+                if (ctIdx < 0) return arrayBuffer;
+                let ct = dec.decode(files[ctIdx].data);
+                if (ct.indexOf('</Types>') < 0) return arrayBuffer;
+                if (ct.indexOf('Extension="png"') < 0) ct = ct.replace('</Types>', '<Default Extension="png" ContentType="image/png"/></Types>');
+                if (ct.indexOf('/xl/drawings/drawing1.xml') < 0) ct = ct.replace('</Types>', '<Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/></Types>');
+                files[ctIdx] = { name: files[ctIdx].name, data: enc.encode(ct) };
+                const sheetIdx = files.findIndex(f => /^xl\/worksheets\/sheet\d+\.xml$/.test(f.name));
+                if (sheetIdx < 0) return arrayBuffer;
+                const sheetFile = files[sheetIdx].name.split('/').pop();
+                let sheetXml = dec.decode(files[sheetIdx].data);
+                if (sheetXml.indexOf('<drawing') >= 0) return arrayBuffer;
+                if (!/<worksheet[^>]*xmlns:r=/.test(sheetXml)) return arrayBuffer;
+                if (sheetXml.indexOf('</worksheet>') < 0) return arrayBuffer;
+                sheetXml = sheetXml.replace('</worksheet>', '<drawing r:id="rIdTeamLogo"/></worksheet>');
+                files[sheetIdx] = { name: files[sheetIdx].name, data: enc.encode(sheetXml) };
+                const relEntry = '<Relationship Id="rIdTeamLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/>';
+                const relsName = 'xl/worksheets/_rels/' + sheetFile + '.rels';
+                const relsIdx = files.findIndex(f => f.name === relsName);
+                if (relsIdx >= 0) {
+                    let rx = dec.decode(files[relsIdx].data);
+                    if (rx.indexOf('rIdTeamLogo') < 0) {
+                        if (rx.indexOf('</Relationships>') < 0) return arrayBuffer;
+                        rx = rx.replace('</Relationships>', relEntry + '</Relationships>');
+                    }
+                    files[relsIdx] = { name: relsName, data: enc.encode(rx) };
+                } else {
+                    files.push({ name: relsName, data: enc.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + relEntry + '</Relationships>') });
+                }
+                // ロゴの実寸 1079×332（縦横比 約3.25）。表示は幅2.5in×高さ約0.77inで、
+                // ロゴ専用行の高さ（58pt＝約0.81in）の中に収める。
+                const CX = 2286000, CY = 703384;
+                const drawing = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+                    + '<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
+                    + '<xdr:oneCellAnchor><xdr:from><xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>'
+                    + '<xdr:ext cx="' + CX + '" cy="' + CY + '"/>'
+                    + '<xdr:pic><xdr:nvPicPr><xdr:cNvPr id="1" name="team-logo"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>'
+                    + '<xdr:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill>'
+                    + '<xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + CX + '" cy="' + CY + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic>'
+                    + '<xdr:clientData/></xdr:oneCellAnchor></xdr:wsDr>';
+                files.push({ name: 'xl/drawings/drawing1.xml', data: enc.encode(drawing) });
+                files.push({ name: 'xl/drawings/_rels/drawing1.xml.rels', data: enc.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/team-logo.png"/></Relationships>') });
+                files.push({ name: 'xl/media/team-logo.png', data: png });
+                return __zipBuildStored(files).buffer;
+            } catch (err) {
+                return arrayBuffer;
+            }
+        }
         // fontSpec が渡された場合は、行の高さに合わせて拡大したフォントも差し込む。
         // fontSpec = { title, summary, head, data（pt）, rows（データ行数）, nameColors（行番号→学年カラー） }
-        // ランキング表の行構成（1始まり）：1=タイトル, 2=測定月, 4=見出し, 5〜=データ行。
+        // ランキング表の行構成（1始まり）：1=ロゴ専用行, 2=タイトル, 3=測定月, 5=見出し, 6〜=データ行。
         async function __xlsxAddA4FitToPage(arrayBuffer, fontSpec) {
             try {
                 const entries = __zipReadEntries(arrayBuffer);
@@ -6154,7 +6296,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 const dc = fontSpec.rows || 0;
                                 const nameColors = fontSpec.nameColors || {};
                                 mod = __xlsxApplyRowStyles(mod,
-                                    r => r === 1 ? styleIdx.title : r === 2 ? styleIdx.summary : r === 4 ? styleIdx.head : (r >= 5 && r < 5 + dc) ? styleIdx.data : null,
+                                    r => r === 2 ? styleIdx.title : r === 3 ? styleIdx.summary : r === 5 ? styleIdx.head : (r >= 6 && r < 6 + dc) ? styleIdx.data : null,
                                     r => nameColors[r] ? styleIdx[nameColors[r]] : null);
                             }
                             files[i] = { name: files[i].name, data: new TextEncoder().encode(mod) };
@@ -6191,6 +6333,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 widths = [7, 22, 10].concat(tests.map(() => 19));
             }
             const aoa = [];
+            aoa.push(['']); // 1行目：チームロゴ専用行（.xlsxでは画像を重ねて表示。HTMLフォールバック形式ではブランド表記を出す）
             aoa.push(['体力測定 ' + title]);
             aoa.push([rankingMeasurementMonthLabel()]);
             aoa.push([]);
@@ -6209,18 +6352,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             // 文字サイズも行の高さに合わせて拡大し（タイトルはさらに大きめ）、
             // 拡大した文字が収まるようタイトル行・測定月行の高さも連動させる。
             // フォントは __xlsxAddA4FitToPage の後加工で styles.xml へ差し込む。
-            const __provRowH = Math.floor((777 - 47) / (rows.length + 1));
+            const __provRowH = Math.floor((777 - 105) / (rows.length + 1));
             const excelFontPt = Math.max(11, Math.min(20, Math.round(__provRowH * 0.26)));
             const excelTitleFontPt = Math.max(14, Math.min(28, Math.round(excelFontPt * 1.4)));
+            const __logoRowH = 58;
             const __titleRowH = Math.max(24, Math.ceil(excelTitleFontPt * 1.35));
             const __monthRowH = Math.max(15, Math.ceil(excelFontPt * 1.35));
-            const __fixedTotal = __titleRowH + __monthRowH + 8;
+            const __fixedTotal = __logoRowH + __titleRowH + __monthRowH + 8;
             const excelDataRowH = Math.max(15, Math.min(409, Math.floor((777 - __fixedTotal) / (rows.length + 1))));
-            // 氏名セルの学年カラー（シート行番号は1始まり：データは5行目から）
+            // 氏名セルの学年カラー（シート行番号は1始まり：データは6行目から）
             const excelNameColors = {};
             rows.forEach((r, i) => {
                 const k = normalizeGradeColor(r.player ? r.player.gradeColor : '');
-                if (k) excelNameColors[5 + i] = k;
+                if (k) excelNameColors[6 + i] = k;
             });
             const excelFontSpec = { title: excelTitleFontPt, summary: excelFontPt, head: excelFontPt, data: excelFontPt, rows: rows.length, nameColors: excelNameColors };
             try {
@@ -6229,36 +6373,37 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     const ws = XLSX.utils.aoa_to_sheet(aoa);
                     ws['!cols'] = widths.map(w => ({ wch: w }));
                     // 行の高さをA4縦1枚いっぱいに配分する（固定行＋見出し行・データ行）
-                    const __fixedRowH = [__titleRowH, __monthRowH, 8];
+                    const __fixedRowH = [__logoRowH, __titleRowH, __monthRowH, 8];
                     ws['!rows'] = aoa.map((_, ri) => {
-                        if (ri < 3) return { hpt: __fixedRowH[ri] };
+                        if (ri < 4) return { hpt: __fixedRowH[ri] };
                         return { hpt: excelDataRowH };
                     });
                     // 余白はSheetJSが書ける !margins で指定する
                     ws['!margins'] = { left: 0.35, right: 0.35, top: 0.45, bottom: 0.45, header: 0.25, footer: 0.25 };
-                    // タイトル・測定月の行は全列に結合して1行で見せる
+                    // タイトル・測定月の行は全列に結合して1行で見せる（1行目はロゴ専用行）
                     const lastCol = headers.length - 1;
-                    ws['!merges'] = [0, 1].map(r => ({ s: { r: r, c: 0 }, e: { r: r, c: lastCol } }));
+                    ws['!merges'] = [1, 2].map(r => ({ s: { r: r, c: 0 }, e: { r: r, c: lastCol } }));
                     XLSX.utils.book_append_sheet(wb, ws, __excelSheetName(title));
                     const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
                     // A4縦・1ページに収める印刷設定（紙サイズ・向き・fitToPage）と、
                     // 行の高さに合わせた拡大フォントを差し込んでからダウンロードする
-                    const finalOut = await __xlsxAddA4FitToPage(out, excelFontSpec);
+                    const finalOut = await __xlsxAddLogoImage(await __xlsxAddA4FitToPage(out, excelFontSpec));
                     __excelDownloadBlob(new Blob([finalOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), fileBase + '_' + __excelDateStamp() + '.xlsx');
                 } else {
                     // SheetJSが使えない場合のフォールバック: Excelで開けるHTML形式（.xls）。
                     // 印刷設定（A4縦・1ページに収める）も可能な範囲で付ける。
                     const rowsHtml = aoa.map((row, ri) => {
+                        if (ri === 0) return '<tr style="height:' + __logoRowH + 'pt"><td colspan="' + headers.length + '" style="font-weight:bold;font-size:' + excelTitleFontPt + 'pt;color:#1E3A8A;vertical-align:middle;">Showa BASEBALL TEAM（庄和高校野球部）</td></tr>';
                         if (!row || row.length === 0) return '<tr style="height:8pt"><td></td></tr>';
-                        if (ri <= 1) {
-                            const fh = ri === 0 ? __titleRowH : __monthRowH;
-                            const fs = ' style="font-weight:bold;font-size:' + (ri === 0 ? excelTitleFontPt : excelFontPt) + 'pt;"';
+                        if (ri <= 2) {
+                            const fh = ri === 1 ? __titleRowH : __monthRowH;
+                            const fs = ' style="font-weight:bold;font-size:' + (ri === 1 ? excelTitleFontPt : excelFontPt) + 'pt;"';
                             return '<tr style="height:' + fh + 'pt"><td colspan="' + headers.length + '"' + fs + '>' + __excelEscapeHtml(row[0]) + '</td></tr>';
                         }
-                        const dataRow = rows[ri - 4];
+                        const dataRow = rows[ri - 5];
                         const cells = row.map((v, ci) => {
                             const s = __excelEscapeHtml(v === null || v === undefined ? '' : v);
-                            if (ri === 3) return '<td style="font-weight:bold;background-color:#FFF7ED;border:1px solid #CBD5E1;text-align:center;vertical-align:middle;font-size:' + excelFontPt + 'pt;">' + s + '</td>';
+                            if (ri === 4) return '<td style="font-weight:bold;background-color:#FFF7ED;border:1px solid #CBD5E1;text-align:center;vertical-align:middle;font-size:' + excelFontPt + 'pt;">' + s + '</td>';
                             let st = 'border:1px solid #E2E8F0;vertical-align:middle;font-size:' + excelFontPt + 'pt;';
                             if (ci === 1 && dataRow) {
                                 const gm = GRADE_COLOR_META[normalizeGradeColor(dataRow.player ? dataRow.player.gradeColor : '')];
@@ -6343,6 +6488,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (sel.measuredCount === 0) { showToast('ダウンロードできる測定済みの選手がいません。先に「記録入力」から記録を追加してください', 'warning'); return; }
             const rows = sel.rows;
             const title = isOverall ? '総合ランキング' : cat + 'ランキング';
+            const logoImg = await __loadTeamLogoImage();
             // 表データ（Excel版と同じ並び）：順位・選手名・平均点＋データ列
             let headers, dataOf;
             if (isOverall) {
@@ -6370,8 +6516,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, PW, PH);
                 ctx.textBaseline = 'middle';
-                // --- 見出し（種目タイトルと測定月だけ） ---
+                // --- チームロゴ：見出しの上に中央配置し、ページ中央には透かしとして薄く敷く ---
                 let y = M + 4;
+                if (logoImg && logoImg.naturalWidth > 0 && logoImg.naturalHeight > 0) {
+                    const logoAspect = logoImg.naturalWidth / logoImg.naturalHeight;
+                    const wmW = 400, wmH = wmW / logoAspect;
+                    ctx.save();
+                    ctx.globalAlpha = 0.045;
+                    ctx.drawImage(logoImg, (PW - wmW) / 2, (PH - wmH) / 2, wmW, wmH);
+                    ctx.restore();
+                    const lgH = 30, lgW = lgH * logoAspect;
+                    ctx.drawImage(logoImg, (PW - lgW) / 2, y, lgW, lgH);
+                    y += lgH + 12;
+                }
+                // --- 見出し（種目タイトルと測定月だけ） ---
                 ctx.fillStyle = '#0f172a';
                 ctx.font = '800 19px ' + FONT;
                 ctx.textAlign = 'left';
