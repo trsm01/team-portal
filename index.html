@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>〇〇高校野球部　チームポータル</title>
+    <title>庄和高校野球部　チームポータル</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffffff' stroke='%2394a3b8' stroke-width='4'/%3E%3Cpath d='M29 13 Q56 50 29 87' fill='none' stroke='%23dc2626' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M71 13 Q44 50 71 87' fill='none' stroke='%23dc2626' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
     <!-- Tailwind CSS: 外部CDNに依存せず動作するよう、コンパイル済みCSSをこのファイル内に内蔵 -->
     <!-- Google Fonts: Inter & Noto Sans JP -->
@@ -522,6 +522,30 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
         input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-green); }
         #screen-physical input[type="checkbox"], #screen-physical input[type="radio"] { accent-color: var(--accent-orange); }
+
+        /* --- 体力測定・記録入力表（縦列＝選手氏名、横列＝種目名の記録用紙形式） --- */
+        /* ページ自体は通常どおりスクロールできるようにし、表は枠の中でもスクロールできる
+           二段構えにする。以前はページスクロールを止めて枠だけをスクロールさせていたが、
+           枠の外側（ヘッダー・測定月行・下部ボタン等）の高さ分だけページが画面より高くなり、
+           下部が切り捨てられて選手の下の方や保存ボタンに届かなくなったため廃止した。
+           枠の端までスクロールしたらそのままページ側へ連鎖させ（overscroll-behavior は
+           指定しない）、全選手と最下部の保存ボタンまで必ず届くようにする。
+           見出し行・選手名列は枠内で固定表示する。 */
+        .phys-grid-scroll { overflow: auto; max-height: 72vh; max-height: 72dvh; border: 2px solid #94a3b8; border-radius: 12px; background: #ffffff; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; scrollbar-gutter: stable; }
+        table.phys-grid { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 1480px; }
+        .phys-grid th, .phys-grid td { border-right: 1px solid #eef2f7; border-bottom: 1px solid #e2e8f0; padding: 3px; }
+        .phys-grid thead th { position: sticky; top: 0; z-index: 2; background: #fff7ed; text-align: center; padding: 6px 3px; }
+        .phys-grid thead .phys-grid-name-head { position: sticky; left: 0; top: 0; z-index: 3; background: #ffedd5; text-align: left; padding-left: 10px; font-size: 12px; font-weight: 800; color: #7c2d12; white-space: nowrap; }
+        .phys-grid .phys-grid-cat { display: block; font-size: 9px; font-weight: 700; color: #c2410c; letter-spacing: 0.04em; }
+        .phys-grid .phys-grid-test { display: block; font-size: 12px; font-weight: 800; color: #431407; white-space: nowrap; }
+        .phys-grid .phys-grid-unit { display: block; font-size: 9px; font-weight: 700; color: #9a3412; }
+        .phys-grid tbody th.phys-grid-name { position: sticky; left: 0; z-index: 1; background: #ffffff; text-align: left; font-size: 13px; font-weight: 800; color: #0f172a; white-space: nowrap; padding: 4px 10px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+        .phys-grid tbody tr:hover > td { background-color: #fff7ed; }
+        .phys-grid tbody tr:hover > th.phys-grid-name { background-color: #fff7ed; }
+        .phys-grid td { text-align: center; }
+        .phys-grid td input[type="number"] { width: 62px; padding: 5px 4px; font-size: 13px; text-align: right; border: 1px solid #cbd5e1; border-radius: 7px; background: #ffffff; }
+        .phys-grid td select { width: 84px; padding: 5px 16px 5px 4px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 7px; background-color: #ffffff; }
+        .phys-grid td input[type="number"], .phys-grid td select { touch-action: manipulation; }
         #screen-team-settings input[type="checkbox"], #screen-team-settings input[type="radio"] { accent-color: var(--accent-blue); }
         label { letter-spacing: 0.02em; }
 
@@ -685,7 +709,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <i data-lucide="clipboard-list" class="w-5 h-5 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg font-bold tracking-tight leading-none">〇〇高校野球部　チームポータル</h1>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight leading-none">庄和高校野球部　チームポータル</h1>
                     <p class="text-[11px] text-slate-400 mt-0.5 hidden sm:block">高校野球・アマチュア野球 公式記録管理システム</p>
                 </div>
             </div>
@@ -1091,8 +1115,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
         </div>
 
-        <!-- 選手選択（メニュー選択・各画面のすべてで表示） -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <!-- 選手選択（記録入力ページ以外で表示。記録入力は表の行が選手になるため隠す） -->
+        <div id="physical-player-card" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
             <div class="flex flex-wrap items-end gap-3">
                 <div class="min-w-[200px] flex-1 max-w-sm">
                     <label class="block text-xs font-bold text-slate-500 mb-1.5">選手</label>
@@ -1186,73 +1210,40 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <div id="physical-personal-growth"></div>
                 </div>
             </div>
-            <!-- ベスト記録と記録一覧：選択中の選手の種目別ベストと記録一覧（閲覧・削除） -->
+            <!-- ベスト記録：選択中の選手の種目別ベスト（過去の測定記録ログの表は表示しない。記録データ自体は保持する） -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-5">
                 <div>
                     <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">種目別ベスト記録</h4>
                     <div id="physical-fitness-bests" class="space-y-5"></div>
                 </div>
-                <div>
-                    <div class="flex flex-wrap items-center gap-3 mb-2">
-                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">記録一覧</h4>
-                    </div>
-                    <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[640px]">
-                        <thead>
-                            <tr class="bg-slate-900 text-slate-200 font-semibold">
-                                <th class="py-2.5 px-3">日付</th>
-                                <th class="py-2.5 px-3">種目</th>
-                                <th class="py-2.5 px-3 text-right">測定値</th>
-                                <th class="py-2.5 px-3 text-right">前回比</th>
-                                <th class="py-2.5 px-3 text-center">ベスト</th>
-                                <th class="py-2.5 px-3">メモ</th>
-                                <th class="py-2.5 px-3 text-center w-16">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="physical-fitness-tbody" class="divide-y divide-slate-200"></tbody>
-                    </table>
-                    </div>
-                </div>
             </div>
         </div>
 
-        <!-- 記録入力（一括入力）：選手・測定日は上部で1回だけ選び、6カテゴリ・17種目すべてを1画面に並べて一度に入力し、1回の送信で保存する。未測定の種目は空欄のまま送信でき、空欄の種目は保存せずスキップする。保存した記録は個人記録の確認・個人記録の比較・総合評価・各カテゴリーランキングへ自動で反映される -->
-        <div id="physical-input" class="hidden space-y-6">
+        <!-- 記録入力（表形式・一括入力）：最上部に測定月と測定日、その下に縦列＝選手氏名・横列＝種目名（17種目）の記録表を置き、全選手分を一気に入力して保存する。空欄（未測定）のセルは保存せずスキップする。表は renderPhysicalBulkForm() が組み立てる -->
+        <div id="physical-input" class="hidden space-y-4">
             <p id="physical-saved-notice" class="hidden rounded-xl border border-orange-300 bg-orange-50 px-4 py-3 text-sm font-bold text-orange-800">記録を保存しました。</p>
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
-                <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
-                    <i data-lucide="pen-line" class="w-5 h-5 text-orange-600"></i>記録入力（一括入力）
-                </h3>
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
                 <form onsubmit="addPhysicalFitnessBulk(event)" class="space-y-4">
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                        <p class="text-xs font-bold text-slate-700 mb-1">全種目を一度に入力して、まとめて保存できます（選択中の選手に登録されます）</p>
-                        <p class="text-[11px] text-slate-500 mb-3">未測定の種目は空欄のままで送信できます。空欄の種目は保存されず、入力済みの種目だけが保存されます。</p>
-                        <div class="flex flex-wrap items-end gap-3">
-                            <div>
-                                <label class="block text-[11px] font-bold text-slate-500 mb-1" for="physical-fitness-date">測定日（全種目共通）</label>
-                                <input type="date" id="physical-fitness-date" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
-                            </div>
-                            <div class="flex-1 min-w-[160px]">
-                                <label class="block text-[11px] font-bold text-slate-500 mb-1" for="physical-fitness-memo">メモ（任意・全種目共通）</label>
-                                <input type="text" id="physical-fitness-memo" placeholder="例：追い風・スパイク着用など" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
-                            </div>
-                            <p class="text-xs font-bold text-orange-700 pb-2">入力済み <span id="physical-bulk-count">0</span> / 17種目</p>
+                    <div class="flex flex-wrap items-end gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1" for="physical-fitness-month">測定月</label>
+                            <input type="month" id="physical-fitness-month" onchange="changePhysicalFitnessMonth(this.value)" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
                         </div>
-                        <div class="flex flex-wrap items-center gap-3 mt-3">
-                            <button type="button" onclick="addPhysicalFitnessBulk(event)" class="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-bold transition flex items-center gap-1.5">
-                                <i data-lucide="save" class="w-4 h-4"></i>入力した記録をまとめて保存
-                            </button>
-                            <p class="text-[11px] text-slate-500">下まで入力したあと、画面下の保存ボタンからも保存できます。</p>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1" for="physical-fitness-date">測定日</label>
+                            <input type="date" id="physical-fitness-date" onchange="syncPhysicalMonthFromDate()" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
                         </div>
+                        <p class="text-xs font-bold text-orange-700 pb-2">入力済み <span id="physical-bulk-count">0</span> 件</p>
+                        <button type="button" onclick="addPhysicalFitnessBulk(event)" class="ml-auto px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-bold transition flex items-center gap-1.5">
+                            <i data-lucide="save" class="w-4 h-4"></i>保存
+                        </button>
                     </div>
-                    <!-- 6カテゴリ・17種目の入力欄は renderPhysicalBulkForm() がカテゴリごとに組み立てる。数値種目は数値＋単位、KWテストと柔軟系は区分セレクト -->
-                    <div id="physical-bulk-groups" class="space-y-4"></div>
+                    <div id="physical-bulk-table-wrap" class="min-w-0"></div>
                     <p id="physical-fitness-error" class="hidden text-xs font-bold text-rose-600"></p>
-                    <div class="bg-orange-50/60 border border-orange-200 rounded-xl px-4 py-3 flex flex-wrap items-center gap-3">
-                        <p class="text-[11px] text-slate-500 flex-1 min-w-[180px]">空欄の種目は未測定としてスキップされます。入力した種目だけが保存されます。</p>
+                    <div class="flex flex-wrap items-center justify-end gap-3">
                         <button type="button" onclick="clearPhysicalBulkForm()" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-300 rounded-lg text-sm font-bold transition">入力をクリア</button>
                         <button type="button" onclick="addPhysicalFitnessBulk(event)" class="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-bold transition flex items-center gap-1.5">
-                            <i data-lucide="save" class="w-4 h-4"></i>入力した記録をまとめて保存
+                            <i data-lucide="save" class="w-4 h-4"></i>保存
                         </button>
                     </div>
                 </form>
@@ -3888,12 +3879,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             '井上 一樹', '岩瀬 仁紀'
         ];
         const GENERIC_TEAM_NAMES = { away: '先攻チーム', home: '後攻チーム' };
+        // 自チーム名のデフォルト。新規作成時の自チーム（既定は 'away' 枠）は
+        // この名前で始める。ユーザーがチーム設定で登録した名前は上書きしない。
+        const DEFAULT_OWN_TEAM_NAME = '庄和高校';
 
         function getDefaultTeamRosters() {
-            // 既定の名簿は特定の学校名・選手名を持たない汎用データにする。
+            // 既定の名簿は選手名を持たない汎用データにする。
             // スコア記録の動作確認がそのまま行えるよう、両チームとも
             // スタメン9名（選手1〜選手9）＋ベンチ3名（選手10〜選手12）を用意する。
-            // 実際のチーム名・選手名は「チーム設定」から登録する。
+            // 自チーム（既定の 'away' 枠）の名前は DEFAULT_OWN_TEAM_NAME を初期値とし、
+            // 実際の選手名は「チーム設定」から登録する。
             const starterPos = ['中', '二', '右', '一', '左', '三', '遊', '捕', '投'];
             const benchPos = ['外', '内', '投'];
             const buildPlayers = (prefix) => {
@@ -3907,9 +3902,23 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 return players;
             };
             return {
-                away: { name: GENERIC_TEAM_NAMES.away, players: buildPlayers('away') },
+                away: { name: DEFAULT_OWN_TEAM_NAME, players: buildPlayers('away') },
                 home: { name: GENERIC_TEAM_NAMES.home, players: buildPlayers('home') }
             };
+        }
+
+        // 自チームの名前が未登録の汎用名（先攻チーム／後攻チーム）のまま保存されて
+        // いたら、デフォルトの自チーム名へ置き換える。ユーザーが自分で登録した
+        // チーム名（汎用名以外）は一切変更しない。相手側の名簿も変更しない。
+        function migrateDefaultOwnTeamName(rosters) {
+            if (!rosters) return false;
+            const ownKey = (rosters.ownKey === 'home') ? 'home' : 'away';
+            const t = rosters[ownKey];
+            if (t && t.name === GENERIC_TEAM_NAMES[ownKey]) {
+                t.name = DEFAULT_OWN_TEAM_NAME;
+                return true;
+            }
+            return false;
         }
 
         // 名簿に旧デフォルトの学校名・選手名が残っていたら汎用名へ置き換える。
@@ -3972,7 +3981,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     // 旧デフォルト名が保存されていたら汎用名へ置き換えて保存し直す
-                    if (migrateOldDefaultRosters(parsed)) {
+                    let rosterChanged = migrateOldDefaultRosters(parsed);
+                    // 自チーム名が未登録の汎用名のままなら、デフォルトの自チーム名へ置き換える
+                    // （ユーザーが登録したチーム名は変更しない）
+                    if (migrateDefaultOwnTeamName(parsed)) rosterChanged = true;
+                    if (rosterChanged) {
                         try { safeStorage.setItem(ROSTER_KEY, JSON.stringify(parsed)); } catch (e) {}
                     }
                     return parsed;
@@ -4269,6 +4282,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (rankingHub) rankingHub.classList.toggle('hidden', !inRankingHub);
             if (ranking) ranking.classList.toggle('hidden', !inRanking);
             if (input) input.classList.toggle('hidden', !inInput);
+            // 記録入力ページでは選手は表の行で選ぶため、上部の選手選択カードは隠す
+            const playerCard = document.getElementById('physical-player-card');
+            if (playerCard) playerCard.classList.toggle('hidden', inInput);
             // 最上部の「体力測定」の横に、開いている画面を括弧書きで示す（メニュー選択では何も出さない）
             const headingCat = document.getElementById('physical-heading-category');
             if (headingCat) {
@@ -4556,6 +4572,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const today = physicalTodayStr();
             const fDate = document.getElementById('physical-fitness-date');
             if (fDate && !fDate.value) fDate.value = today;
+            const fMonth = document.getElementById('physical-fitness-month');
+            if (fMonth && !fMonth.value) fMonth.value = today.slice(0, 7);
             renderPhysicalBulkForm();
 
             renderPhysicalScreen();
@@ -4621,7 +4639,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 return;
             }
             if (physicalInputView) {
-                // 記録入力ページ（一括入力）：6カテゴリ・17種目の入力欄をカテゴリごとに表示する
+                // 記録入力ページ（表形式・一括入力）：縦列＝選手氏名・横列＝17種目の記録表を表示する
                 renderPhysicalBulkForm();
                 if (typeof lucide !== 'undefined') lucide.createIcons();
                 return;
@@ -4675,7 +4693,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // 項目（カテゴリ）と種目の定義：better が 'low' の種目（スプリント）は小さいほど、'high' は大きいほどベスト。
         const FITNESS_CATEGORIES = ['体組成', 'プライオ', '筋力', 'スプリント', '上半身柔軟', '下半身柔軟'];
         const FITNESS_TEST_DEFS = [
-            { category: '体組成', name: '除脂肪指数', unit: 'kg/m²', better: 'high' },
+            { category: '体組成', name: '除脂肪指数', unit: '', better: 'high' },
             { category: 'プライオ', name: '垂直跳び', unit: 'cm', better: 'high' },
             { category: 'プライオ', name: '三段跳び', unit: 'm', better: 'high' },
             { category: 'プライオ', name: 'MBバックスロー', unit: 'm', better: 'high' },
@@ -4811,7 +4829,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function fitnessRecordLabel(record, def) {
             if (!record) return '記録なし';
             if (record.grade) return record.grade;
-            return fitnessRecordValueText(record) + ' ' + (record.unit || (def ? def.unit : ''));
+            // 除脂肪指数は単位なしで数値だけを表示する（過去に単位つきで保存された記録も同様）
+            if (record.test === '除脂肪指数' || (def && def.name === '除脂肪指数')) return fitnessRecordValueText(record);
+            const unit = record.unit || (def ? def.unit : '');
+            return unit ? fitnessRecordValueText(record) + ' ' + unit : fitnessRecordValueText(record);
         }
 
         // カテゴリごとの評価を組み立てる：各種目のベスト記録と点数、採点済み種目の平均点。
@@ -5095,7 +5116,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         // 日付ベースの複数系列ライングラフ（SVG）。seriesList: [{label, color, points:[{date, value}]}]
         // targetLines: [{value, label}] を破線の横線で重ね、右端にライン名を出す。
-        function buildPhysTrendChart(seriesList, unit, targetLines) {
+        // invertY: 小さいほど良い種目（スプリントの10m走・30m走）用。縦軸を反転し、
+        // 値が小さいほど上（改善＝右肩上がり）に描く。軸ラベル・点ラベル・目標ラインは
+        // 実測値のまま表示し、数値そのものは変えない。
+        function buildPhysTrendChart(seriesList, unit, targetLines, invertY) {
             const allPts = [];
             seriesList.forEach(s => (s.points || []).forEach(p => allPts.push(p)));
             if (allPts.length === 0) return physEmptyMsg('まだ記録がありません。');
@@ -5115,12 +5139,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const pad = (vMax - vMin) * 0.12;
             vMin -= pad; vMax += pad;
             const x = t => PL + (W - PL - PR) * ((t - tMin) / (tMax - tMin));
-            const y = v => PT + (H - PT - PB) * (1 - (v - vMin) / (vMax - vMin));
+            const y = invertY
+                ? (v => PT + (H - PT - PB) * ((v - vMin) / (vMax - vMin)))
+                : (v => PT + (H - PT - PB) * (1 - (v - vMin) / (vMax - vMin)));
             let svg = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-auto" role="img" aria-label="推移グラフ">`;
             [vMin + (vMax - vMin) * 0.06, (vMin + vMax) / 2, vMax - (vMax - vMin) * 0.06].forEach(gv => {
                 const gy = y(gv);
                 svg += `<line x1="${PL}" y1="${gy}" x2="${W - PR}" y2="${gy}" stroke="#e2e8f0" stroke-width="1"/>`;
-                svg += `<text x="${PL - 6}" y="${gy + 4}" text-anchor="end" font-size="11" fill="#64748b">${physFmtNum(Math.round(gv * 10) / 10)}</text>`;
+                svg += `<text x="${PL - 6}" y="${gy + 4}" text-anchor="end" font-size="11" fill="#64748b">${invertY ? physFmtNum(gv) : physFmtNum(Math.round(gv * 10) / 10)}</text>`;
             });
             (targetLines || []).forEach(t => {
                 const gy = y(t.value);
@@ -5146,6 +5172,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 svg += `<text x="${x(tOf(dMax)).toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="11" fill="#64748b">${physicalEscapeHtml(physicalFormatDate(dMax))}</text>`;
             }
             if (unit) svg += `<text x="6" y="${PT - 8}" font-size="11" fill="#64748b">(${physicalEscapeHtml(unit)})</text>`;
+            if (invertY) svg += `<text x="${W - PR}" y="${PT - 8}" text-anchor="end" font-size="11" fill="#64748b">上ほど速い（タイム短縮）</text>`;
             svg += '</svg>';
             return svg;
         }
@@ -5303,10 +5330,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             } else {
                 const numRows = rows.filter(r => r.value != null && !isNaN(Number(r.value)));
                 pts = numRows.map(r => ({ date: r.date, value: Number(r.value) }));
-                unit = (numRows[0] && numRows[0].unit) || (def ? def.unit : '');
+                unit = physPersonalTest === '除脂肪指数' ? '' : ((numRows[0] && numRows[0].unit) || (def ? def.unit : ''));
             }
+            const personalInvertY = !fitnessIsGradeTest(physPersonalTest) && !!(def && def.better === 'low');
             chartEl.innerHTML = pts.length
-                ? buildPhysTrendChart([{ label: physicalPlayerName, color: '#ea580c', points: pts }], unit, physTargetLinesFor(physPersonalTest, physPersonalLines))
+                ? buildPhysTrendChart([{ label: physicalPlayerName, color: '#ea580c', points: pts }], unit, physTargetLinesFor(physPersonalTest, physPersonalLines), personalInvertY)
                 : physEmptyMsg('この種目の記録が期間内にありません。');
 
             growthEl.innerHTML = physGrowthTableHtml(periodRecs);
@@ -5336,9 +5364,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         : '<span class="text-slate-400">―</span>';
                 } else {
                     const fv = Number(first.value), lv = Number(last.value);
-                    const unit = last.unit || (def ? def.unit : '');
-                    firstText = isNaN(fv) ? '―' : physFmtNum(fv) + ' ' + unit;
-                    lastText = isNaN(lv) ? '―' : physFmtNum(lv) + ' ' + unit;
+                    const unit = name === '除脂肪指数' ? '' : (last.unit || (def ? def.unit : ''));
+                    firstText = isNaN(fv) ? '―' : (unit ? physFmtNum(fv) + ' ' + unit : physFmtNum(fv));
+                    lastText = isNaN(lv) ? '―' : (unit ? physFmtNum(lv) + ' ' + unit : physFmtNum(lv));
                     if (!isNaN(fv) && !isNaN(lv)) {
                         const diff = lv - fv;
                         const improved = diff === 0 ? null : (def && def.better === 'low' ? diff < 0 : diff > 0);
@@ -5460,6 +5488,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const metricDef = fitnessTestDef(physCompareMetric);
             const unit = isScoreMetric ? '点' : ((metricDef ? metricDef.unit : '') || '');
             const targetLines = isScoreMetric ? physTargetLinesFor(null, physCompareLines) : physTargetLinesFor(physCompareMetric, physCompareLines);
+            const compareInvertY = !isScoreMetric && !!(metricDef && metricDef.better === 'low');
 
             const seriesList = selected.map(n => ({
                 label: n,
@@ -5479,11 +5508,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             const withData = seriesList.filter(s => s.points.length > 0);
             chartEl.innerHTML = withData.length
-                ? buildPhysTrendChart(withData, unit, targetLines)
+                ? buildPhysTrendChart(withData, unit, targetLines, compareInvertY)
                 : physEmptyMsg('選択した選手の記録が期間内にありません。期間を広げて確認してください。');
 
             // 期間内の伸び（選手別）：系列の最初と最後の差
-            const lowerBetter = metricDef && metricDef.better === 'low' && !isScoreMetric;
+            const lowerBetter = compareInvertY;
             const rowHtml = s => {
                 if (s.points.length === 0) {
                     return `<tr class="border-t border-slate-100"><td class="py-2 px-3 font-bold text-slate-800 whitespace-nowrap"><span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:${s.color}"></span>${physicalEscapeHtml(s.label)}</span></td><td colspan="3" class="py-2 px-3 text-slate-400">期間内の記録なし</td></tr>`;
@@ -6640,16 +6669,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 return;
             }
             const cardHtml = r => {
-                const def = fitnessTestDef(r.test);
                 const score = fitnessRecordScore(r);
                 const note = r.grade
                     ? (score != null ? score + '点' : '未採点')
-                    : (def && def.better === 'low' ? '（小さいほど良い）' : '（大きいほど良い）');
+                    : '';
+                const displayUnit = r.test === '除脂肪指数' ? '' : (r.unit || '');
                 return `
                 <div class="bg-orange-50/60 border border-orange-100 rounded-xl p-3.5">
                     <p class="text-xs font-bold text-slate-600 truncate">${physicalEscapeHtml(r.test)}</p>
-                    <p class="mt-1"><span class="text-xl font-extrabold text-slate-900">${physicalEscapeHtml(fitnessRecordValueText(r))}</span>${r.grade ? '' : `<span class="text-[11px] font-bold text-slate-500 ml-1">${physicalEscapeHtml(r.unit || '')}</span>`}</p>
-                    <p class="text-[11px] text-slate-500 mt-0.5">${physicalFormatDate(r.date)} 達成 ${note}</p>
+                    <p class="mt-1"><span class="text-xl font-extrabold text-slate-900">${physicalEscapeHtml(fitnessRecordValueText(r))}</span>${r.grade || !displayUnit ? '' : `<span class="text-[11px] font-bold text-slate-500 ml-1">${physicalEscapeHtml(displayUnit)}</span>`}</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">${physicalFormatDate(r.date)} 達成${note ? ' ' + physicalEscapeHtml(note) : ''}</p>
                 </div>`;
             };
             const groupHtml = (label, items) => items.length === 0 ? '' : `
@@ -6688,7 +6717,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const isBest = bests[r.test] === r.id;
                 const valueCell = r.grade
                     ? physicalEscapeHtml(r.grade)
-                    : `${r.value}<span class="text-[11px] font-bold text-slate-500 ml-0.5">${physicalEscapeHtml(r.unit || '')}</span>`;
+                    : (r.test === '除脂肪指数' || !(r.unit || '')
+                        ? `${r.value}`
+                        : `${r.value}<span class="text-[11px] font-bold text-slate-500 ml-0.5">${physicalEscapeHtml(r.unit || '')}</span>`);
                 return `<tr class="hover:bg-orange-50/40">
                     <td class="py-2.5 px-3 font-bold text-slate-700 whitespace-nowrap">${physicalFormatDate(r.date)}</td>
                     <td class="py-2.5 px-3 font-bold text-slate-800">${physicalEscapeHtml(r.test)}</td>
@@ -6748,108 +6779,148 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             changePhysicalFitnessTest(sel.value);
         }
 
-        // ===== 記録入力（一括入力） =====
-        // 6カテゴリ・17種目すべての入力欄をカテゴリごとに組み立てる。
-        // 数値種目は数値入力＋単位表示、区分種目（KWテスト・柔軟系）は区分セレクトにする。
-        // すでに入力欄が組み立て済みの場合は、入力途中の値を消さないよう再構築しない。
-        function renderPhysicalBulkForm() {
-            const wrap = document.getElementById('physical-bulk-groups');
-            if (!wrap) return;
-            if (wrap.children.length > 0) { updatePhysicalBulkCount(); return; }
-            wrap.innerHTML = FITNESS_CATEGORIES.map(cat => {
-                const meta = PHYSICAL_CATEGORY_META[cat] || { icon: 'clipboard-list' };
-                const defs = FITNESS_TEST_DEFS.filter(d => d.category === cat);
-                const rows = defs.map(d => {
-                    if (fitnessIsGradeTest(d.name)) {
-                        const std = FITNESS_SCORE_STANDARDS[d.name];
-                        const opts = std.options.map(o => `<option value="${physicalEscapeHtml(o)}">${physicalEscapeHtml(o)}</option>`).join('');
-                        return `<div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
-                            <label class="flex-1 min-w-[130px] text-sm font-bold text-slate-800" for="bulk-grade-${physicalEscapeHtml(d.name)}">${physicalEscapeHtml(d.name)}<span class="ml-1.5 text-[10px] font-bold text-slate-400">区分</span></label>
-                            <select id="bulk-grade-${physicalEscapeHtml(d.name)}" data-bulk-test="${physicalEscapeHtml(d.name)}" data-bulk-kind="grade" onchange="updatePhysicalBulkCount()" class="w-44 max-w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
-                                <option value="">未測定（空欄）</option>${opts}
-                            </select>
-                        </div>`;
-                    }
-                    return `<div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
-                        <label class="flex-1 min-w-[130px] text-sm font-bold text-slate-800" for="bulk-value-${physicalEscapeHtml(d.name)}">${physicalEscapeHtml(d.name)}</label>
-                        <span class="flex items-center gap-1.5">
-                            <input type="number" id="bulk-value-${physicalEscapeHtml(d.name)}" data-bulk-test="${physicalEscapeHtml(d.name)}" data-bulk-kind="number" step="0.01" min="-100000" max="100000" placeholder="未測定は空欄" oninput="updatePhysicalBulkCount()" class="w-32 border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
-                            <span class="text-xs font-bold text-slate-500">${physicalEscapeHtml(d.unit)}</span>
-                        </span>
-                    </div>`;
-                }).join('');
-                return `<section class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-                    <h4 class="bg-orange-50 px-4 py-2.5 flex items-center gap-2 text-sm font-extrabold text-orange-800">
-                        <i data-lucide="${physicalEscapeHtml(meta.icon)}" class="w-4 h-4 text-orange-600"></i>${physicalEscapeHtml(cat)}
-                        <span class="text-[11px] font-bold text-orange-500">${defs.length}種目</span>
-                    </h4>
-                    <div class="divide-y divide-slate-100">${rows}</div>
-                </section>`;
-            }).join('');
-            updatePhysicalBulkCount();
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+        // ===== 記録入力（表形式・一括入力） =====
+        // 紙の記録用紙のように、縦列に選手氏名・横列に種目名（17種目）を並べた表で
+        // 全選手分を一気に入力する。空欄（未測定）のセルは保存せずスキップする。
+        // 数値種目は数値＋単位、区分種目（KWテスト・柔軟系）は区分セレクトにする。
+        // 保存形式は従来の1件保存と同一（{id, teamKey, playerName, date, test, value, unit, memo, grade?}）。
+
+        // 記録入力表の対象選手（自チーム・選択中の年度で1〜3年生に当たる選手。入学年度未入力は常に対象）
+        function physicalGridPlayers() {
+            const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || { players: [] };
+            return yearFilteredPlayers(roster.players || []).filter(p => p && p.name);
         }
 
-        // 入力済み種目数（空欄でない種目の数）を数えて表示する
+        // 測定月の変更：測定日もその月へ寄せる（日は可能な範囲で維持する）
+        function changePhysicalFitnessMonth(monthVal) {
+            const mv = String(monthVal || '');
+            if (!/^\d{4}-\d{2}$/.test(mv)) return;
+            const dateEl = document.getElementById('physical-fitness-date');
+            if (!dateEl) return;
+            const cur = String(dateEl.value || '');
+            let day = 1;
+            if (/^\d{4}-\d{2}-\d{2}$/.test(cur)) {
+                if (cur.slice(0, 7) === mv) return;
+                day = parseInt(cur.slice(8, 10), 10) || 1;
+            }
+            const y = parseInt(mv.slice(0, 4), 10), mo = parseInt(mv.slice(5, 7), 10);
+            const lastDay = new Date(y, mo, 0).getDate();
+            if (day > lastDay) day = lastDay;
+            dateEl.value = mv + '-' + String(day).padStart(2, '0');
+        }
+
+        // 測定日の変更：測定月を測定日の月へ合わせる
+        function syncPhysicalMonthFromDate() {
+            const dateEl = document.getElementById('physical-fitness-date');
+            const monthEl = document.getElementById('physical-fitness-month');
+            if (!dateEl || !monthEl) return;
+            const v = String(dateEl.value || '');
+            if (/^\d{4}-\d{2}-\d{2}$/.test(v)) monthEl.value = v.slice(0, 7);
+        }
+
+        // 記録入力表を組み立てる（行＝選手、列＝17種目）。
+        // 再構築前に入力途中の値を保持し、再構築後に戻す（画面再描画で入力が消えないように）。
+        function renderPhysicalBulkForm() {
+            const wrap = document.getElementById('physical-bulk-table-wrap');
+            if (!wrap) return;
+            const saved = {};
+            wrap.querySelectorAll('[data-grid-test]').forEach(el => {
+                const k = el.getAttribute('data-grid-player') + '::' + el.getAttribute('data-grid-test');
+                if (String(el.value || '').trim() !== '') saved[k] = el.value;
+            });
+            const players = physicalGridPlayers();
+            if (players.length === 0) {
+                wrap.innerHTML = '<p class="text-[13px] text-rose-600 font-bold py-4 text-center">対象選手がいません。チーム設定で選手を登録するか、年度を選び直してください。</p>';
+                updatePhysicalBulkCount();
+                return;
+            }
+            const headCells = FITNESS_TEST_DEFS.map(d => {
+                const unit = d.unit ? `<span class="phys-grid-unit">${physicalEscapeHtml(d.unit)}</span>` : '';
+                return `<th scope="col"><span class="phys-grid-cat">${physicalEscapeHtml(d.category)}</span><span class="phys-grid-test">${physicalEscapeHtml(d.name)}</span>${unit}</th>`;
+            }).join('');
+            const bodyRows = players.map(p => {
+                const gc = GRADE_COLOR_META[normalizeGradeColor(p.gradeColor)];
+                const nameStyle = gc ? ` style="color:${gc.hex}"` : '';
+                const cells = FITNESS_TEST_DEFS.map(d => {
+                    const val = saved[p.name + '::' + d.name];
+                    if (fitnessIsGradeTest(d.name)) {
+                        const std = FITNESS_SCORE_STANDARDS[d.name];
+                        const opts = std.options.map(o => `<option value="${physicalEscapeHtml(o)}"${val === o ? ' selected' : ''}>${physicalEscapeHtml(o)}</option>`).join('');
+                        return `<td><select data-grid-player="${physicalEscapeHtml(p.name)}" data-grid-test="${physicalEscapeHtml(d.name)}" data-bulk-kind="grade" onchange="updatePhysicalBulkCount()" aria-label="${physicalEscapeHtml(p.name)} ${physicalEscapeHtml(d.name)}"><option value=""></option>${opts}</select></td>`;
+                    }
+                    return `<td><input type="number" data-grid-player="${physicalEscapeHtml(p.name)}" data-grid-test="${physicalEscapeHtml(d.name)}" data-bulk-kind="number" step="0.01" min="-100000" max="100000" value="${val != null ? physicalEscapeHtml(val) : ''}" oninput="updatePhysicalBulkCount()" aria-label="${physicalEscapeHtml(p.name)} ${physicalEscapeHtml(d.name)}"></td>`;
+                }).join('');
+                return `<tr><th scope="row" class="phys-grid-name"${nameStyle}>${physicalEscapeHtml(p.name)}</th>${cells}</tr>`;
+            }).join('');
+            wrap.innerHTML = `<div class="phys-grid-scroll"><table class="phys-grid"><thead><tr><th scope="col" class="phys-grid-name-head">選手氏名</th>${headCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>`;
+            syncPhysicalMonthFromDate();
+            updatePhysicalBulkCount();
+        }
+
+        // 入力済みセル数（空欄でないセルの数）を数えて表示する
         function updatePhysicalBulkCount() {
             const countEl = document.getElementById('physical-bulk-count');
             if (!countEl) return;
-            const wrap = document.getElementById('physical-bulk-groups');
+            const wrap = document.getElementById('physical-bulk-table-wrap');
             if (!wrap) { countEl.textContent = '0'; return; }
             let n = 0;
-            wrap.querySelectorAll('[data-bulk-test]').forEach(el => { if (String(el.value || '').trim() !== '') n++; });
+            wrap.querySelectorAll('[data-grid-test]').forEach(el => { if (String(el.value || '').trim() !== '') n++; });
             countEl.textContent = String(n);
         }
 
-        // 一括入力欄をすべて空欄に戻す（測定日は残す）
+        // 入力表をすべて空欄に戻す（測定月・測定日は残す）
         function clearPhysicalBulkForm() {
-            const wrap = document.getElementById('physical-bulk-groups');
-            if (wrap) wrap.querySelectorAll('[data-bulk-test]').forEach(el => { el.value = ''; });
-            const memoEl = document.getElementById('physical-fitness-memo');
-            if (memoEl) memoEl.value = '';
+            const wrap = document.getElementById('physical-bulk-table-wrap');
+            if (wrap) wrap.querySelectorAll('[data-grid-test]').forEach(el => { el.value = ''; });
             physicalShowError('physical-fitness-error', '');
             updatePhysicalBulkCount();
         }
 
-        // 一括送信：入力済みの種目だけを保存し、空欄（未測定）の種目はスキップする。
+        // 一括送信：入力済みのセルだけを保存し、空欄（未測定）のセルはスキップする。
         // 空欄があること自体はエラーにせず、送信を止めない。保存形式は従来の1件保存と同一。
         function addPhysicalFitnessBulk(event) {
             if (event) event.preventDefault();
-            if (!physicalPlayerName) { physicalShowError('physical-fitness-error', '先に選手を選択してください。'); return; }
             const dateEl = document.getElementById('physical-fitness-date');
             const date = dateEl ? dateEl.value : '';
             if (!date) { physicalShowError('physical-fitness-error', '測定日を入力してください。'); return; }
-            const memoEl = document.getElementById('physical-fitness-memo');
-            const memo = memoEl ? memoEl.value.trim() : '';
-            const wrap = document.getElementById('physical-bulk-groups');
+            const wrap = document.getElementById('physical-bulk-table-wrap');
             if (!wrap) return;
-            const inputs = {};
-            wrap.querySelectorAll('[data-bulk-test]').forEach(el => { inputs[el.getAttribute('data-bulk-test')] = el; });
+            const cells = {};
+            wrap.querySelectorAll('[data-grid-test]').forEach(el => {
+                const pn = el.getAttribute('data-grid-player');
+                const tn = el.getAttribute('data-grid-test');
+                if (!cells[pn]) cells[pn] = {};
+                cells[pn][tn] = el;
+            });
             const newRecords = [];
-            FITNESS_TEST_DEFS.forEach((d, i) => {
-                const el = inputs[d.name];
-                if (!el) return;
-                const raw = String(el.value || '').trim();
-                if (raw === '') return; // 未測定：保存せずスキップ
-                if (fitnessIsGradeTest(d.name)) {
-                    // 区分種目（KWテスト・柔軟系）は数値ではなく区分で記録する（grade に区分を保存）
-                    newRecords.push({
-                        id: 'f_' + Date.now() + '_' + i + '_' + Math.floor(Math.random() * 1000000),
-                        teamKey: physicalTeamKey, playerName: physicalPlayerName,
-                        date: date, test: d.name, value: null, unit: '', memo: memo, grade: raw
-                    });
-                } else {
-                    const value = parseFloat(raw);
-                    if (isNaN(value)) return; // 数値として読めない入力はスキップ（他の種目の保存は止めない）
-                    newRecords.push({
-                        id: 'f_' + Date.now() + '_' + i + '_' + Math.floor(Math.random() * 1000000),
-                        teamKey: physicalTeamKey, playerName: physicalPlayerName,
-                        date: date, test: d.name, value: value, unit: d.unit, memo: memo
-                    });
-                }
+            let seq = 0;
+            Object.keys(cells).forEach(playerName => {
+                FITNESS_TEST_DEFS.forEach(d => {
+                    const el = cells[playerName][d.name];
+                    if (!el) return;
+                    const raw = String(el.value || '').trim();
+                    if (raw === '') return; // 未測定：保存せずスキップ
+                    seq++;
+                    if (fitnessIsGradeTest(d.name)) {
+                        // 区分種目（KWテスト・柔軟系）は数値ではなく区分で記録する（grade に区分を保存）
+                        newRecords.push({
+                            id: 'f_' + Date.now() + '_' + seq + '_' + Math.floor(Math.random() * 1000000),
+                            teamKey: physicalTeamKey, playerName: playerName,
+                            date: date, test: d.name, value: null, unit: '', memo: '', grade: raw
+                        });
+                    } else {
+                        const value = parseFloat(raw);
+                        if (isNaN(value)) return; // 数値として読めない入力はスキップ（他のセルの保存は止めない）
+                        newRecords.push({
+                            id: 'f_' + Date.now() + '_' + seq + '_' + Math.floor(Math.random() * 1000000),
+                            teamKey: physicalTeamKey, playerName: playerName,
+                            date: date, test: d.name, value: value, unit: d.unit, memo: ''
+                        });
+                    }
+                });
             });
             if (newRecords.length === 0) {
-                physicalShowError('physical-fitness-error', '入力された種目がありませんでした。保存する種目に記録を入力してください（未測定の種目は空欄のままで構いません）。');
+                physicalShowError('physical-fitness-error', '入力された記録がありませんでした。保存するセルに記録を入力してください（未測定のセルは空欄のままで構いません）。');
                 return;
             }
             physicalShowError('physical-fitness-error', '');
@@ -6864,7 +6935,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             clearPhysicalBulkForm();
             renderPhysicalScreen();
             const notice = document.getElementById('physical-saved-notice');
-            if (notice) notice.textContent = '記録を保存しました（' + savedCount + '件）。未測定の種目は保存されていません。';
+            if (notice) notice.textContent = '記録を保存しました（' + savedCount + '件）';
             showPhysicalSavedAndView();
         }
 
@@ -7707,7 +7778,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             };
             const normHead = v => String(v === null || v === undefined ? '' : v).replace(/[\s　]/g, '').toLowerCase();
             // 「チーム名」欄（ひな型のチーム名行など）があればチーム名も読み取る。
-            // 形式: [チーム名, 〇〇高校] ／ [チーム名：〇〇高校] のどちらにも対応する。
+            // 形式: [チーム名, 庄和高校] ／ [チーム名：庄和高校] のどちらにも対応する。
             let teamName = '';
             for (let r = 0; r < Math.min(aoa.length, 15) && !teamName; r++) {
                 const row = aoa[r] || [];
@@ -15121,6 +15192,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             togglePhysLine, changePhysPeriod, resetPhysPeriod, changePhysPersonalTest, switchPhysPersonalTab, changePhysPersonalCategory, togglePhysComparePlayer, changePhysCompareMetric,
             changePhysicalFitnessTest,
             addPhysicalFitness, addPhysicalFitnessBulk, clearPhysicalBulkForm, updatePhysicalBulkCount, renderPhysicalBulkForm, deletePhysicalFitness,
+            changePhysicalFitnessMonth, syncPhysicalMonthFromDate,
             openDemoInsertModal, openDemoRemoveModal, insertDemoData, removeDemoData, updateDemoDataStatus,
             renderNewGameLineupRows, resetCount, resetWizard,
             resumeCurrentGameFromHome, saveAndRender, saveGameInfo,
