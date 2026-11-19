@@ -211,6 +211,104 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         [id^="modal-"] button[class*="rounded-xl"] { min-height: 44px; }
         [id^="modal-"] > div { animation: sb-modal-in 0.18s ease-out; }
         @keyframes sb-modal-in { from { opacity: 0; transform: translateY(6px) scale(0.99); } to { opacity: 1; transform: none; } }
+        /* --- 体力測定：ランキング表をA4縦1枚のシートとして表示する --- */
+        .ranking-sheet {
+            width: 210mm;
+            max-width: 100%;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 14px 34px -14px rgba(10, 19, 34, 0.35);
+            padding: 11mm 10mm;
+            color: #0f172a;
+        }
+        @media (max-width: 900px) {
+            .ranking-sheet { min-height: 0; padding: 7mm 5mm; }
+        }
+        .ranking-doc-head {
+            display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 6px 16px;
+            border-bottom: 3px solid #ea580c; padding-bottom: 8px; margin-bottom: 10px;
+        }
+        .ranking-doc-title { font-size: 21px; font-weight: 800; letter-spacing: 0.02em; color: #0f172a; }
+        .ranking-doc-meta { font-size: 11px; font-weight: 700; color: #64748b; text-align: right; line-height: 1.6; }
+        .ranking-doc-summary { font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 10px; }
+        .ranking-doc-summary strong { color: #c2410c; }
+        .ranking-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 11.5px; }
+        .ranking-table th, .ranking-table td { border: 1px solid #cbd5e1; padding: 5px 6px; vertical-align: middle; overflow-wrap: break-word; }
+        .ranking-table thead th { background: #fff7ed; color: #9a3412; font-size: 11px; font-weight: 800; text-align: center; }
+        .ranking-table td.c-rank, .ranking-table td.c-avg { text-align: center; }
+        .ranking-table td.c-rank { font-weight: 800; font-size: 13px; color: #475569; }
+        .ranking-table tr.top1 td { background: #fff7ed; }
+        .ranking-table tr.top1 td.c-rank { color: #ea580c; font-size: 15px; }
+        .ranking-table tr.top2 td.c-rank, .ranking-table tr.top3 td.c-rank { color: #c2410c; }
+        .ranking-table td.c-name { font-weight: 800; }
+        .ranking-table td.c-name .pno { color: #94a3b8; font-weight: 700; font-size: 10px; margin-right: 4px; }
+        .ranking-table td.c-avg { font-weight: 800; font-size: 14px; }
+        .ranking-table td.c-avg .pt { font-size: 10px; font-weight: 700; color: #64748b; margin-left: 1px; }
+        .ranking-table td.c-test { text-align: center; color: #334155; }
+        .ranking-table td.c-test .score { color: #c2410c; font-weight: 800; white-space: nowrap; }
+        .ranking-table td.none, .ranking-table tr.unscored td { color: #94a3b8; }
+        .ranking-table tr.unscored td.c-name { font-weight: 700; }
+        .ranking-doc-note { font-size: 10px; color: #64748b; line-height: 1.7; margin-top: 10px; }
+        /* 行数が多いときは文字と余白を詰めてA4縦1枚に収める */
+        .ranking-doc[data-density="2"] .ranking-table { font-size: 10.5px; }
+        .ranking-doc[data-density="2"] .ranking-table th, .ranking-doc[data-density="2"] .ranking-table td { padding: 4px 5px; }
+        .ranking-doc[data-density="3"] .ranking-table { font-size: 9.5px; }
+        .ranking-doc[data-density="3"] .ranking-table th, .ranking-doc[data-density="3"] .ranking-table td { padding: 3px 4px; }
+        .ranking-doc[data-density="3"] .ranking-doc-title { font-size: 18px; }
+        .ranking-doc[data-density="4"] .ranking-table { font-size: 8.5px; }
+        .ranking-doc[data-density="4"] .ranking-table th, .ranking-doc[data-density="4"] .ranking-table td { padding: 2px 3px; }
+        .ranking-doc[data-density="4"] .ranking-doc-title { font-size: 17px; }
+        .ranking-doc[data-density="4"] .ranking-doc-summary { font-size: 10.5px; margin-bottom: 6px; }
+        .ranking-doc[data-density="4"] .ranking-doc-head { margin-bottom: 6px; padding-bottom: 5px; }
+        /* 印刷専用の高密度（5・6）：測定済み選手が多い場合でもA4縦1枚に収めるため、画面表示では使わない */
+        .ranking-doc[data-density="5"] .ranking-table { font-size: 8px; }
+        .ranking-doc[data-density="5"] .ranking-table th, .ranking-doc[data-density="5"] .ranking-table td { padding: 1.5px 3px; line-height: 1.2; }
+        .ranking-doc[data-density="5"] .ranking-doc-title { font-size: 15px; }
+        .ranking-doc[data-density="5"] .ranking-doc-summary { font-size: 10px; margin-bottom: 5px; }
+        .ranking-doc[data-density="5"] .ranking-doc-head { margin-bottom: 5px; padding-bottom: 4px; }
+        .ranking-doc[data-density="5"] .ranking-doc-note { font-size: 8.5px; margin-top: 5px; line-height: 1.5; }
+        .ranking-doc[data-density="6"] .ranking-table { font-size: 7.5px; }
+        .ranking-doc[data-density="6"] .ranking-table th, .ranking-doc[data-density="6"] .ranking-table td { padding: 1px 2px; line-height: 1.15; }
+        .ranking-doc[data-density="6"] .ranking-doc-title { font-size: 14px; }
+        .ranking-doc[data-density="6"] .ranking-doc-summary { font-size: 9.5px; margin-bottom: 4px; }
+        .ranking-doc[data-density="6"] .ranking-doc-head { margin-bottom: 4px; padding-bottom: 3px; }
+        .ranking-doc[data-density="6"] .ranking-doc-note { font-size: 8px; margin-top: 4px; line-height: 1.4; }
+        @media (max-width: 640px) {
+            .ranking-doc .ranking-table { font-size: 9.5px; }
+            .ranking-doc .ranking-table th, .ranking-doc .ranking-table td { padding: 4px 3px; }
+            .ranking-doc .ranking-doc-title { font-size: 17px; }
+            .ranking-doc td.c-rank { font-size: 11px; }
+            .ranking-doc td.c-avg { font-size: 12px; }
+        }
+
+        /* --- 印刷：ランキング表だけをA4縦1枚で印刷する --- */
+        #ranking-print-area { display: none; }
+        @page { size: A4 portrait; margin: 10mm; }
+        @media print {
+            /* アプリ側のレイアウト（flex・min-height・overflow）を印刷時に解除し、表が欠けたり白紙になったりしないようにする */
+            html, body { height: auto !important; min-height: 0 !important; overflow: visible !important; }
+            body.printing-ranking { display: block !important; background: #ffffff !important; }
+            body.printing-ranking > *:not(#ranking-print-area) { display: none !important; }
+            body.printing-ranking #ranking-print-area {
+                display: block !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                color: #0f172a;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            #ranking-print-area .ranking-table { width: 100%; }
+            #ranking-print-area .ranking-table th, #ranking-print-area .ranking-table td { line-height: 1.3; }
+            #ranking-print-area .ranking-table tr { break-inside: avoid; page-break-inside: avoid; }
+            #ranking-print-area .ranking-table thead { display: table-header-group; }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             [id^="modal-"] > div { animation: none; }
             * { transition-duration: 0.01ms !important; }
@@ -577,6 +675,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition"></i>
                 </div>
             </div>
+
+            <!-- デモデータ -->
+            <div class="bg-white rounded-2xl shadow-sm border-2 border-dashed border-slate-300 p-6 sm:col-span-2 lg:col-span-3">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div class="flex items-start gap-4 flex-1">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                            <i data-lucide="flask-conical" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-extrabold text-slate-900">デモデータ</h3>
+                            <p class="text-[13px] text-slate-600 mt-1 leading-[1.9]">デモ選手20名の名簿・試合4試合分の成績・体力測定（6カテゴリ・17種目、3か月分）の記録をまとめて入れます。今ある本物の記録は上書き・削除しません。</p>
+                            <p id="demo-data-status" class="text-xs font-bold text-indigo-700 mt-1.5">デモデータは入っていません。</p>
+                        </div>
+                    </div>
+                    <div class="flex sm:flex-col gap-2 shrink-0">
+                        <button onclick="openDemoInsertModal()" class="flex-1 sm:flex-none px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm shadow-sm transition whitespace-nowrap">デモデータを入れる</button>
+                        <button onclick="openDemoRemoveModal()" class="flex-1 sm:flex-none px-5 py-2.5 bg-white hover:bg-rose-50 text-rose-600 border border-rose-300 rounded-xl font-bold text-sm transition whitespace-nowrap">デモデータを消す</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- スコアブック メインメニュー3カード -->
@@ -772,10 +890,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
             </div>
             <input type="file" id="roster-excel-file" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleRosterExcelFile(this)">
-            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">Excel登録は「ひな型Excel」の利用がおすすめです。列：背番号・選手名・投・打・学年・守備位置・身長。</p>
+            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">Excel登録は「ひな型Excel」の利用がおすすめです。列：背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー。何期生は数字（例：72）、学年カラーは青・赤・緑のいずれかで入力します（どちらも空欄可）。</p>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[820px]">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1020px]">
                     <thead>
                         <tr class="bg-slate-900 text-slate-200 font-semibold">
                             <th class="py-2.5 px-3 text-center w-14">背番号</th>
@@ -784,6 +902,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <th class="py-2.5 px-3 text-center w-28">打 (打席)</th>
                             <th class="py-2.5 px-3 text-center w-24">学年</th>
                             <th class="py-2.5 px-3 text-center w-24">身長（cm）</th>
+                            <th class="py-2.5 px-3 text-center w-24">何期生</th>
+                            <th class="py-2.5 px-3 text-center w-32">学年カラー</th>
                             <th class="py-2.5 px-3 text-center w-16">操作</th>
                         </tr>
                     </thead>
@@ -807,7 +927,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <p id="roster-import-summary" class="text-[13px] text-slate-600 mt-1 leading-relaxed"></p>
                 </div>
                 <div class="border border-slate-200 rounded-lg overflow-auto max-h-64">
-                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[520px]">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[680px]">
                         <thead>
                             <tr class="bg-slate-900 text-slate-200 font-semibold">
                                 <th class="py-2 px-3 text-center w-16">背番号</th>
@@ -817,6 +937,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 <th class="py-2 px-3 text-center w-16">学年</th>
                                 <th class="py-2 px-3 text-center w-16">守備</th>
                                 <th class="py-2 px-3 text-center w-16">身長</th>
+                                <th class="py-2 px-3 text-center w-16">何期生</th>
+                                <th class="py-2 px-3 text-center w-20">学年カラー</th>
                             </tr>
                         </thead>
                         <tbody id="roster-import-preview-tbody" class="divide-y divide-slate-100"></tbody>
@@ -1068,15 +1190,25 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <div id="physical-ranking-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
         </div>
 
-        <!-- カテゴリ別ランキング：選択したカテゴリの平均点で自チームの選手を順位付けして表示する -->
+        <!-- カテゴリ別ランキング：選択したカテゴリの平均点で自チームの選手を順位付けし、A4縦1枚のランキング表として表示する -->
         <div id="physical-ranking" class="hidden space-y-6">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-5">
-                <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
-                    <i data-lucide="trophy" class="w-5 h-5 text-orange-600"></i><span id="physical-ranking-title">ランキング</span>
-                </h3>
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                        <i data-lucide="trophy" class="w-5 h-5 text-orange-600"></i><span id="physical-ranking-title">ランキング</span>
+                    </h3>
+                    <div id="physical-ranking-print-btn" class="hidden flex-wrap items-center gap-2">
+                        <button type="button" onclick="downloadPhysicalRankingPdf()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-extrabold transition shadow-sm" title="測定済みの選手だけのランキング表を、A4縦1枚に収まるPDFファイルでそのままダウンロード">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>PDFでダウンロード
+                        </button>
+                        <button type="button" onclick="downloadPhysicalRankingExcel()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#107C41] hover:bg-[#0B5C2E] text-white text-sm font-extrabold transition shadow-sm" title="測定済みの選手だけのランキング表を、A4縦1枚に収まる印刷設定付きのExcelファイルでダウンロード">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>Excelでダウンロード
+                        </button>
+                    </div>
+                </div>
                 <div id="physical-ranking-summary"></div>
-                <div id="physical-ranking-list" class="space-y-3"></div>
-                <p class="text-[11px] text-slate-400">各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、カテゴリ別はカテゴリごとの平均点、総合は全種目の採点済み平均（総合平均点）で順位付けしています。未記録・未採点の選手は点数「―」で末尾に表示します。</p>
+                <div id="physical-ranking-sheet" class="ranking-sheet ranking-doc" data-density="1"></div>
+                <p class="text-[11px] text-slate-400">ランキング表はA4縦1枚の大きさで表示しています。「PDFでダウンロード」「Excelでダウンロード」のどちらかを押すと、測定済みの選手だけのランキング表をそのままファイルでダウンロードできます（別タブは開きません）。PDFはA4縦1枚に収まるレイアウトで作成され、ExcelファイルにはA4縦・1ページに収める印刷設定が付いているので、どちらでも測定済みの選手全員がA4縦1枚に収まります。各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、カテゴリ別はカテゴリごとの平均点、総合は全種目の採点済み平均（総合平均点）で順位付けしています。未記録・未採点の選手は画面では点数「―」で末尾に表示します（ダウンロードには含まれません）。</p>
                 <button type="button" onclick="openPhysicalRankingHub()" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-extrabold transition">
                     <i data-lucide="layout-grid" class="w-4 h-4"></i>ランキングのカテゴリ選択に戻る
                 </button>
@@ -2776,6 +2908,47 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
     </div>
 
+    <!-- デモデータを入れる確認モーダル -->
+    <div id="modal-demo-insert" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full overflow-hidden">
+            <div class="bg-indigo-700 text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 class="font-bold text-base flex items-center gap-2"><i data-lucide="flask-conical" class="w-4 h-4 text-indigo-200"></i>デモデータを入れる</h3>
+                <button onclick="closeModal('modal-demo-insert')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-5 space-y-3 text-sm text-slate-700 leading-relaxed">
+                <p>次のデモデータを追加します。</p>
+                <ul class="list-disc pl-5 space-y-1 text-[13px]">
+                    <li>選手名簿：デモ選手1〜20（投手・野手・DHを含む）を自チームに追加</li>
+                    <li>試合データ：デモの試合4試合を蓄積アーカイブに追加（打者成績・投手成績が表示されます）</li>
+                    <li>体力測定：6カテゴリ・17種目×3か月分の記録を追加</li>
+                </ul>
+                <p class="text-xs text-slate-500">今ある本物の記録は上書き・削除しません。デモデータは後から「デモデータを消す」でデモ分だけ削除できます。体力測定の総合評価と個人記録の確認は選択中の選手だけを表示する画面のため、投入後はデモ選手1を選択した状態で表示されます。</p>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end space-x-2">
+                <button onclick="closeModal('modal-demo-insert')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
+                <button onclick="insertDemoData()" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-xs transition">デモデータを入れる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- デモデータを消す確認モーダル -->
+    <div id="modal-demo-remove" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full overflow-hidden">
+            <div class="bg-rose-700 text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 class="font-bold text-base flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4 text-rose-200"></i>デモデータを消す</h3>
+                <button onclick="closeModal('modal-demo-remove')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-5 space-y-3 text-sm text-slate-700 leading-relaxed">
+                <p id="demo-remove-summary">デモデータを削除します。</p>
+                <p class="text-xs text-slate-500">削除されるのはデモとして入れた選手・試合・体力測定の記録だけです。本物の記録はそのまま残ります。</p>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end space-x-2">
+                <button onclick="closeModal('modal-demo-remove')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
+                <button onclick="removeDemoData()" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-lg shadow-xs transition">デモデータだけを消す</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 代打・代走 守備確認モーダル（その回が終わり攻守交替する際に表示） -->
     <div id="modal-defense-decision" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden max-h-[92vh] flex flex-col">
@@ -3167,6 +3340,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
     <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
+    <!-- 印刷専用エリア：体力測定のランキング表を印刷するときだけ、シートの中身をここへ複写してA4縦1枚で印刷する（画面には表示しない） -->
+    <div id="ranking-print-area" class="ranking-doc" data-density="1" aria-hidden="true"></div>
+
     <!-- 新規試合スタメン編成モーダル -->
     <div id="modal-new-game-setup" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs hidden items-center justify-center z-50 p-3 sm:p-5 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden my-auto max-h-[92vh] flex flex-col">
@@ -3308,6 +3484,83 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // ファウルの打球の質・方向の表示名（方向はフェアゾーンではなくファウルゾーンの5区分から選ぶ）
         const FOUL_QUALITY_LABELS = { fly: 'フライ', liner: 'ライナー', grounder: 'ゴロ' };
         const FOUL_DIRECTION_LABELS = { catcher: '捕手周辺', first_side: '一塁側', third_side: '三塁側', right_field: '右翼側', left_field: '左翼側' };
+        // 学年カラー（本校の学年色分け：青・赤・緑）。選手マスタの gradeColor に
+        // 'blue' | 'red' | 'green' | ''（未設定）で保持する。旧データには項目自体が
+        // 無い場合があるため、参照側はすべて未設定として安全に扱う。
+        const GRADE_COLOR_META = {
+            blue: { label: '青', hex: '#2563eb', bg: '#dbeafe', text: '#1d4ed8', ring: '#93c5fd' },
+            red: { label: '赤', hex: '#dc2626', bg: '#fee2e2', text: '#b91c1c', ring: '#fca5a5' },
+            green: { label: '緑', hex: '#16a34a', bg: '#dcfce7', text: '#15803d', ring: '#86efac' }
+        };
+        function normalizeGradeColor(v) {
+            const s = String(v === null || v === undefined ? '' : v).trim().toLowerCase();
+            if (!s) return '';
+            if (s === 'blue' || s === '青' || s === 'あお' || s === 'ブルー') return 'blue';
+            if (s === 'red' || s === '赤' || s === 'あか' || s === 'レッド') return 'red';
+            if (s === 'green' || s === '緑' || s === 'みどり' || s === 'グリーン') return 'green';
+            return '';
+        }
+        function gradeColorLabel(v) {
+            const m = GRADE_COLOR_META[normalizeGradeColor(v)];
+            return m ? m.label : '';
+        }
+        // 学年カラーの色丸（ドット）。未設定なら空文字を返す。
+        function gradeColorDotHtml(v) {
+            const key = normalizeGradeColor(v);
+            const m = GRADE_COLOR_META[key];
+            if (!m) return '';
+            return '<span title="学年カラー：' + m.label + '" style="display:inline-block;width:10px;height:10px;border-radius:9999px;background:' + m.hex + ';border:1px solid rgba(15,23,42,.25);margin-right:5px;vertical-align:middle;flex:none"></span>';
+        }
+        // 学年カラーの色付きバッジ（ドット＋色名）。未設定なら空文字を返す。
+        function gradeColorBadgeHtml(v) {
+            const key = normalizeGradeColor(v);
+            const m = GRADE_COLOR_META[key];
+            if (!m) return '';
+            return '<span style="display:inline-flex;align-items:center;gap:4px;background:' + m.bg + ';color:' + m.text + ';border:1px solid ' + m.ring + ';border-radius:9999px;padding:1px 8px 1px 5px;font-size:11px;font-weight:700;line-height:1.5;white-space:nowrap"><span style="display:inline-block;width:9px;height:9px;border-radius:9999px;background:' + m.hex + '"></span>' + m.label + '</span>';
+        }
+        // 何期生の表示ラベル（例：72 → 「72期生」）。未入力なら空文字。
+        function cohortLabel(v) {
+            if (v === null || v === undefined || v === '') return '';
+            const n = parseInt(String(v).replace(/[^\d]/g, ''), 10);
+            return isNaN(n) ? '' : (n + '期生');
+        }
+        // 選手オブジェクト（マスタ／試合データ）から学年カラーのドットHTMLを得る。
+        // オブジェクトに gradeColor が無い旧データは、選手名でマスタを引いて補う。
+        function playerColorDotHtml(player) {
+            if (!player) return '';
+            if (player.gradeColor) return gradeColorDotHtml(player.gradeColor);
+            return playerColorDotByName(player.name);
+        }
+        function playerColorDotByName(name) {
+            if (!name || typeof globalTeamRosters === 'undefined' || !globalTeamRosters) return '';
+            const keys = ['away', 'home'];
+            for (let i = 0; i < keys.length; i++) {
+                const t = globalTeamRosters[keys[i]];
+                if (!t || !Array.isArray(t.players)) continue;
+                const p = t.players.find(x => x && x.name === name);
+                if (p && p.gradeColor) return gradeColorDotHtml(p.gradeColor);
+            }
+            return '';
+        }
+        // 選手名でマスタを引き、何期生・学年カラーの補足テキスト（例：「72期生・青」）を返す
+        function playerCohortColorTextByName(name) {
+            if (!name || typeof globalTeamRosters === 'undefined' || !globalTeamRosters) return '';
+            const keys = ['away', 'home'];
+            for (let i = 0; i < keys.length; i++) {
+                const t = globalTeamRosters[keys[i]];
+                if (!t || !Array.isArray(t.players)) continue;
+                const p = t.players.find(x => x && x.name === name);
+                if (p) {
+                    const parts = [];
+                    const cl = cohortLabel(p.cohort);
+                    if (cl) parts.push(cl);
+                    const gl = gradeColorLabel(p.gradeColor);
+                    if (gl) parts.push(gl);
+                    return parts.join('・');
+                }
+            }
+            return '';
+        }
 
         let gameState = null;
         let globalTeamRosters = null;
@@ -3524,10 +3777,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const buildPlayers = (prefix) => {
                 const players = [];
                 for (let i = 0; i < 9; i++) {
-                    players.push({ id: prefix + '_p_' + (i + 1), order: i + 1, pos: starterPos[i], number: String(i + 1), name: '選手' + (i + 1), throws: '右', bats: '右', grade: '', isActive: true });
+                    players.push({ id: prefix + '_p_' + (i + 1), order: i + 1, pos: starterPos[i], number: String(i + 1), name: '選手' + (i + 1), throws: '右', bats: '右', grade: '', cohort: '', gradeColor: '', isActive: true });
                 }
                 for (let j = 0; j < 3; j++) {
-                    players.push({ id: prefix + '_p_' + (10 + j), order: 0, pos: benchPos[j], number: String(10 + j), name: '選手' + (10 + j), throws: '右', bats: '右', grade: '', isActive: false });
+                    players.push({ id: prefix + '_p_' + (10 + j), order: 0, pos: benchPos[j], number: String(10 + j), name: '選手' + (10 + j), throws: '右', bats: '右', grade: '', cohort: '', gradeColor: '', isActive: false });
                 }
                 return players;
             };
@@ -4194,9 +4447,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             if (noPlayer) noPlayer.classList.add('hidden');
             if (!players.some(p => p.name === physicalPlayerName)) physicalPlayerName = players[0].name;
-            sel.innerHTML = players.map(p =>
-                `<option value="${physicalEscapeHtml(p.name)}"${p.name === physicalPlayerName ? ' selected' : ''}>${p.number ? 'No.' + physicalEscapeHtml(p.number) + ' ' : ''}${physicalEscapeHtml(p.name)}</option>`
-            ).join('');
+            sel.innerHTML = players.map(p => {
+                const cc = [];
+                const cl = cohortLabel(p.cohort);
+                if (cl) cc.push(cl);
+                const gl = gradeColorLabel(p.gradeColor);
+                if (gl) cc.push(gl);
+                const ccText = cc.length ? '（' + cc.join('・') + '）' : '';
+                const dotMark = gl ? '● ' : '';
+                return `<option value="${physicalEscapeHtml(p.name)}"${p.name === physicalPlayerName ? ' selected' : ''}>${dotMark}${p.number ? 'No.' + physicalEscapeHtml(p.number) + ' ' : ''}${physicalEscapeHtml(p.name)}${physicalEscapeHtml(ccText)}</option>`;
+            }).join('');
         }
 
         function changePhysicalTeam(teamKey) {
@@ -4261,9 +4521,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || { players: [] };
             const p = (roster.players || []).find(x => x.name === physicalPlayerName);
             const hCm = getPhysicalHeightCm();
-            el.textContent = p
-                ? `背番号 ${p.number || '―'} ／ ${p.grade || ''} ／ ${p.throws || ''}投${p.bats || ''}打` + (hCm ? ` ／ 身長 ${hCm} cm` : '')
-                : '';
+            if (!p) { el.innerHTML = ''; return; }
+            const cl = cohortLabel(p.cohort);
+            el.innerHTML = gradeColorDotHtml(p.gradeColor)
+                + physicalEscapeHtml(`背番号 ${p.number || '―'} ／ ${p.grade || ''} ／ ${p.throws || ''}投${p.bats || ''}打`
+                    + (cl ? ` ／ ${cl}` : '')
+                    + (gradeColorLabel(p.gradeColor) ? ` ／ 学年カラー ${gradeColorLabel(p.gradeColor)}` : '')
+                    + (hCm ? ` ／ 身長 ${hCm} cm` : ''));
         }
 
         function physicalShowError(id, msg) {
@@ -4520,7 +4784,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <p class="text-xs text-slate-500 pb-1.5">${scoredCats} / ${results.length} カテゴリを採点${fitnessLineLabel(overallAvg) ? '（' + fitnessLineLabel(overallAvg) + '相当）' : ''}</p>
                 </div>`;
             } else {
-                summaryEl.innerHTML = '<p class="text-[13px] text-slate-500 italic py-3 px-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">' + (hasRecords ? '採点できる記録がまだありません。' : 'まだ記録がありません。') + '</p>';
+                // 選択中の選手に記録がなくても、チーム内の他の選手（デモ選手など）に
+                // 記録がある場合は、その旨と選手選択での切り替え方を案内する
+                const otherHasRecords = !hasRecords && physicalData && Array.isArray(physicalData.fitness)
+                    && physicalData.fitness.some(r => r.teamKey === physicalTeamKey && r.playerName !== physicalPlayerName);
+                summaryEl.innerHTML = '<p class="text-[13px] text-slate-500 italic py-3 px-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">' + (hasRecords ? '採点できる記録がまだありません。' : (otherHasRecords ? '選択中の選手にはまだ記録がありません。画面上部の選手選択で、記録のある選手（デモデータの場合はデモ選手1など）を選ぶと総合評価が表示されます。' : 'まだ記録がありません。')) + '</p>';
             }
 
             chartEl.innerHTML = hasRecords ? buildPhysicalRadarChart(results) : '';
@@ -4837,8 +5105,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 : '全期間';
 
             if (allAsc.length === 0 || periodRecs.length === 0) {
+                // 選択中の選手に記録がなくても、チーム内の他の選手（デモ選手など）に
+                // 記録がある場合は、その旨と選手選択での切り替え方を案内する
+                const otherHasRecords = allAsc.length === 0 && physicalData && Array.isArray(physicalData.fitness)
+                    && physicalData.fitness.some(r => r.teamKey === physicalTeamKey && r.playerName !== physicalPlayerName);
                 const msg = allAsc.length === 0
-                    ? 'まだ記録がありません。メニューの「記録入力」から記録を追加してください。'
+                    ? (otherHasRecords ? '選択中の選手にはまだ記録がありません。画面上部の選手選択で、記録のある選手（デモデータの場合はデモ選手1など）を選ぶと推移が表示されます。' : 'まだ記録がありません。メニューの「記録入力」から記録を追加してください。')
                     : '指定した期間（' + periodLabel + '）内の記録がありません。期間を広げて確認してください。';
                 summaryEl.innerHTML = physEmptyMsg(msg);
                 radarEl.innerHTML = '';
@@ -5119,12 +5391,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const grid = document.getElementById('physical-category-grid');
             if (!grid) return;
             const records = getPhysicalFitness();
+            // チーム全体の記録（選択中の選手以外も含む）。総合評価・個人記録の確認は
+            // 選択中の選手だけを表示するため、選択中の選手に記録がなくてもチーム内に
+            // 記録（デモデータなど）があれば、カードには「記録なし」と出さず案内する。
+            const teamFitnessAll = (physicalData && Array.isArray(physicalData.fitness)) ? physicalData.fitness.filter(r => r.teamKey === physicalTeamKey) : [];
+            const otherPlayerHasRecords = records.length === 0 && teamFitnessAll.length > 0;
             // 各カテゴリの個別画面は廃止したため、メニューにはカテゴリカードを出さない。
             // 残すのは総合評価・個人記録の確認・個人記録の比較・各カテゴリーランキング・記録入力の5カード。
             // 総合評価カードを先頭に置く
             const overallResults = computePhysicalOverall();
             const overallAvg = overallAverageOf(overallResults);
-            const overallStat = overallAvg != null ? '総合平均 ' + fmtScore(overallAvg) + ' 点' : (records.length > 0 ? 'カテゴリ別の平均点を表示' : '記録なし');
+            const overallStat = overallAvg != null ? '総合平均 ' + fmtScore(overallAvg) + ' 点' : (records.length > 0 ? 'カテゴリ別の平均点を表示' : (otherPlayerHasRecords ? '選手を選ぶと表示されます' : '記録なし'));
             const overallCard = `
                 <div onclick="openPhysicalOverall()" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-orange-500 p-7 cursor-pointer transition flex flex-col justify-between">
                     <div class="space-y-4">
@@ -5154,11 +5431,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         </div>
                     </div>
                     <div class="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-orange-700">
-                        <span>${records.length > 0 ? records.length + '件の記録' : '記録なし'}</span>
+                        <span>${records.length > 0 ? records.length + '件の記録' : (otherPlayerHasRecords ? '選手を選ぶと表示されます' : '記録なし')}</span>
                         <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition"></i>
                     </div>
                 </div>`;
-            const teamFitnessAll = (physicalData && Array.isArray(physicalData.fitness)) ? physicalData.fitness.filter(r => r.teamKey === physicalTeamKey) : [];
             const comparePlayerCount = new Set(teamFitnessAll.map(r => r.playerName)).size;
             const compareCard = `
                 <div onclick="openPhysicalCompare()" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-orange-500 p-7 cursor-pointer transition flex flex-col justify-between">
@@ -5334,21 +5610,619 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }).join('');
         }
 
-        // カテゴリ別ランキングページの描画：順位・選手名・カテゴリ平均点・各種目のベスト記録と点数
+        // ===== ランキング表シート（A4縦1枚）の共通部品 =====
+        function rankingSheetDateLabel() {
+            const d = new Date();
+            return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日現在';
+        }
+        // 行数に応じて密度（1〜4）を決めてシートへ反映し、表があるときだけ印刷ボタンを出す
+        function setupRankingSheet(sheetEl, rowCount, hasTable) {
+            const density = rowCount > 44 ? '4' : rowCount > 34 ? '3' : rowCount > 24 ? '2' : '1';
+            sheetEl.setAttribute('data-density', density);
+            const btn = document.getElementById('physical-ranking-print-btn');
+            if (btn) {
+                btn.classList.toggle('hidden', !hasTable);
+                btn.classList.toggle('flex', !!hasTable);
+            }
+        }
+        function rankingSheetHead(title, summaryHtml) {
+            const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || {};
+            const team = roster.name ? String(roster.name) : '';
+            return '<div class="ranking-doc-head">'
+                + '<p class="ranking-doc-title">体力測定 ' + physicalEscapeHtml(title) + '</p>'
+                + '<p class="ranking-doc-meta">' + (team ? physicalEscapeHtml(team) + '<br>' : '') + rankingSheetDateLabel() + '</p>'
+                + '</div>'
+                + (summaryHtml ? '<p class="ranking-doc-summary">' + summaryHtml + '</p>' : '');
+        }
+        function rankingNameCell(r) {
+            return gradeColorDotHtml(r.player ? r.player.gradeColor : '') + (r.player.number ? '<span class="pno">No.' + physicalEscapeHtml(r.player.number) + '</span>' : '') + physicalEscapeHtml(r.name);
+        }
+        function rankingRowClass(r) {
+            if (r.avg == null) return ' class="unscored"';
+            if (r.rank === 1) return ' class="top1"';
+            if (r.rank === 2) return ' class="top2"';
+            if (r.rank === 3) return ' class="top3"';
+            return '';
+        }
+        function rankingAvgCell(r) {
+            return '<td class="c-avg">' + (r.avg != null ? fmtScore(r.avg) + '<span class="pt">点</span>' : '―') + '</td>';
+        }
+        function rankingTestCell(t) {
+            if (!t.record) return '<td class="c-test none">―</td>';
+            return '<td class="c-test">' + physicalEscapeHtml(fitnessRecordLabel(t.record, t.def))
+                + (t.score != null ? ' <span class="score">（' + fmtScore(t.score) + '点）</span>' : ' <span class="score">（―）</span>') + '</td>';
+        }
+
+        // ランキング表の印刷用コンテンツの組み立て（ブラウザの印刷＝Ctrl+P等のときに使う）。
+        // シートの中身を印刷専用エリアへ複写し、@media print の指定で印刷専用エリア以外を
+        // すべて隠してA4縦1枚で印刷する。
+        // 画面表示のシートはそのままに、印刷では測定済み（採点あり）の選手だけを載せる。
+        // 未測定・未採点の行（点数「―」の末尾セクション）は印刷表から除き、印刷に載る
+        // 行数に応じて密度を決め直してA4縦1枚に必ず収める。
+        // なお画面のボタンは印刷ではなく、PDFダウンロード（downloadPhysicalRankingPdf）と
+        // Excelダウンロード（downloadPhysicalRankingExcel）の2つから選ぶ方式。
+        // 以前はボタンが別タブを開いて印刷する方式で、押すたびにブラウザのタブが開いて
+        // しまう問題があったため、ダウンロード方式に切り替えた。
+        function rankingPrintDensity(rowCount) {
+            return rowCount > 54 ? '6' : rowCount > 42 ? '5' : rowCount > 32 ? '4' : rowCount > 24 ? '3' : rowCount > 18 ? '2' : '1';
+        }
+        function buildRankingPrintContent(sheet) {
+            const clone = sheet.cloneNode(true);
+            clone.removeAttribute('id');
+            const unscoredRows = clone.querySelectorAll('tr.unscored');
+            for (let i = 0; i < unscoredRows.length; i++) unscoredRows[i].remove();
+            const printedRows = clone.querySelectorAll('tbody tr').length;
+            // 注記の「未測定の選手は末尾に表示します」は画面表示向けの文言なので、印刷用に差し替える
+            const note = clone.querySelector('.ranking-doc-note');
+            if (note) {
+                note.textContent = note.textContent.replace('未記録・未採点の選手は点数「―」で末尾に表示します。', '印刷用には測定済みの選手のみを掲載しています。');
+            }
+            return { html: clone.innerHTML, rowCount: printedRows };
+        }
+        function prepareRankingPrintArea() {
+            const sheet = document.getElementById('physical-ranking-sheet');
+            const area = document.getElementById('ranking-print-area');
+            if (!sheet || !area || !sheet.querySelector('table')) return false;
+            const content = buildRankingPrintContent(sheet);
+            area.innerHTML = content.html;
+            area.setAttribute('data-density', rankingPrintDensity(content.rowCount));
+            document.body.classList.add('printing-ranking');
+            return true;
+        }
+        function cleanupRankingPrint() {
+            document.body.classList.remove('printing-ranking');
+        }
+        // ランキング表のExcelダウンロード。
+        // 画面のボタンはこの関数を呼び、既存のSheetJSで .xlsx を生成してその場で直接
+        // ダウンロードする（別タブは開かない）。
+        // 掲載するのは測定済み（採点あり）の選手だけ。表は順位・背番号・氏名・平均点と、
+        // カテゴリ別は各種目の「記録（点数）」、総合は各カテゴリの平均点を並べる。
+        // 印刷設定はA4縦・1ページに収める指定をファイルへ埋め込む（下記
+        // __xlsxAddA4FitToPage）。Excelで印刷すると測定済みの選手全員がA4縦1枚に収まる。
+        // 順位付け・採点基準・保存データは変えない。
+
+        // --- .xlsx（zip）の後加工：ワークシートXMLへ印刷設定を差し込む ---
+        // 同梱のSheetJSは余白（!margins）しか書き出せず、紙サイズ・向き・「1ページに
+        // 収める」（fitToPage）を書けない。そこで生成済みの .xlsx を読み直し、
+        // ワークシートXMLへ <sheetPr><pageSetUpPr fitToPage="1"/></sheetPr> と
+        // <pageSetup paperSize="9"（A4） orientation="portrait" fitToWidth="1"
+        // fitToHeight="1"/> を差し込んでから zip を組み直す。途中で失敗した場合は
+        // 元のデータをそのまま返す（ダウンロード自体は必ず成功させる）。
+        function __xlsxCrc32(u8) {
+            let table = __xlsxCrc32._t;
+            if (!table) {
+                table = [];
+                for (let n = 0; n < 256; n++) {
+                    let c = n;
+                    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+                    table[n] = c >>> 0;
+                }
+                __xlsxCrc32._t = table;
+            }
+            let crc = 0xFFFFFFFF;
+            for (let i = 0; i < u8.length; i++) crc = table[(crc ^ u8[i]) & 0xFF] ^ (crc >>> 8);
+            return (crc ^ 0xFFFFFFFF) >>> 0;
+        }
+        function __zipReadEntries(buf) {
+            const u8 = new Uint8Array(buf);
+            const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+            let eocd = -1;
+            const minPos = Math.max(0, u8.length - 22 - 65535);
+            for (let i = u8.length - 22; i >= minPos; i--) {
+                if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+            }
+            if (eocd < 0) return null;
+            const count = dv.getUint16(eocd + 10, true);
+            let off = dv.getUint32(eocd + 16, true);
+            const dec = new TextDecoder('utf-8');
+            const entries = [];
+            for (let n = 0; n < count; n++) {
+                if (dv.getUint32(off, true) !== 0x02014b50) return null;
+                const method = dv.getUint16(off + 10, true);
+                const compSize = dv.getUint32(off + 20, true);
+                const nameLen = dv.getUint16(off + 28, true);
+                const extraLen = dv.getUint16(off + 30, true);
+                const commentLen = dv.getUint16(off + 32, true);
+                const lho = dv.getUint32(off + 42, true);
+                const name = dec.decode(u8.subarray(off + 46, off + 46 + nameLen));
+                if (dv.getUint32(lho, true) !== 0x04034b50) return null;
+                const lNameLen = dv.getUint16(lho + 26, true);
+                const lExtraLen = dv.getUint16(lho + 28, true);
+                const dataStart = lho + 30 + lNameLen + lExtraLen;
+                entries.push({ name: name, method: method, data: u8.slice(dataStart, dataStart + compSize) });
+                off += 46 + nameLen + extraLen + commentLen;
+            }
+            return entries;
+        }
+        async function __zipEntryPlain(entry) {
+            if (entry.method === 0) return entry.data;
+            if (entry.method !== 8 || typeof DecompressionStream === 'undefined') throw new Error('unsupported zip entry');
+            const stream = new Blob([entry.data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+            return new Uint8Array(await new Response(stream).arrayBuffer());
+        }
+        function __zipBuildStored(files) {
+            const enc = new TextEncoder();
+            const now = new Date();
+            const dosTime = ((now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1)) & 0xFFFF;
+            const dosDate = (((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()) & 0xFFFF;
+            const chunks = [];
+            const centrals = [];
+            let offset = 0;
+            files.forEach(f => {
+                const nameU8 = enc.encode(f.name);
+                const crc = __xlsxCrc32(f.data);
+                const head = new DataView(new ArrayBuffer(30));
+                head.setUint32(0, 0x04034b50, true);
+                head.setUint16(4, 20, true);
+                head.setUint16(6, 0x0800, true); // UTF-8ファイル名フラグ
+                head.setUint16(8, 0, true);      // 無圧縮（stored）
+                head.setUint16(10, dosTime, true);
+                head.setUint16(12, dosDate, true);
+                head.setUint32(14, crc, true);
+                head.setUint32(18, f.data.length, true);
+                head.setUint32(22, f.data.length, true);
+                head.setUint16(26, nameU8.length, true);
+                head.setUint16(28, 0, true);
+                chunks.push(new Uint8Array(head.buffer), nameU8, f.data);
+                const cen = new DataView(new ArrayBuffer(46));
+                cen.setUint32(0, 0x02014b50, true);
+                cen.setUint16(4, 20, true);
+                cen.setUint16(6, 20, true);
+                cen.setUint16(8, 0x0800, true);
+                cen.setUint16(10, 0, true);
+                cen.setUint16(12, dosTime, true);
+                cen.setUint16(14, dosDate, true);
+                cen.setUint32(16, crc, true);
+                cen.setUint32(20, f.data.length, true);
+                cen.setUint32(24, f.data.length, true);
+                cen.setUint16(28, nameU8.length, true);
+                cen.setUint32(42, offset, true);
+                centrals.push(new Uint8Array(cen.buffer), nameU8);
+                offset += 30 + nameU8.length + f.data.length;
+            });
+            const cenStart = offset;
+            let cenSize = 0;
+            centrals.forEach(c => { cenSize += c.length; });
+            const eocd = new DataView(new ArrayBuffer(22));
+            eocd.setUint32(0, 0x06054b50, true);
+            eocd.setUint16(8, files.length, true);
+            eocd.setUint16(10, files.length, true);
+            eocd.setUint32(12, cenSize, true);
+            eocd.setUint32(16, cenStart, true);
+            const all = chunks.concat(centrals, [new Uint8Array(eocd.buffer)]);
+            let total = 0;
+            all.forEach(c => { total += c.length; });
+            const out = new Uint8Array(total);
+            let pos = 0;
+            all.forEach(c => { out.set(c, pos); pos += c.length; });
+            return out;
+        }
+        function __xlsxInjectA4Setup(xml) {
+            if (xml.indexOf('<pageSetup') >= 0) return xml;
+            const openEnd = xml.indexOf('>', xml.indexOf('<worksheet')) + 1;
+            if (openEnd <= 0) return xml;
+            // sheetPr は worksheet の先頭子要素として差し込む
+            let out = xml.slice(0, openEnd) + '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>' + xml.slice(openEnd);
+            const setup = '<pageSetup paperSize="9" orientation="portrait" fitToWidth="1" fitToHeight="1"/>';
+            const pm = out.indexOf('<pageMargins');
+            if (pm >= 0) {
+                // pageSetup は pageMargins の直後がスキーマ上の正位置
+                const pmEnd = out.indexOf('/>', pm) + 2;
+                out = out.slice(0, pmEnd) + setup + out.slice(pmEnd);
+            } else {
+                out = out.replace('</worksheet>', setup + '</worksheet>');
+            }
+            return out;
+        }
+        async function __xlsxAddA4FitToPage(arrayBuffer) {
+            try {
+                const entries = __zipReadEntries(arrayBuffer);
+                if (!entries) return arrayBuffer;
+                const files = [];
+                let injected = false;
+                for (let i = 0; i < entries.length; i++) {
+                    const e = entries[i];
+                    const plain = await __zipEntryPlain(e);
+                    if (!injected && /^xl\/worksheets\/sheet\d+\.xml$/.test(e.name)) {
+                        const xml = new TextDecoder('utf-8').decode(plain);
+                        const mod = __xlsxInjectA4Setup(xml);
+                        if (mod !== xml) {
+                            files.push({ name: e.name, data: new TextEncoder().encode(mod) });
+                            injected = true;
+                            continue;
+                        }
+                    }
+                    files.push({ name: e.name, data: plain });
+                }
+                if (!injected) return arrayBuffer;
+                return __zipBuildStored(files).buffer;
+            } catch (err) {
+                return arrayBuffer;
+            }
+        }
+        function rankingExcelTestCell(t) {
+            if (!t.record) return '―';
+            return fitnessRecordLabel(t.record, t.def) + (t.score != null ? '（' + fmtScore(t.score) + '点）' : '（―）');
+        }
+        async function downloadPhysicalRankingExcel() {
+            const cat = physicalRankingCategory;
+            const isOverall = cat === PHYS_RANKING_OVERALL;
+            if (!isOverall && FITNESS_CATEGORIES.indexOf(cat) < 0) { showToast('カテゴリが選ばれていません', 'warning'); return; }
+            const allRows = isOverall ? physOverallRankingRows() : physCategoryRankingRows(cat);
+            const rows = allRows.filter(r => r.avg != null);
+            if (rows.length === 0) { showToast('ダウンロードできる測定済みの選手がいません。先に「記録入力」から記録を追加してください', 'warning'); return; }
+            const title = isOverall ? '総合ランキング' : cat + 'ランキング';
+            const top = rows[0];
+            const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || {};
+            const teamName = roster.name ? String(roster.name) : '';
+            const summary = '1位：' + top.name + '（' + (isOverall ? '総合平均 ' : '平均 ') + fmtScore(top.avg) + ' 点） ― ' + rows.length + ' / ' + allRows.length + ' 名がランクイン'
+                + (fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : '');
+            let headers, widths;
+            if (isOverall) {
+                headers = ['順位', '背番号', '選手名', '総合平均点'].concat(FITNESS_CATEGORIES);
+                widths = [7, 9, 20, 12].concat(FITNESS_CATEGORIES.map(() => 11));
+            } else {
+                const tests = (allRows[0] && allRows[0].tests) || [];
+                headers = ['順位', '背番号', '選手名', '平均点'].concat(tests.map(t => t.def.name));
+                widths = [7, 9, 20, 10].concat(tests.map(() => 19));
+            }
+            const aoa = [];
+            aoa.push(['体力測定 ' + title]);
+            aoa.push([(teamName ? teamName + ' ／ ' : '') + rankingSheetDateLabel()]);
+            aoa.push([summary]);
+            aoa.push([]);
+            aoa.push(headers);
+            rows.forEach(r => {
+                const base = [r.rank + '位', (r.player && r.player.number) ? String(r.player.number) : '', r.name, fmtScore(r.avg) + '点'];
+                if (isOverall) aoa.push(base.concat(r.catAvgs.map(c => c.avg != null ? fmtScore(c.avg) + '点' : '―')));
+                else aoa.push(base.concat((r.tests || []).map(rankingExcelTestCell)));
+            });
+            aoa.push([]);
+            aoa.push(['※ ' + (isOverall
+                ? '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、全種目の採点済み平均（総合平均点）で順位付けしています。各カテゴリの欄はそのカテゴリの平均点です。'
+                : '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、このカテゴリの平均点で順位付けしています。各欄は「記録（点数）」です。')
+                + 'このファイルには測定済みの選手のみを掲載しています。印刷設定はA4縦・1ページに収める指定になっています。']);
+            const fileBase = '体力測定_' + title;
+            try {
+                if (window.XLSX && XLSX.utils && XLSX.utils.book_new) {
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.aoa_to_sheet(aoa);
+                    ws['!cols'] = widths.map(w => ({ wch: w }));
+                    // 余白はSheetJSが書ける !margins で指定する
+                    ws['!margins'] = { left: 0.35, right: 0.35, top: 0.45, bottom: 0.45, header: 0.25, footer: 0.25 };
+                    // タイトル・日付・サマリー・注記の行は全列に結合して1行で見せる
+                    const lastCol = headers.length - 1;
+                    ws['!merges'] = [0, 1, 2, aoa.length - 1].map(r => ({ s: { r: r, c: 0 }, e: { r: r, c: lastCol } }));
+                    XLSX.utils.book_append_sheet(wb, ws, __excelSheetName(title));
+                    const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                    // A4縦・1ページに収める印刷設定（紙サイズ・向き・fitToPage）を差し込んでからダウンロードする
+                    const finalOut = await __xlsxAddA4FitToPage(out);
+                    __excelDownloadBlob(new Blob([finalOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), fileBase + '_' + __excelDateStamp() + '.xlsx');
+                } else {
+                    // SheetJSが使えない場合のフォールバック: Excelで開けるHTML形式（.xls）。
+                    // 印刷設定（A4縦・1ページに収める）も可能な範囲で付ける。
+                    const lastRow = aoa.length - 1;
+                    const rowsHtml = aoa.map((row, ri) => {
+                        if (!row || row.length === 0) return '<tr><td></td></tr>';
+                        if (ri <= 2 || ri === lastRow) {
+                            return '<tr><td colspan="' + headers.length + '"' + (ri === 0 ? ' style="font-weight:bold;font-size:15px;"' : '') + '>' + __excelEscapeHtml(row[0]) + '</td></tr>';
+                        }
+                        const cells = row.map(v => {
+                            const s = __excelEscapeHtml(v === null || v === undefined ? '' : v);
+                            return ri === 4
+                                ? '<td style="font-weight:bold;background-color:#FFF7ED;border:1px solid #CBD5E1;text-align:center;">' + s + '</td>'
+                                : '<td style="border:1px solid #E2E8F0;">' + s + '</td>';
+                        }).join('');
+                        return '<tr>' + cells + '</tr>';
+                    }).join('');
+                    const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">'
+                        + '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>' + __excelEscapeHtml(__excelSheetName(title)) + '</x:Name>'
+                        + '<x:WorksheetOptions><x:PageSetup><x:Layout x:Orientation="Portrait"/></x:PageSetup><x:FitToPage/></x:WorksheetOptions>'
+                        + '</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->'
+                        + '<style>@page { size: A4 portrait; margin: 10mm; }</style></head><body>'
+                        + '<table border="0" cellpadding="4" cellspacing="0">' + rowsHtml + '</table></body></html>';
+                    __excelDownloadBlob(new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8' }), fileBase + '_' + __excelDateStamp() + '.xls');
+                }
+                showToast('ランキングをExcelでダウンロードしました（測定済み ' + rows.length + ' 名・A4縦1枚の印刷設定付き）', 'success');
+            } catch (e) {
+                showToast('Excelのダウンロードに失敗しました。もう一度お試しください', 'warning');
+            }
+        }
+        // ランキング表のPDFダウンロード。
+        // 画面のボタンはこの関数を呼び、ランキング表をCanvasへ描画してJPEG化し、
+        // A4縦1ページのPDFファイルとしてその場で直接ダウンロードする（別タブは開かない）。
+        // 外部ライブラリ（jsPDF等）は読み込まず、PDFの組み立てもページ内で完結させる
+        // （自己完結版の方針を維持する）。掲載するのは測定済み（採点あり）の選手だけ
+        // （Excel版と同じ）。表は順位・背番号・氏名・平均点と、カテゴリ別は各種目の
+        // 「記録（点数）」、総合は各カテゴリの平均点を並べ、画面のシートと同じ配色にする。
+        // 行数に応じて行の高さと文字サイズを詰めるため、測定済みの選手全員が必ず
+        // A4縦1枚に収まる。順位付け・採点基準・保存データは変えない。
+        function __pdfFitText(ctx, text, maxWidth) {
+            // 現在のフォントで測り、収まらなければ末尾を「…」で省略する
+            if (ctx.measureText(text).width <= maxWidth) return text;
+            let t = text;
+            while (t.length > 1 && ctx.measureText(t + '…').width > maxWidth) t = t.slice(0, -1);
+            return t + '…';
+        }
+        function __pdfBytesFromJpeg(jpegU8, imgW, imgH) {
+            // JPEG画像をA4縦1ページ全面に配置するだけの最小構成PDFを組み立てる
+            const PW = 595.28, PH = 841.89; // A4縦（pt）
+            const enc = new TextEncoder();
+            const parts = [];
+            let length = 0;
+            const push = (u8) => { parts.push(u8); length += u8.length; };
+            const pushStr = (s) => push(enc.encode(s));
+            pushStr('%PDF-1.4\n%');
+            push(new Uint8Array([0xE2, 0xE3, 0xCF, 0xD3, 0x0A]));
+            const offsets = [0];
+            const obj = (num, body) => { offsets[num] = length; pushStr(num + ' 0 obj\n' + body + '\nendobj\n'); };
+            obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+            obj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+            obj(3, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + PW + ' ' + PH + '] /Resources << /XObject << /Im0 5 0 R >> >> /Contents 4 0 R >>');
+            const content = 'q\n' + PW + ' 0 0 ' + PH + ' 0 0 cm\n/Im0 Do\nQ\n';
+            offsets[4] = length;
+            pushStr('4 0 obj\n<< /Length ' + content.length + ' >>\nstream\n' + content + 'endstream\nendobj\n');
+            offsets[5] = length;
+            pushStr('5 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + imgW + ' /Height ' + imgH + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + jpegU8.length + ' >>\nstream\n');
+            push(jpegU8);
+            pushStr('\nendstream\nendobj\n');
+            const xrefPos = length;
+            let xref = 'xref\n0 6\n0000000000 65535 f \n';
+            for (let i = 1; i <= 5; i++) xref += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+            pushStr(xref);
+            pushStr('trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n' + xrefPos + '\n%%EOF');
+            const out = new Uint8Array(length);
+            let pos = 0;
+            parts.forEach(p => { out.set(p, pos); pos += p.length; });
+            return out;
+        }
+        async function downloadPhysicalRankingPdf() {
+            const cat = physicalRankingCategory;
+            const isOverall = cat === PHYS_RANKING_OVERALL;
+            if (!isOverall && FITNESS_CATEGORIES.indexOf(cat) < 0) { showToast('カテゴリが選ばれていません', 'warning'); return; }
+            const allRows = isOverall ? physOverallRankingRows() : physCategoryRankingRows(cat);
+            const rows = allRows.filter(r => r.avg != null);
+            if (rows.length === 0) { showToast('ダウンロードできる測定済みの選手がいません。先に「記録入力」から記録を追加してください', 'warning'); return; }
+            const title = isOverall ? '総合ランキング' : cat + 'ランキング';
+            const top = rows[0];
+            const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || {};
+            const teamName = roster.name ? String(roster.name) : '';
+            const summaryMain = '1位：' + top.name + '（' + (isOverall ? '総合平均 ' : '平均 ') + fmtScore(top.avg) + ' 点）';
+            const summaryRest = ' ― ' + rows.length + ' / ' + allRows.length + ' 名がランクイン'
+                + (fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : '');
+            // 表データ（Excel版と同じ並び）：順位・背番号・選手名・平均点＋データ列
+            let headers, dataOf;
+            if (isOverall) {
+                headers = ['順位', '背番号', '選手名', '総合平均点'].concat(FITNESS_CATEGORIES);
+                dataOf = r => r.catAvgs.map(c => ({ main: c.avg != null ? fmtScore(c.avg) + '点' : '―', score: null }));
+            } else {
+                const tests0 = (allRows[0] && allRows[0].tests) || [];
+                headers = ['順位', '背番号', '選手名', '平均点'].concat(tests0.map(t => t.def.name));
+                dataOf = r => (r.tests || []).map(t => {
+                    if (!t.record) return { main: '―', score: null };
+                    return { main: fitnessRecordLabel(t.record, t.def), score: t.score != null ? '（' + fmtScore(t.score) + '点）' : '（―）' };
+                });
+            }
+            const note = '※ ' + (isOverall
+                ? '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、全種目の採点済み平均（総合平均点）で順位付けしています。各カテゴリの欄はそのカテゴリの平均点です。'
+                : '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、このカテゴリの平均点で順位付けしています。各欄は「記録（点数）」です。')
+                + 'このファイルには測定済みの選手のみを掲載しています。';
+            try {
+                const PW = 595.28, PH = 841.89, SCALE = 3;
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.round(PW * SCALE);
+                canvas.height = Math.round(PH * SCALE);
+                const ctx = canvas.getContext('2d');
+                if (!ctx) throw new Error('canvas unavailable');
+                ctx.scale(SCALE, SCALE);
+                const FONT = '"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI","Yu Gothic","Noto Sans JP",Meiryo,sans-serif';
+                const M = 34;                    // 余白（pt ≒ 12mm）
+                const CW = PW - M * 2;           // 本文幅
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, PW, PH);
+                ctx.textBaseline = 'middle';
+                // --- 見出し ---
+                let y = M + 4;
+                ctx.fillStyle = '#0f172a';
+                ctx.font = '800 19px ' + FONT;
+                ctx.textAlign = 'left';
+                ctx.fillText('体力測定 ' + title, M, y + 10);
+                ctx.font = '700 8.5px ' + FONT;
+                ctx.fillStyle = '#64748b';
+                ctx.textAlign = 'right';
+                if (teamName) ctx.fillText(teamName, PW - M, y + 3);
+                ctx.fillText(rankingSheetDateLabel(), PW - M, y + 15);
+                ctx.textAlign = 'left';
+                y += 26;
+                ctx.fillStyle = '#ea580c';
+                ctx.fillRect(M, y, CW, 2.4);
+                y += 12;
+                // --- サマリー（1位の部分はオレンジ太字） ---
+                ctx.font = '700 10.5px ' + FONT;
+                ctx.fillStyle = '#c2410c';
+                ctx.fillText(summaryMain, M, y + 5);
+                const mainW = ctx.measureText(summaryMain).width;
+                ctx.fillStyle = '#334155';
+                ctx.fillText(__pdfFitText(ctx, summaryRest, CW - mainW), M + mainW, y + 5);
+                y += 20;
+                // --- 表の寸法（行数に応じて詰めてA4縦1枚に収める） ---
+                const noteH = 32;
+                const tableBottom = PH - M - noteH;
+                const nRows = rows.length + 1; // 見出し行＋データ行
+                const rowH = Math.min(23, (tableBottom - y) / nRows);
+                const bodyFont = Math.max(6.8, Math.min(10.5, rowH * 0.44));
+                const headFont = Math.max(6.5, bodyFont - 0.5);
+                // 列幅：順位・背番号・平均点は固定幅、残りを選手名とデータ列で配分
+                const colRank = 32, colNo = 40, colAvg = isOverall ? 52 : 46;
+                const dataCount = headers.length - 4;
+                const nameWeight = 1.05, dataWeight = isOverall ? 0.62 : 1.2;
+                const restW = CW - colRank - colNo - colAvg;
+                const unit = restW / (nameWeight + dataWeight * Math.max(1, dataCount));
+                const colW = [colRank, colNo, unit * nameWeight, colAvg];
+                for (let i = 0; i < dataCount; i++) colW.push(unit * dataWeight);
+                const colX = [M];
+                for (let i = 0; i < colW.length; i++) colX.push(colX[i] + colW[i]);
+                const tableW = colX[colX.length - 1] - M;
+                // --- 見出し行 ---
+                ctx.fillStyle = '#fff7ed';
+                ctx.fillRect(M, y, tableW, rowH);
+                ctx.font = '800 ' + headFont + 'px ' + FONT;
+                ctx.fillStyle = '#9a3412';
+                ctx.textAlign = 'center';
+                headers.forEach((h, i) => { ctx.fillText(__pdfFitText(ctx, h, colW[i] - 4), colX[i] + colW[i] / 2, y + rowH / 2 + 0.5); });
+                ctx.textAlign = 'left';
+                // --- データ行 ---
+                let ry = y + rowH;
+                rows.forEach(r => {
+                    if (r.rank === 1) { ctx.fillStyle = '#fff7ed'; ctx.fillRect(M, ry, tableW, rowH); }
+                    const cy = ry + rowH / 2 + 0.5;
+                    // 順位
+                    ctx.font = '800 ' + (r.rank === 1 ? bodyFont + 2.5 : bodyFont + 1) + 'px ' + FONT;
+                    ctx.fillStyle = r.rank === 1 ? '#ea580c' : (r.rank <= 3 ? '#c2410c' : '#475569');
+                    ctx.textAlign = 'center';
+                    ctx.fillText(String(r.rank), colX[0] + colW[0] / 2, cy);
+                    // 背番号
+                    ctx.font = '700 ' + bodyFont + 'px ' + FONT;
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.fillText(r.player && r.player.number ? String(r.player.number) : '', colX[1] + colW[1] / 2, cy);
+                    // 選手名（学年カラーの色丸＋氏名）
+                    let nx = colX[2] + 4;
+                    const gc = GRADE_COLOR_META[normalizeGradeColor(r.player ? r.player.gradeColor : '')];
+                    if (gc) {
+                        ctx.beginPath();
+                        ctx.arc(nx + 3, cy, 3.1, 0, Math.PI * 2);
+                        ctx.fillStyle = gc.hex;
+                        ctx.fill();
+                        ctx.lineWidth = 0.6;
+                        ctx.strokeStyle = 'rgba(15,23,42,.25)';
+                        ctx.stroke();
+                        nx += 9.5;
+                    }
+                    ctx.font = '800 ' + bodyFont + 'px ' + FONT;
+                    ctx.fillStyle = '#0f172a';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(__pdfFitText(ctx, r.name, colX[2] + colW[2] - (nx - colX[2]) - 3), nx, cy);
+                    // 平均点
+                    ctx.font = '800 ' + (bodyFont + 2) + 'px ' + FONT;
+                    ctx.fillStyle = '#0f172a';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(fmtScore(r.avg) + '点', colX[3] + colW[3] / 2, cy);
+                    // データ列
+                    const cells = dataOf(r);
+                    cells.forEach((c, i) => {
+                        const cx = colX[4 + i], w = colW[4 + i];
+                        ctx.textAlign = 'left';
+                        if (!c.score) {
+                            ctx.font = '400 ' + bodyFont + 'px ' + FONT;
+                            ctx.fillStyle = c.main === '―' ? '#94a3b8' : '#334155';
+                            const t = __pdfFitText(ctx, c.main, w - 5);
+                            ctx.fillText(t, cx + (w - ctx.measureText(t).width) / 2, cy);
+                        } else {
+                            // 「記録」は通常色、「（点数）」はオレンジ太字で、組として中央寄せ
+                            let fs = bodyFont;
+                            ctx.font = '400 ' + fs + 'px ' + FONT;
+                            let mw = ctx.measureText(c.main).width;
+                            ctx.font = '800 ' + fs + 'px ' + FONT;
+                            let sw = ctx.measureText(c.score).width;
+                            while (fs > 6.2 && mw + sw + 2 > w - 4) {
+                                fs -= 0.4;
+                                ctx.font = '400 ' + fs + 'px ' + FONT; mw = ctx.measureText(c.main).width;
+                                ctx.font = '800 ' + fs + 'px ' + FONT; sw = ctx.measureText(c.score).width;
+                            }
+                            let main = c.main;
+                            if (mw + sw + 2 > w - 4) {
+                                ctx.font = '400 ' + fs + 'px ' + FONT;
+                                main = __pdfFitText(ctx, c.main, Math.max(6, w - 4 - sw - 2));
+                                mw = ctx.measureText(main).width;
+                            }
+                            const sx = cx + (w - (mw + sw + 2)) / 2;
+                            ctx.font = '400 ' + fs + 'px ' + FONT;
+                            ctx.fillStyle = '#334155';
+                            ctx.fillText(main, sx, cy);
+                            ctx.font = '800 ' + fs + 'px ' + FONT;
+                            ctx.fillStyle = '#c2410c';
+                            ctx.fillText(c.score, sx + mw + 2, cy);
+                        }
+                    });
+                    ctx.textAlign = 'left';
+                    ry += rowH;
+                });
+                // --- 罫線 ---
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 0.7;
+                for (let i = 0; i <= nRows; i++) {
+                    const ly = y + rowH * i;
+                    ctx.beginPath(); ctx.moveTo(M, ly); ctx.lineTo(M + tableW, ly); ctx.stroke();
+                }
+                colX.forEach(x => {
+                    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + rowH * nRows); ctx.stroke();
+                });
+                // --- 注記（本文幅で折り返し） ---
+                ctx.font = '400 8px ' + FONT;
+                ctx.fillStyle = '#64748b';
+                const noteLines = [];
+                let line = '';
+                for (let i = 0; i < note.length; i++) {
+                    if (line && ctx.measureText(line + note[i]).width > CW) { noteLines.push(line); line = ''; }
+                    line += note[i];
+                }
+                if (line) noteLines.push(line);
+                noteLines.slice(0, 3).forEach((ln, i) => ctx.fillText(ln, M, tableBottom + 12 + i * 10.5));
+                // --- PDF化してその場でダウンロード ---
+                const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
+                if (!blob) throw new Error('pdf canvas failed');
+                const jpegU8 = new Uint8Array(await blob.arrayBuffer());
+                const pdfU8 = __pdfBytesFromJpeg(jpegU8, canvas.width, canvas.height);
+                __excelDownloadBlob(new Blob([pdfU8.buffer], { type: 'application/pdf' }), '体力測定_' + title + '_' + __excelDateStamp() + '.pdf');
+                showToast('ランキングをPDFでダウンロードしました（測定済み ' + rows.length + ' 名・A4縦1枚）', 'success');
+            } catch (e) {
+                showToast('PDFのダウンロードに失敗しました。もう一度お試しください', 'warning');
+            }
+        }
+        // ブラウザのメニューやショートカット（Ctrl+P等）から印刷した場合も、ランキング画面を
+        // 表示中ならランキング表だけが印刷されるようにする。印刷が終わったら通常表示に戻す。
+        window.addEventListener('beforeprint', function () {
+            const wrap = document.getElementById('physical-ranking');
+            if (wrap && !wrap.classList.contains('hidden')) prepareRankingPrintArea();
+        });
+        window.addEventListener('afterprint', cleanupRankingPrint);
+
+        // カテゴリ別ランキングページの描画：A4縦1枚の表に、順位・選手名・カテゴリ平均点・各種目のベスト記録と点数を並べる
         function renderPhysicalRanking() {
             const titleEl = document.getElementById('physical-ranking-title');
             const summaryEl = document.getElementById('physical-ranking-summary');
-            const listEl = document.getElementById('physical-ranking-list');
-            if (!titleEl || !summaryEl || !listEl) return;
+            const sheetEl = document.getElementById('physical-ranking-sheet');
+            if (!titleEl || !summaryEl || !sheetEl) return;
             const cat = physicalRankingCategory;
             if (cat === PHYS_RANKING_OVERALL) {
-                renderPhysicalOverallRanking(titleEl, summaryEl, listEl);
+                renderPhysicalOverallRanking(titleEl, summaryEl, sheetEl);
                 return;
             }
             if (FITNESS_CATEGORIES.indexOf(cat) < 0) {
                 titleEl.textContent = 'ランキング';
                 summaryEl.innerHTML = '';
-                listEl.innerHTML = physEmptyMsg('カテゴリが選ばれていません。「ランキングのカテゴリ選択に戻る」からカテゴリを選んでください。');
+                sheetEl.innerHTML = physEmptyMsg('カテゴリが選ばれていません。「ランキングのカテゴリ選択に戻る」からカテゴリを選んでください。');
+                setupRankingSheet(sheetEl, 0, false);
                 return;
             }
             titleEl.textContent = cat + 'ランキング';
@@ -5356,7 +6230,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const playerCount = (roster.players || []).filter(p => p && p.name).length;
             if (playerCount === 0) {
                 summaryEl.innerHTML = '';
-                listEl.innerHTML = physEmptyMsg('選手が登録されていません。先に「チーム設定」で選手を登録してください。');
+                sheetEl.innerHTML = physEmptyMsg('選手が登録されていません。先に「チーム設定」で選手を登録してください。');
+                setupRankingSheet(sheetEl, 0, false);
                 return;
             }
             const rows = physCategoryRankingRows(cat);
@@ -5364,8 +6239,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const unscored = rows.filter(r => r.avg == null);
             if (scored.length === 0) {
                 summaryEl.innerHTML = '';
-                listEl.innerHTML = physEmptyMsg('このカテゴリで採点できる記録がまだありません。メニューの「記録入力」から記録を追加してください。')
+                sheetEl.innerHTML = physEmptyMsg('このカテゴリで採点できる記録がまだありません。メニューの「記録入力」から記録を追加してください。')
                     + (unscored.length ? '<p class="text-xs text-slate-400 mt-3">未記録・未採点の選手（' + unscored.length + '名）：' + unscored.map(r => physicalEscapeHtml(r.name)).join('、') + '</p>' : '');
+                setupRankingSheet(sheetEl, 0, false);
                 return;
             }
             const top = scored[0];
@@ -5377,50 +6253,39 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                     <p class="text-xs text-slate-500 pb-1">${scored.length} / ${rows.length} 名がランクイン${fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : ''}</p>
                 </div>`;
-            const rankBadge = r => {
-                if (r.rank === 1) return '<span class="w-11 h-11 rounded-full bg-orange-600 text-white flex items-center justify-center text-base font-extrabold shrink-0 shadow-sm">1</span>';
-                if (r.rank === 2 || r.rank === 3) return '<span class="w-11 h-11 rounded-full bg-orange-100 text-orange-800 border border-orange-200 flex items-center justify-center text-base font-extrabold shrink-0">' + r.rank + '</span>';
-                return '<span class="w-11 h-11 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-base font-extrabold shrink-0">' + r.rank + '</span>';
-            };
-            const rowHtml = r => `
-                <div class="flex gap-3 sm:gap-4 border ${r.rank === 1 ? 'border-orange-300 bg-orange-50/60' : 'border-slate-200 bg-white'} rounded-xl p-4">
-                    ${rankBadge(r)}
-                    <div class="flex-1 min-w-0">
-                        <div class="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
-                            <p class="font-extrabold text-slate-900 text-[15px] leading-snug">${r.player.number ? '<span class="text-slate-400 font-bold mr-1.5">No.' + physicalEscapeHtml(r.player.number) + '</span>' : ''}${physicalEscapeHtml(r.name)}<span class="block sm:inline text-[11px] font-bold text-slate-400 sm:ml-2">${r.rank}位 ／ ${r.scoredCount}種目を採点</span></p>
-                            <p class="text-right leading-none"><span class="text-[10px] font-bold text-slate-400 block mb-0.5">平均点</span><span class="text-2xl font-extrabold ${r.rank === 1 ? 'text-orange-600' : 'text-slate-900'}">${fmtScore(r.avg)}</span><span class="text-[11px] font-bold text-slate-500 ml-0.5">点</span></p>
-                        </div>
-                        <div class="flex flex-wrap gap-1.5 mt-2.5">
-                            ${r.tests.map(t => `
-                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md ${t.score != null ? 'bg-white border border-slate-200 text-slate-700' : 'bg-slate-50 border border-slate-100 text-slate-400'} text-[11px] font-bold">
-                                ${physicalEscapeHtml(t.def.name)}：${t.record ? physicalEscapeHtml(fitnessRecordLabel(t.record, t.def)) : '記録なし'}
-                                <span class="${t.score != null ? 'text-orange-700' : 'text-slate-300'}">${t.score != null ? fmtScore(t.score) + '点' : '―'}</span>
-                            </span>`).join('')}
-                        </div>
-                    </div>
-                </div>`;
-            let html = scored.map(rowHtml).join('');
-            if (unscored.length) {
-                html += `
-                <div class="border border-dashed border-slate-200 rounded-xl p-4 bg-slate-50/60">
-                    <p class="text-xs font-extrabold text-slate-500 mb-2">未記録・未採点（平均点 ―）</p>
-                    <div class="flex flex-wrap gap-1.5">
-                        ${unscored.map(r => `<span class="inline-flex items-center px-2.5 py-1 rounded-md bg-white border border-slate-200 text-xs font-bold text-slate-500">${physicalEscapeHtml(r.name)}</span>`).join('')}
-                    </div>
-                </div>`;
-            }
-            listEl.innerHTML = html;
+            const tests = rows[0].tests || [];
+            const testColW = tests.length ? Math.max(10, Math.floor(57 / tests.length)) : 0;
+            const summaryHtml = '1位：<strong>' + physicalEscapeHtml(top.name) + '</strong>（平均 ' + fmtScore(top.avg) + ' 点） ― ' + scored.length + ' / ' + rows.length + ' 名がランクイン'
+                + (fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : '');
+            const rowHtml = r => '<tr' + rankingRowClass(r) + '>'
+                + '<td class="c-rank">' + (r.rank != null ? r.rank + '位' : '―') + '</td>'
+                + '<td class="c-name">' + rankingNameCell(r) + '</td>'
+                + rankingAvgCell(r)
+                + r.tests.map(rankingTestCell).join('')
+                + '</tr>';
+            sheetEl.innerHTML = rankingSheetHead(cat + 'ランキング', summaryHtml)
+                + '<table class="ranking-table"><colgroup>'
+                + '<col style="width:8%"><col style="width:24%"><col style="width:11%">'
+                + tests.map(() => '<col style="width:' + testColW + '%">').join('')
+                + '</colgroup><thead><tr><th>順位</th><th>選手名</th><th>平均点</th>'
+                + tests.map(t => '<th>' + physicalEscapeHtml(t.def.name) + '</th>').join('')
+                + '</tr></thead><tbody>'
+                + rows.map(rowHtml).join('')
+                + '</tbody></table>'
+                + '<p class="ranking-doc-note">各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、このカテゴリの平均点で順位付けしています。未記録・未採点の選手は点数「―」で末尾に表示します。</p>';
+            setupRankingSheet(sheetEl, rows.length, true);
         }
 
-        // 総合ランキングページの描画：順位・選手名・総合平均点・各カテゴリの平均点
+        // 総合ランキングページの描画：A4縦1枚の表に、順位・選手名・総合平均点・各カテゴリの平均点を並べる
         // 総合平均点は総合評価と同じ overallAverageOf（全種目の採点済み平均）で計算する。
-        function renderPhysicalOverallRanking(titleEl, summaryEl, listEl) {
+        function renderPhysicalOverallRanking(titleEl, summaryEl, sheetEl) {
             titleEl.textContent = '総合ランキング';
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || { players: [] };
             const playerCount = (roster.players || []).filter(p => p && p.name).length;
             if (playerCount === 0) {
                 summaryEl.innerHTML = '';
-                listEl.innerHTML = physEmptyMsg('選手が登録されていません。先に「チーム設定」で選手を登録してください。');
+                sheetEl.innerHTML = physEmptyMsg('選手が登録されていません。先に「チーム設定」で選手を登録してください。');
+                setupRankingSheet(sheetEl, 0, false);
                 return;
             }
             const rows = physOverallRankingRows();
@@ -5428,8 +6293,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const unscored = rows.filter(r => r.avg == null);
             if (scored.length === 0) {
                 summaryEl.innerHTML = '';
-                listEl.innerHTML = physEmptyMsg('採点できる記録がまだありません。メニューの「記録入力」から記録を追加してください。')
+                sheetEl.innerHTML = physEmptyMsg('採点できる記録がまだありません。メニューの「記録入力」から記録を追加してください。')
                     + (unscored.length ? '<p class="text-xs text-slate-400 mt-3">未記録・未採点の選手（' + unscored.length + '名）：' + unscored.map(r => physicalEscapeHtml(r.name)).join('、') + '</p>' : '');
+                setupRankingSheet(sheetEl, 0, false);
                 return;
             }
             const top = scored[0];
@@ -5441,39 +6307,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                     <p class="text-xs text-slate-500 pb-1">${scored.length} / ${rows.length} 名がランクイン${fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : ''}</p>
                 </div>`;
-            const rankBadge = r => {
-                if (r.rank === 1) return '<span class="w-11 h-11 rounded-full bg-orange-600 text-white flex items-center justify-center text-base font-extrabold shrink-0 shadow-sm">1</span>';
-                if (r.rank === 2 || r.rank === 3) return '<span class="w-11 h-11 rounded-full bg-orange-100 text-orange-800 border border-orange-200 flex items-center justify-center text-base font-extrabold shrink-0">' + r.rank + '</span>';
-                return '<span class="w-11 h-11 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-base font-extrabold shrink-0">' + r.rank + '</span>';
-            };
-            const rowHtml = r => `
-                <div class="flex gap-3 sm:gap-4 border ${r.rank === 1 ? 'border-orange-300 bg-orange-50/60' : 'border-slate-200 bg-white'} rounded-xl p-4">
-                    ${rankBadge(r)}
-                    <div class="flex-1 min-w-0">
-                        <div class="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
-                            <p class="font-extrabold text-slate-900 text-[15px] leading-snug">${r.player.number ? '<span class="text-slate-400 font-bold mr-1.5">No.' + physicalEscapeHtml(r.player.number) + '</span>' : ''}${physicalEscapeHtml(r.name)}<span class="block sm:inline text-[11px] font-bold text-slate-400 sm:ml-2">${r.rank}位 ／ ${r.scoredCount}種目を採点</span></p>
-                            <p class="text-right leading-none"><span class="text-[10px] font-bold text-slate-400 block mb-0.5">総合平均点</span><span class="text-2xl font-extrabold ${r.rank === 1 ? 'text-orange-600' : 'text-slate-900'}">${fmtScore(r.avg)}</span><span class="text-[11px] font-bold text-slate-500 ml-0.5">点</span></p>
-                        </div>
-                        <div class="flex flex-wrap gap-1.5 mt-2.5">
-                            ${r.catAvgs.map(c => `
-                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md ${c.avg != null ? 'bg-white border border-slate-200 text-slate-700' : 'bg-slate-50 border border-slate-100 text-slate-400'} text-[11px] font-bold">
-                                ${physicalEscapeHtml(c.category)} 平均
-                                <span class="${c.avg != null ? 'text-orange-700' : 'text-slate-300'}">${c.avg != null ? fmtScore(c.avg) + '点' : '―'}</span>
-                            </span>`).join('')}
-                        </div>
-                    </div>
-                </div>`;
-            let html = scored.map(rowHtml).join('');
-            if (unscored.length) {
-                html += `
-                <div class="border border-dashed border-slate-200 rounded-xl p-4 bg-slate-50/60">
-                    <p class="text-xs font-extrabold text-slate-500 mb-2">未記録・未採点（総合平均点 ―）</p>
-                    <div class="flex flex-wrap gap-1.5">
-                        ${unscored.map(r => `<span class="inline-flex items-center px-2.5 py-1 rounded-md bg-white border border-slate-200 text-xs font-bold text-slate-500">${physicalEscapeHtml(r.name)}</span>`).join('')}
-                    </div>
-                </div>`;
-            }
-            listEl.innerHTML = html;
+            const summaryHtml = '1位：<strong>' + physicalEscapeHtml(top.name) + '</strong>（総合平均 ' + fmtScore(top.avg) + ' 点） ― ' + scored.length + ' / ' + rows.length + ' 名がランクイン'
+                + (fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : '');
+            const catCell = c => '<td class="c-test">' + (c.avg != null ? '<span class="score">' + fmtScore(c.avg) + '点</span>' : '―') + '</td>';
+            const rowHtml = r => '<tr' + rankingRowClass(r) + '>'
+                + '<td class="c-rank">' + (r.rank != null ? r.rank + '位' : '―') + '</td>'
+                + '<td class="c-name">' + rankingNameCell(r) + '</td>'
+                + rankingAvgCell(r)
+                + r.catAvgs.map(catCell).join('')
+                + '</tr>';
+            sheetEl.innerHTML = rankingSheetHead('総合ランキング', summaryHtml)
+                + '<table class="ranking-table"><colgroup>'
+                + '<col style="width:7%"><col style="width:20%"><col style="width:13%">'
+                + FITNESS_CATEGORIES.map(() => '<col style="width:10%">').join('')
+                + '</colgroup><thead><tr><th>順位</th><th>選手名</th><th>総合平均点</th>'
+                + FITNESS_CATEGORIES.map(c => '<th>' + physicalEscapeHtml(c) + '</th>').join('')
+                + '</tr></thead><tbody>'
+                + rows.map(rowHtml).join('')
+                + '</tbody></table>'
+                + '<p class="ranking-doc-note">各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、全種目の採点済み平均（総合平均点）で順位付けしています。各カテゴリの欄はそのカテゴリの平均点です。未記録・未採点の選手は点数「―」で末尾に表示します。</p>';
+            setupRankingSheet(sheetEl, rows.length, true);
         }
 
         function fitnessTestDef(name) {
@@ -5786,6 +6639,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function updateHomeScreenUI() {
+            try { updateDemoDataStatus(); } catch (e) { /* デモ状態表示の失敗でホーム描画を止めない */ }
             const archives = getArchivedGames();
             const countEl = document.getElementById('home-archive-count');
             if (countEl) countEl.textContent = `${archives.length}試合`;
@@ -5898,7 +6752,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (hasSnapMy && snap.myPos[i]) defaultPos = snap.myPos[i];
                 const selectedPlayer = myRoster.players.find(p => p.id === selectedPlayerId) || defaultPlayer;
                 const playerOptions = myRoster.players.map(p =>
-                    `<option value="${p.id}" ${selectedPlayer && p.id === selectedPlayer.id ? 'selected' : ''}>#${p.number} ${p.name} (${p.grade || ''}/${p.bats || ''}打)</option>`
+                    `<option value="${p.id}" ${selectedPlayer && p.id === selectedPlayer.id ? 'selected' : ''}>#${p.number} ${p.name} (${p.grade || ''}/${p.bats || ''}打)${cohortLabel(p.cohort) ? ' ' + cohortLabel(p.cohort) : ''}${gradeColorLabel(p.gradeColor) ? ' ' + gradeColorLabel(p.gradeColor) : ''}</option>`
                 ).join('');
                 const posOptions = positions.map(pos =>
                     `<option value="${pos}" ${pos === defaultPos ? 'selected' : ''}>${pos}</option>`
@@ -5928,7 +6782,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     let selectedPitcherId = pitcherDefault ? pitcherDefault.id : '';
                     if (snap.myPitcher && myRoster.players.some(p => p.id === snap.myPitcher)) selectedPitcherId = snap.myPitcher;
                     const pitcherOptions = myRoster.players.map(p =>
-                        `<option value="${p.id}" ${p.id === selectedPitcherId ? 'selected' : ''}>#${p.number} ${p.name} (${p.grade || ''}/${p.bats || ''}打)</option>`
+                        `<option value="${p.id}" ${p.id === selectedPitcherId ? 'selected' : ''}>#${p.number} ${p.name} (${p.grade || ''}/${p.bats || ''}打)${cohortLabel(p.cohort) ? ' ' + cohortLabel(p.cohort) : ''}${gradeColorLabel(p.gradeColor) ? ' ' + gradeColorLabel(p.gradeColor) : ''}</option>`
                     ).join('');
                     myPitcherArea.innerHTML = `
                         <div class="flex items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
@@ -6081,6 +6935,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     pos: pos,
                     number: masterP ? masterP.number : String(i + 1),
                     name: masterP ? masterP.name : `選手${i + 1}`,
+                    cohort: masterP && masterP.cohort != null ? masterP.cohort : '',
+                    gradeColor: masterP ? normalizeGradeColor(masterP.gradeColor) : '',
                     isActive: true,
                     batting: { pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} }
                 });
@@ -6093,6 +6949,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     pos: '投',
                     number: myPitcherMaster.number || '',
                     name: myPitcherMaster.name,
+                    cohort: myPitcherMaster.cohort != null ? myPitcherMaster.cohort : '',
+                    gradeColor: normalizeGradeColor(myPitcherMaster.gradeColor),
                     isActive: true,
                     dhPitcher: true,
                     batting: { pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} }
@@ -6111,6 +6969,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         pos: mp.pos || '控',
                         number: mp.number || '',
                         name: mp.name,
+                        cohort: mp.cohort != null ? mp.cohort : '',
+                        gradeColor: normalizeGradeColor(mp.gradeColor),
                         isActive: false,
                         batting: { pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} }
                     });
@@ -6287,7 +7147,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="py-2 px-3 text-center"><input type="text" value="${p.number}" onchange="updateMasterPlayer(${idx}, 'number', this.value)" class="w-14 text-center border border-slate-200 rounded py-1 font-mono text-xs"></td>
-                    <td class="py-2 px-3"><input type="text" value="${p.name}" onchange="updateMasterPlayer(${idx}, 'name', this.value)" class="w-full border border-slate-200 rounded px-2 py-1 font-bold text-xs"></td>
+                    <td class="py-2 px-3"><span class="flex items-center">${gradeColorDotHtml(p.gradeColor)}<input type="text" value="${p.name}" onchange="updateMasterPlayer(${idx}, 'name', this.value)" class="flex-1 min-w-0 border border-slate-200 rounded px-2 py-1 font-bold text-xs"></span></td>
                     <td class="py-2 px-3 text-center">
                         <select onchange="updateMasterPlayer(${idx}, 'throws', this.value)" class="border border-slate-200 rounded px-2 py-1 text-xs">
                             <option value="右" ${p.throws === '右' ? 'selected' : ''}>右投</option>
@@ -6311,6 +7171,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         </select>
                     </td>
                     <td class="py-2 px-3 text-center"><input type="number" step="0.1" min="100" max="250" value="${p.height != null && p.height !== '' ? p.height : ''}" placeholder="未登録" onchange="updateMasterPlayer(${idx}, 'height', this.value)" class="w-20 text-center border border-slate-200 rounded py-1 text-xs" title="身長（cm）"></td>
+                    <td class="py-2 px-3 text-center">
+                        <input type="number" step="1" min="1" max="999" value="${p.cohort != null && p.cohort !== '' ? p.cohort : ''}" placeholder="未登録" onchange="updateMasterPlayer(${idx}, 'cohort', this.value)" class="w-16 text-center border border-slate-200 rounded py-1 text-xs" title="何期生（数字のみ。例：72）">
+                    </td>
+                    <td class="py-2 px-3 text-center">
+                        <span class="inline-flex items-center gap-1.5 justify-center">${gradeColorDotHtml(p.gradeColor)}<select onchange="updateMasterPlayer(${idx}, 'gradeColor', this.value)" class="border border-slate-200 rounded px-2 py-1 text-xs font-bold" title="学年カラー（青・赤・緑）">
+                            <option value="" ${!normalizeGradeColor(p.gradeColor) ? 'selected' : ''}>未設定</option>
+                            <option value="blue" ${normalizeGradeColor(p.gradeColor) === 'blue' ? 'selected' : ''}>青</option>
+                            <option value="red" ${normalizeGradeColor(p.gradeColor) === 'red' ? 'selected' : ''}>赤</option>
+                            <option value="green" ${normalizeGradeColor(p.gradeColor) === 'green' ? 'selected' : ''}>緑</option>
+                        </select></span>
+                    </td>
                     <td class="py-2 px-3 text-center">
                         <button onclick="removeMasterPlayer(${idx})" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded text-xs font-bold transition">削除</button>
                     </td>
@@ -6358,6 +7229,31 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function updateMasterPlayer(idx, field, value) {
             const player = globalTeamRosters[currentSettingsTeam].players[idx];
             const oldName = field === 'name' ? player.name : null;
+            if (field === 'cohort') {
+                // 何期生は数字のみ（例：72 → 72期生）。空欄可。1〜999の整数以外は受け付けない
+                const raw = String(value == null ? '' : value).trim().replace(/[^\d]/g, '');
+                if (raw === '') {
+                    player.cohort = '';
+                } else {
+                    const n = parseInt(raw, 10);
+                    if (isNaN(n) || n < 1 || n > 999) {
+                        showToast('何期生は1〜999の数字で入力してください', 'warning');
+                        renderTeamSettingsScreen();
+                        return;
+                    }
+                    player.cohort = n;
+                }
+                saveTeamRosters();
+                renderTeamSettingsScreen();
+                return;
+            }
+            if (field === 'gradeColor') {
+                // 学年カラーは青・赤・緑のいずれか（未設定＝空欄も可）
+                player.gradeColor = normalizeGradeColor(value);
+                saveTeamRosters();
+                renderTeamSettingsScreen();
+                return;
+            }
             if (field === 'height') {
                 // 身長は選手登録で保持する（cm・小数1位まで、空欄可）
                 const raw = String(value == null ? '' : value).trim();
@@ -6394,6 +7290,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 bats: '右',
                 grade: '1年',
                 height: '',
+                cohort: '',
+                gradeColor: '',
                 isActive: true
             });
             saveTeamRosters();
@@ -6454,6 +7352,18 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (isNaN(h) || h < 100 || h > 250) return '';
             return Math.round(h * 10) / 10;
         }
+        function __rosterNormCohort(v) {
+            // 何期生：数字だけを取り出し、1〜999の整数ならその数値を返す。それ以外は空（未登録）
+            const s = String(v === null || v === undefined ? '' : v).replace(/[^\d]/g, '');
+            if (!s) return '';
+            const n = parseInt(s, 10);
+            if (isNaN(n) || n < 1 || n > 999) return '';
+            return n;
+        }
+        function __rosterNormGradeColor(v) {
+            // 学年カラー：青・赤・緑（英語表記含む）を内部値へ正規化する。それ以外は空（未設定）
+            return normalizeGradeColor(v);
+        }
         function __rosterNormPos(v) {
             const s = String(v === null || v === undefined ? '' : v).trim();
             const full = { '投手': '投', '捕手': '捕', '一塁手': '一', '二塁手': '二', '三塁手': '三', '遊撃手': '遊', '左翼手': '左', '中堅手': '中', '右翼手': '右', '内野手': '内', '外野手': '外' };
@@ -6480,7 +7390,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return rows;
         }
         // シートの2次元配列 → 選手リスト。見出し行があれば列を自動判別し、
-        // 無ければ「背番号・選手名・投・打・学年・守備位置・身長」の順とみなす。
+        // 無ければ「背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー」の順とみなす。
         function __parseRosterAoa(aoa) {
             const aliases = {
                 number: ['背番号', '番号', '背番', '選手番号', 'No'],
@@ -6489,7 +7399,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 bats: ['打', '打席', '利き打'],
                 grade: ['学年'],
                 pos: ['守備位置', '守備', 'ポジション'],
-                height: ['身長', '身長cm', '身長（cm）', '身長(cm)']
+                height: ['身長', '身長cm', '身長（cm）', '身長(cm)'],
+                cohort: ['何期生', '期生', '期'],
+                gradeColor: ['学年カラー', '学年色', 'カラー', '色']
             };
             const normHead = v => String(v === null || v === undefined ? '' : v).replace(/[\s　]/g, '').toLowerCase();
             // 「チーム名」欄（ひな型のチーム名行など）があればチーム名も読み取る。
@@ -6515,7 +7427,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             let colMap = null, startRow = 0;
             for (let r = 0; r < Math.min(aoa.length, 15); r++) {
                 const row = aoa[r] || [];
-                const map = { number: -1, name: -1, throws: -1, bats: -1, grade: -1, pos: -1, height: -1 };
+                const map = { number: -1, name: -1, throws: -1, bats: -1, grade: -1, pos: -1, height: -1, cohort: -1, gradeColor: -1 };
                 row.forEach((cell, c) => {
                     const h = normHead(cell);
                     if (!h) return;
@@ -6525,7 +7437,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 });
                 if (map.name !== -1 && (map.number !== -1 || map.throws !== -1 || map.grade !== -1)) { colMap = map; startRow = r + 1; break; }
             }
-            if (!colMap) colMap = { number: 0, name: 1, throws: 2, bats: 3, grade: 4, pos: 5, height: 6 };
+            if (!colMap) colMap = { number: 0, name: 1, throws: 2, bats: 3, grade: 4, pos: 5, height: 6, cohort: 7, gradeColor: 8 };
             const players = [], skipped = [], seen = {};
             for (let r = startRow; r < aoa.length; r++) {
                 const row = aoa[r] || [];
@@ -6552,7 +7464,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     bats: __rosterNormHand(get(colMap.bats)),
                     grade: __rosterNormGrade(get(colMap.grade)),
                     pos: __rosterNormPos(get(colMap.pos)),
-                    height: height
+                    height: height,
+                    cohort: __rosterNormCohort(get(colMap.cohort)),
+                    gradeColor: __rosterNormGradeColor(get(colMap.gradeColor))
                 });
             }
             return { players: players, skipped: skipped, teamName: teamName };
@@ -6621,7 +7535,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 '<td class="py-1.5 px-3 text-center">' + p.bats + '打</td>' +
                 '<td class="py-1.5 px-3 text-center">' + __excelEscapeHtml(p.grade) + '</td>' +
                 '<td class="py-1.5 px-3 text-center">' + __excelEscapeHtml(p.pos || '-') + '</td>' +
-                '<td class="py-1.5 px-3 text-center">' + (p.height !== '' && p.height != null ? p.height + ' cm' : '-') + '</td></tr>').join('');
+                '<td class="py-1.5 px-3 text-center">' + (p.height !== '' && p.height != null ? p.height + ' cm' : '-') + '</td>' +
+                '<td class="py-1.5 px-3 text-center">' + (p.cohort !== '' && p.cohort != null ? __excelEscapeHtml(cohortLabel(p.cohort)) : '-') + '</td>' +
+                '<td class="py-1.5 px-3 text-center">' + (gradeColorLabel(p.gradeColor) ? gradeColorBadgeHtml(p.gradeColor) : '-') + '</td></tr>').join('');
             const skipWrap = document.getElementById('roster-import-skipped-wrap');
             if (parsed.skipped.length) {
                 skipWrap.classList.remove('hidden');
@@ -6653,6 +7569,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     bats: p.bats,
                     grade: p.grade,
                     height: p.height != null ? p.height : '',
+                    cohort: p.cohort != null ? p.cohort : '',
+                    gradeColor: p.gradeColor != null ? p.gradeColor : '',
                     isActive: i < 9
                 }));
                 if (newTeamName) tData.name = newTeamName;
@@ -6677,6 +7595,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     bats: p.bats,
                     grade: p.grade,
                     height: p.height != null ? p.height : '',
+                    cohort: p.cohort != null ? p.cohort : '',
+                    gradeColor: p.gradeColor != null ? p.gradeColor : '',
                     isActive: false
                 });
                 added++;
@@ -6700,15 +7620,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ['選手登録ひな型（チーム名・選手一括登録用）'],
                 ['チーム名', tData.name, '※ チーム名を登録・変更したい場合は、この行のチーム名（B列）を書き換えてください。読み込むとチーム名も一緒に登録されます。この行と見出し行は消さないでください'],
                 [],
-                ['背番号', '選手名', '投', '打', '学年', '守備位置', '身長'],
-                ['※例1', '山田 太郎', '右投', '右打', '3年', '投', 175],
-                ['※例2', '佐藤 次郎', '左投', '左打', '2年', '捕', 168],
-                ['※例3', '鈴木 三郎', '右投', '両打', '1年', '外', 180]
+                ['背番号', '選手名', '投', '打', '学年', '守備位置', '身長', '何期生', '学年カラー'],
+                ['※例1', '山田 太郎', '右投', '右打', '3年', '投', 175, 71, '青'],
+                ['※例2', '佐藤 次郎', '左投', '左打', '2年', '捕', 168, 72, '赤'],
+                ['※例3', '鈴木 三郎', '右投', '両打', '1年', '外', 180, 73, '緑']
             ];
-            for (let i = 0; i < 25; i++) sheet1.push(['', '', '', '', '', '', '']);
+            for (let i = 0; i < 25; i++) sheet1.push(['', '', '', '', '', '', '', '', '']);
             sheet1.push([]);
             sheet1.push(['※ 記入例の行（背番号が「※例」から始まる行）は読み込まれません。例を参考に、空の行へ実際の選手を1行に1名ずつ入力してください。例の行は消しても構いません。']);
-            sheet1.push(['※ 投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。背番号は空欄でも登録できますが、選手名は必須です。身長はcm単位の数値（例：175）で入力してください。空欄でも登録できます。']);
+            sheet1.push(['※ 投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。背番号は空欄でも登録できますが、選手名は必須です。身長はcm単位の数値（例：175）で入力してください。空欄でも登録できます。何期生は数字（例：72）で入力してください（「72期生」という表記でも判別します）。学年カラーは 青・赤・緑 のいずれかで入力してください。どちらも空欄でも登録できます。']);
             sheet1.push(['※ 入力が終わったらファイルを保存し、チーム設定画面で読み込み先のチームが選択されていることを確認してから「Excelで読み込み」でこのファイルを選んでください。「全員入れ替え」で登録すると先頭9名がスタメン（打順1〜9番）になります。詳しくは2枚目の「入力方法」シートをご覧ください。']);
             const sheet2 = [
                 ['ひな型の入力方法・記入例'],
@@ -6718,7 +7638,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 [],
                 ['手順1', 'チーム設定画面で、登録したいチーム（チームA／チームB）をプルダウンで選んでから「ひな型Excelをダウンロード」を押してください。ひな型は選んだチーム用です。もう一方のチーム分は、チームを切り替えて同じ手順を繰り返してください。'],
                 ['手順2', 'ひな型の1枚目「選手登録ひな型」シートを開き、2行目のチーム名を確認します（変更する場合はB列を書き換えます）。'],
-                ['手順3', '見出し行（背番号・選手名・投・打・学年・守備位置・身長）の下の空の行に、1行に1選手ずつ入力します。記入例の行は読み込まれないので、参考用に残しても消しても構いません。見出し行とチーム名の行は消さず、列の並びも変えないでください。'],
+                ['手順3', '見出し行（背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー）の下の空の行に、1行に1選手ずつ入力します。記入例の行は読み込まれないので、参考用に残しても消しても構いません。見出し行とチーム名の行は消さず、列の並びも変えないでください。'],
                 ['手順4', 'ファイルを保存し、チーム設定画面の「Excelで読み込み」からこのファイルを選ぶと、確認画面で読み込んだ内容をチェックしてから登録できます。'],
                 ['背番号', '半角数字で入力します（例：1、18）。空欄でも登録できます。'],
                 ['選手名', '必須です。空欄の行は読み込めません。同じ選手名・背番号の組み合わせがファイル内に重複していると、その行は読み込めません。'],
@@ -6727,6 +7647,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ['学年', '3年／2年／1年／他 のいずれかで入力します（3・2・1 の数字だけでも判別します）。'],
                 ['守備位置', '投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（投手・捕手などの表記でも判別します）。空欄でも登録できます（その場合は自動で割り当てられます）。'],
                 ['身長', 'cm単位の数値で入力します（例：175、175.5）。空欄でも登録できます。100〜250の範囲外の値は読み込まれません。'],
+                ['何期生', '数字で入力します（例：72）。「72期生」という表記でも判別します。空欄でも登録できます。'],
+                ['学年カラー', '青・赤・緑 のいずれかで入力します（学年ごとの色分け）。空欄でも登録できます。'],
                 ['登録方法（追加）', '「既存リストに追加」では現在の登録を残したまま、読み込んだ選手をベンチメンバーとして追加します。同じ選手名がすでに登録されている場合は追加されません。'],
                 ['登録方法（入れ替え）', '「全員入れ替え」では現在の登録選手をすべて削除し、読み込んだ選手だけで登録し直します。先頭の9名がスタメン（打順1〜9番）になります。'],
                 ['チーム名の登録', 'ひな型の「チーム名」欄を書き換えて読み込むと、読み込み先チームのチーム名も一緒に更新され、スコアブックと体力測定に反映されます。選手行を入れずにチーム名だけのファイルを読み込んだ場合は、チーム名だけが登録されます。']
@@ -6745,14 +7667,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ['選手登録シート（' + tData.name + '）'],
                 ['出力日時: ' + __excelNowText()],
                 [],
-                ['背番号', '選手名', '投', '打', '学年', '守備位置', '身長']
+                ['背番号', '選手名', '投', '打', '学年', '守備位置', '身長', '何期生', '学年カラー']
             ];
             tData.players.forEach(p => {
-                aoa.push([p.number, p.name, p.throws + '投', p.bats + '打', (p.grade === 'other' ? '他' : p.grade), p.pos || '', (p.height != null && p.height !== '' ? p.height : '')]);
+                aoa.push([p.number, p.name, p.throws + '投', p.bats + '打', (p.grade === 'other' ? '他' : p.grade), p.pos || '', (p.height != null && p.height !== '' ? p.height : ''), (p.cohort != null && p.cohort !== '' ? p.cohort : ''), gradeColorLabel(p.gradeColor)]);
             });
             aoa.push([]);
             aoa.push(['※ このファイルを編集して、チーム設定画面の「Excelで読み込み」から読み込むと、選手を一括で登録できます。']);
-            aoa.push(['※ 見出し行（背番号・選手名・投・打・学年・守備位置・身長）は残したまま、選手の行を追加・編集・削除してください。投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。身長はcm単位の数値で入力してください（空欄でも登録できます）。']);
+            aoa.push(['※ 見出し行（背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー）は残したまま、選手の行を追加・編集・削除してください。投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。身長はcm単位の数値で入力してください（空欄でも登録できます）。何期生は数字（例：72）で、学年カラーは 青・赤・緑 のいずれかで入力してください（どちらも空欄でも登録できます）。']);
             __downloadExcelWorkbook([{ name: '選手登録', aoa: aoa }], '選手登録_' + tData.name);
             showToast('現在の登録内容をExcelファイルでダウンロードしました', 'success');
         }
@@ -7441,7 +8363,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const rt = computeBatterRates(p);
                 return `
                     <tr class="hover:bg-slate-50">
-                        <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${p.name}</td>
+                        <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(p.name)}${p.name}</td>
                         <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${p.team}</td>
                         <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtRate3(rt.ops)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.obp)}</td>
@@ -8222,6 +9144,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         pos: p.pos,
                         number: p.number,
                         name: p.name,
+                        cohort: (p.cohort != null ? p.cohort : ''),
+                        gradeColor: normalizeGradeColor(p.gradeColor),
                         isActive: p.isActive,
                         batting: { pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} }
                     }))
@@ -11892,7 +12816,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     tr.innerHTML = `
                         <td class="py-2 px-2 text-center font-bold">${p.order}</td>
                         <td class="py-2 px-2 text-center">${p.pos}</td>
-                        <td class="py-2 px-3 font-sans font-bold">${!p.isActive ? `<span class="text-[10px] text-slate-400 mr-1">[退]</span>` : ''}${p.name}</td>
+                        <td class="py-2 px-3 font-sans font-bold">${!p.isActive ? `<span class="text-[10px] text-slate-400 mr-1">[退]</span>` : ''}${playerColorDotHtml(p)}${p.name}</td>
                         <td class="py-2 px-2 text-center font-bold">${fmtRate3(brt.ops)}</td>
                         <td class="py-2 px-2 text-center">${fmtRate3(brt.obp)}</td>
                         <td class="py-2 px-2 text-center font-bold">${avg}</td>
@@ -11918,7 +12842,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         tr.innerHTML = `
                             <td class="py-2 px-2 text-center font-bold text-[11px]">10人目</td>
                             <td class="py-2 px-2 text-center">${p.pos}</td>
-                            <td class="py-2 px-3 font-sans font-bold">${!p.isActive ? `<span class="text-[10px] text-slate-400 mr-1">[退]</span>` : ''}${p.name} <span class="text-[10px] font-extrabold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">投手・DH（打順なし）</span></td>
+                            <td class="py-2 px-3 font-sans font-bold">${!p.isActive ? `<span class="text-[10px] text-slate-400 mr-1">[退]</span>` : ''}${playerColorDotHtml(p)}${p.name} <span class="text-[10px] font-extrabold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">投手・DH（打順なし）</span></td>
                             <td class="py-2 px-2 text-center" colspan="12">打席なし（指名打者制のため投手は打順に入りません）</td>
                         `;
                         tbody.appendChild(tr);
@@ -12662,7 +13586,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const rt = computePitcherRates(L);
                 return `
                     <tr class="hover:bg-slate-50">
-                        <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${L.name}</td>
+                        <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${isOwnTeamName(L.team) ? playerColorDotByName(L.name) : ''}${L.name}</td>
                         <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${L.team}</td>
                         <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtDecimal2(rt.kbb)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.bbk)}</td>
@@ -12785,7 +13709,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const st = r.strike;
                 return `
                 <tr class="hover:bg-slate-50">
-                    <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${r.name}</td>
+                    <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(r.name)}${r.name}</td>
                     <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${r.team}</td>
                     <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtDecimal2(rt.kbb)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.bbk)}</td>
@@ -13098,6 +14022,523 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             navigateApp('home');
         }
 
+        // ================= デモデータ =================
+        // デモデータは id の接頭辞で本物の記録と区別する。
+        //   名簿の選手: 'demo_p_' / 試合アーカイブ: 'demo_game_' / 体力測定: 'demo_fit_'
+        // 投入は「既にあるものは追加しない」追加のみで、本物の記録は上書き・削除しない。
+        // 削除は接頭辞に一致するものだけを対象にし、本物の記録には触れない。
+        const DEMO_ROSTER_PREFIX = 'demo_p_';
+        const DEMO_GAME_PREFIX = 'demo_game_';
+        const DEMO_FIT_PREFIX = 'demo_fit_';
+
+        // 決定的な疑似乱数（デモの数字が再投入でも同じになるようシード固定）
+        function demoRng(seed) {
+            let a = seed >>> 0;
+            return function () {
+                a |= 0; a = (a + 0x6D2B79F5) | 0;
+                let t = Math.imul(a ^ (a >>> 15), 1 | a);
+                t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+
+        function demoCounts() {
+            let players = 0, games = 0, fitness = 0;
+            try {
+                if (!globalTeamRosters) globalTeamRosters = loadTeamRosters();
+                const ownKey = getOwnTeamKey();
+                const roster = globalTeamRosters[ownKey];
+                if (roster && Array.isArray(roster.players)) {
+                    players = roster.players.filter(p => p && p.id && String(p.id).indexOf(DEMO_ROSTER_PREFIX) === 0).length;
+                }
+            } catch (e) { /* 件数表示用なので失敗しても続行 */ }
+            try {
+                games = getArchivedGames().filter(a => a && a.id && String(a.id).indexOf(DEMO_GAME_PREFIX) === 0).length;
+            } catch (e) { /* 同上 */ }
+            try {
+                const data = physicalData || loadPhysicalData();
+                if (data && Array.isArray(data.fitness)) {
+                    fitness = data.fitness.filter(r => r && r.id && String(r.id).indexOf(DEMO_FIT_PREFIX) === 0).length;
+                }
+            } catch (e) { /* 同上 */ }
+            return { players: players, games: games, fitness: fitness };
+        }
+
+        function updateDemoDataStatus() {
+            const el = document.getElementById('demo-data-status');
+            if (!el) return;
+            const c = demoCounts();
+            if (c.players === 0 && c.games === 0 && c.fitness === 0) {
+                el.textContent = 'デモデータは入っていません。';
+            } else {
+                el.textContent = 'デモデータ投入済み：選手 ' + c.players + '名 ／ 試合 ' + c.games + '試合 ／ 体力測定 ' + c.fitness + '件';
+            }
+        }
+
+        function openDemoInsertModal() {
+            openModal('modal-demo-insert');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function openDemoRemoveModal() {
+            const c = demoCounts();
+            const sumEl = document.getElementById('demo-remove-summary');
+            if (sumEl) {
+                sumEl.textContent = (c.players === 0 && c.games === 0 && c.fitness === 0)
+                    ? 'デモデータは入っていません。'
+                    : 'デモ選手 ' + c.players + '名 ／ デモ試合 ' + c.games + '試合 ／ 体力測定のデモ記録 ' + c.fitness + '件 を削除します。';
+            }
+            openModal('modal-demo-remove');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // ---- デモ名簿（自チームに約20人：投手・野手・DHを含む） ----
+        function buildDemoRosterPlayers() {
+            const posList = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指', '投', '投', '外', '内', '外', '捕', '内', '投', '外', '内'];
+            // 学年ごとに何期生と学年カラーを割り当てる（3年＝71期生・青／2年＝72期生・赤／1年＝73期生・緑）
+            const demoGradeInfo = { '3年': { cohort: 71, gradeColor: 'blue' }, '2年': { cohort: 72, gradeColor: 'red' }, '1年': { cohort: 73, gradeColor: 'green' } };
+            const players = [];
+            for (let i = 1; i <= 20; i++) {
+                const grade = ['3年', '2年', '1年'][i % 3];
+                const gi = demoGradeInfo[grade];
+                players.push({
+                    id: DEMO_ROSTER_PREFIX + i,
+                    order: i <= 9 ? i : 0,
+                    pos: posList[i - 1],
+                    number: String(i),
+                    name: 'デモ選手' + i,
+                    throws: (i % 5 === 3) ? '左' : '右',
+                    bats: (i % 7 === 5) ? '両' : ((i % 4 === 2) ? '左' : '右'),
+                    grade: grade,
+                    height: String(168 + ((i * 7) % 16)),
+                    cohort: gi.cohort,
+                    gradeColor: gi.gradeColor,
+                    isActive: i <= 9
+                });
+            }
+            return players;
+        }
+
+        // ---- デモの打席結果を生成（打撃ラインと打席記録の両方に使う） ----
+        function demoGenBatting(rng, skill, paCount, isLowerOrder) {
+            const batting = { pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} };
+            const outcomes = [];
+            const posChars = ['左', '中', '右', '遊', '二', '三', '一'];
+            const pickPos = () => posChars[Math.floor(rng() * posChars.length)];
+            for (let i = 0; i < paCount; i++) {
+                batting.pa += 1;
+                const roll = rng();
+                const hitP = 0.235 * skill;
+                const bbP = 0.085;
+                let code, label;
+                if (roll < hitP) {
+                    batting.ab += 1; batting.h += 1;
+                    const hk = rng();
+                    if (hk < 0.70) { code = '1B'; label = pickPos() + '安'; }
+                    else if (hk < 0.88) { code = '2B'; batting.b2 += 1; label = pickPos() + '二'; }
+                    else if (hk < 0.92) { code = '3B'; batting.b3 += 1; label = pickPos() + '三'; }
+                    else { code = 'HR'; batting.hr += 1; label = pickPos() + '本'; }
+                    if (code === 'HR') {
+                        batting.rbi += 1 + Math.floor(rng() * 2.4);
+                        batting.r += 1;
+                    } else {
+                        if (rng() < 0.42) batting.rbi += 1;
+                        if (rng() < 0.12) batting.rbi += 1;
+                        if (rng() < 0.40) batting.r += 1;
+                        if (rng() < 0.20 * skill) batting.sb += 1;
+                        if (rng() < 0.07) batting.cs += 1;
+                    }
+                } else if (roll < hitP + bbP) {
+                    code = 'BB'; label = '四球'; batting.bb += 1;
+                    if (rng() < 0.30) batting.r += 1;
+                    if (rng() < 0.15) batting.sb += 1;
+                } else if (roll < hitP + bbP + 0.015) {
+                    code = 'HBP'; label = '死球'; batting.hbp += 1;
+                    if (rng() < 0.30) batting.r += 1;
+                } else if (roll < hitP + bbP + 0.015 + 0.17) {
+                    code = 'SO'; label = '三振'; batting.so += 1; batting.ab += 1;
+                } else if (isLowerOrder && roll < hitP + bbP + 0.015 + 0.17 + 0.035) {
+                    code = 'SAC'; label = pickPos() + '犠打'; batting.sac += 1;
+                    if (rng() < 0.3) batting.rbi += 1;
+                } else if (roll < hitP + bbP + 0.015 + 0.17 + 0.035 + 0.015) {
+                    code = 'SF'; label = '犠飛'; batting.sf += 1; batting.rbi += 1;
+                } else {
+                    batting.ab += 1;
+                    const o = rng();
+                    if (o < 0.45) { code = 'GO'; label = pickPos() + 'ゴロ'; }
+                    else if (o < 0.75) { code = 'FO'; label = pickPos() + 'フライ'; }
+                    else if (o < 0.95) { code = 'LO'; label = pickPos() + 'ライナー'; }
+                    else { code = 'DP'; label = pickPos() + '併殺打'; }
+                    if (rng() < 0.10) batting.rbi += 1;
+                }
+                outcomes.push({ result: code, resultLabel: label });
+            }
+            return { batting: batting, outcomes: outcomes };
+        }
+
+        // ---- 1打席分の投球シーケンス（ストライク率集計用） ----
+        function demoGenSequence(rng, resultCode, pitcherId, pitcherName) {
+            const seq = [];
+            let balls = 0, strikes = 0;
+            const pushBall = () => { seq.push({ type: 'ball', label: 'ボール', badgeClass: 'bg-emerald-600 text-white', countBefore: balls + '-' + strikes, pitcherId: pitcherId, pitcherName: pitcherName }); balls += 1; };
+            const pushStrike = () => { const sw = rng() < 0.5; seq.push({ type: sw ? 'strike_swing' : 'strike_called', label: sw ? '空振りストライク' : '見逃しストライク', badgeClass: 'bg-amber-500 text-white', countBefore: balls + '-' + strikes, pitcherId: pitcherId, pitcherName: pitcherName }); strikes += 1; };
+            const pushFoul = () => { seq.push({ type: 'foul_hitting', label: 'ファウル', badgeClass: 'bg-slate-600 text-white', countBefore: balls + '-' + strikes, pitcherId: pitcherId, pitcherName: pitcherName }); if (strikes < 2) strikes += 1; };
+            let tb, ts;
+            if (resultCode === 'BB' || resultCode === 'IBB') { tb = 4; ts = Math.floor(rng() * 3); }
+            else if (resultCode === 'SO' || resultCode === 'BUNT_SO') { ts = 3; tb = Math.floor(rng() * 4); }
+            else { tb = Math.floor(rng() * 4); ts = Math.floor(rng() * 3); }
+            const kinds = [];
+            for (let i = 0; i < tb; i++) kinds.push('B');
+            for (let i = 0; i < ts; i++) kinds.push('S');
+            for (let i = kinds.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); const tmp = kinds[i]; kinds[i] = kinds[j]; kinds[j] = tmp; }
+            kinds.forEach(k => {
+                if (rng() < 0.22 && strikes >= 1) pushFoul();
+                if (k === 'B') pushBall(); else pushStrike();
+            });
+            if (seq.length === 0) pushStrike();
+            return seq;
+        }
+
+        function demoGenPitchingLine(rng, outs, runsAllowed, isReliever) {
+            const h = Math.max(0, Math.round(outs * (0.27 + rng() * 0.12)));
+            const bb = Math.max(0, Math.round(outs * (0.08 + rng() * 0.08)));
+            const so = Math.max(0, Math.round(outs * (0.28 + rng() * 0.14)));
+            const r = Math.max(0, runsAllowed || 0);
+            const er = Math.max(0, r - (rng() < 0.35 ? 1 : 0));
+            const ir = isReliever ? Math.floor(rng() * 3) : 0;
+            const irs = ir > 0 ? Math.min(ir, Math.floor(rng() * (ir + 1) * 0.6)) : 0;
+            return { outs: outs, bf: outs + h + bb + Math.floor(rng() * 3), h: h, bb: bb, so: so, r: r, er: er, wp: rng() < 0.4 ? 1 : 0, bk: 0, ir: ir, irs: irs };
+        }
+
+        function demoDistributeRuns(rng, total) {
+            const innings = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+            for (let i = 0; i < total; i++) innings[Math.floor(rng() * 9)] += 1;
+            return innings;
+        }
+
+        // ---- デモ試合1試合分のゲームデータ（アーカイブ形式） ----
+        function buildDemoGame(def, ownTeamName) {
+            const rng = demoRng(def.seed);
+            const roster = buildDemoRosterPlayers();
+            const byNum = n => roster[n - 1];
+            const oppPitcherId = def.id + '_opp_p_1';
+            const oppPitcherName = '相手選手1';
+
+            // 自チームの打順構成
+            let lineupNums, pitcherNums;
+            if (def.dh) {
+                lineupNums = [2, 3, 4, 5, 6, 7, 8, 9, 10]; // 10番がDH
+                pitcherNums = [1];
+            } else if (def.seed === 202) {
+                lineupNums = [2, 3, 4, 5, 6, 7, 8, 9, 12]; // 12番が先発投手
+                pitcherNums = [12, 1];
+            } else if (def.seed === 404) {
+                lineupNums = [2, 3, 4, 5, 6, 7, 8, 9, 18]; // 18番が先発投手
+                pitcherNums = [18, 11, 12];
+            } else {
+                lineupNums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                pitcherNums = [1, 11];
+            }
+            const outsPlanMap = {
+                101: { 1: 21, 11: 6 },
+                202: { 12: 21, 1: 6 },
+                303: { 1: 27 },
+                404: { 18: 15, 11: 6, 12: 6 }
+            };
+            const outsPlan = outsPlanMap[def.seed] || { 1: 27 };
+            const posByNum = {};
+            lineupNums.forEach((n, i) => { posByNum[n] = def.dh && n === 10 ? '指' : byNum(n).pos; });
+            if (def.seed === 202) posByNum[12] = '投';
+            if (def.seed === 404) posByNum[18] = '投';
+            pitcherNums.forEach(n => { if (posByNum[n] === undefined) posByNum[n] = '投'; });
+
+            // 打撃生成（自チーム）
+            const ownSkill = n => 0.86 + ((n * 37) % 10) * 0.045;
+            const ownPlayers = [];
+            const ownRecords = [];
+            const ownHalf = def.ownAway ? 'top' : 'bottom';
+            let ownTotalR = 0, ownTotalH = 0;
+            roster.forEach(p => {
+                const num = Number(p.number);
+                const li = lineupNums.indexOf(num);
+                const isLineup = li !== -1;
+                const isPitcherOnly = def.dh && num === 1;
+                let pa = 0;
+                if (isLineup) pa = 3 + Math.floor(rng() * 3); // 3〜5打席
+                else if (!isPitcherOnly && (num === 13 || num === 15 || num === 17) && rng() < 0.75) pa = 1 + Math.floor(rng() * 2); // 代打
+                const gen = demoGenBatting(rng, ownSkill(num), pa, isLineup && li >= 6);
+                // 打席結果を回ごとの表示（results）へ振り分け
+                gen.outcomes.forEach((o, i) => {
+                    const inn = Math.min(9, 1 + Math.floor((i * 9) / Math.max(1, gen.outcomes.length)));
+                    if (!gen.batting.results[inn]) gen.batting.results[inn] = [];
+                    gen.batting.results[inn].push(o.resultLabel);
+                });
+                ownTotalR += gen.batting.r; ownTotalH += gen.batting.h;
+                ownPlayers.push({
+                    id: p.id, order: isLineup ? li + 1 : (isPitcherOnly ? 10 : 0), pos: posByNum[num] || p.pos,
+                    number: p.number, name: p.name, cohort: p.cohort, gradeColor: p.gradeColor, isActive: isLineup || isPitcherOnly || pa > 0,
+                    hasEnteredGame: pa > 0 || pitcherNums.indexOf(num) !== -1,
+                    dhPitcher: isPitcherOnly ? true : undefined,
+                    batting: gen.batting, _outcomes: gen.outcomes, _num: num
+                });
+            });
+
+            // 打撃生成（相手チーム）
+            const oppPos = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右'];
+            const oppPlayers = [];
+            const oppRecords = [];
+            const oppHalf = def.ownAway ? 'bottom' : 'top';
+            let oppTotalR = 0, oppTotalH = 0;
+            for (let n = 1; n <= 9; n++) {
+                const gen = demoGenBatting(rng, 0.82, 3 + Math.floor(rng() * 2), n >= 7);
+                gen.outcomes.forEach((o, i) => {
+                    const inn = Math.min(9, 1 + Math.floor((i * 9) / Math.max(1, gen.outcomes.length)));
+                    if (!gen.batting.results[inn]) gen.batting.results[inn] = [];
+                    gen.batting.results[inn].push(o.resultLabel);
+                });
+                oppTotalR += gen.batting.r; oppTotalH += gen.batting.h;
+                oppPlayers.push({
+                    id: def.id + '_opp_p_' + n, order: n, pos: oppPos[n - 1], number: String(n),
+                    name: '相手選手' + n, isActive: true, batting: gen.batting, _outcomes: gen.outcomes, _num: n
+                });
+            }
+
+            // 投手ライン（自チーム）：失点は相手の総得点をアウト数で按分
+            const totalOuts = pitcherNums.reduce((s, n) => s + (outsPlan[n] || 0), 0) || 27;
+            let assignedR = 0;
+            pitcherNums.forEach((n, i) => {
+                const share = i === pitcherNums.length - 1 ? (oppTotalR - assignedR) : Math.round(oppTotalR * ((outsPlan[n] || 0) / totalOuts));
+                assignedR += share;
+                const pl = ownPlayers.find(x => x._num === n);
+                if (pl) pl.pitching = demoGenPitchingLine(rng, outsPlan[n] || 0, share, i > 0);
+            });
+            // 投手ライン（相手チーム）：先発が完投扱い
+            const oppPitcherOuts = def.ownAway ? 27 : 24;
+            oppPlayers[0].pitching = demoGenPitchingLine(rng, oppPitcherOuts, ownTotalR, false);
+            oppPlayers[0].pitching.h = ownTotalH;
+            oppPlayers[0].pitching.bb = ownPlayers.reduce((s, x) => s + x.batting.bb + x.batting.hbp, 0);
+            oppPlayers[0].pitching.so = ownPlayers.reduce((s, x) => s + x.batting.so, 0);
+            oppPlayers[0].pitching.bf = ownPlayers.reduce((s, x) => s + x.batting.pa, 0);
+
+            // 打席記録（atBatRecords）：両チーム分。投手は登板順に割り当てる
+            const records = [];
+            ownPlayers.forEach(pl => {
+                pl._outcomes.forEach(o => {
+                    records.push({
+                        inning: 1 + Math.floor(rng() * 9), half: ownHalf,
+                        batterId: pl.id, batterName: pl.name,
+                        pitcherId: oppPitcherId, pitcherName: oppPitcherName,
+                        result: o.result, resultLabel: o.resultLabel,
+                        hadRunnerOnStart: rng() < 0.4,
+                        sequence: demoGenSequence(rng, o.result, oppPitcherId, oppPitcherName),
+                        pickoffCount: 0, maxConsecutivePickoffs: 0
+                    });
+                });
+            });
+            const oppPaTotal = oppPlayers.reduce((s, x) => s + x._outcomes.length, 0);
+            let oppPaSeen = 0;
+            oppPlayers.forEach(pl => {
+                pl._outcomes.forEach(o => {
+                    oppPaSeen += 1;
+                    const ratio = oppPaTotal > 0 ? oppPaSeen / oppPaTotal : 1;
+                    let cum = 0, pitcherNum = pitcherNums[pitcherNums.length - 1];
+                    for (const n of pitcherNums) { cum += (outsPlan[n] || 0) / totalOuts; if (ratio <= cum) { pitcherNum = n; break; } }
+                    const pitcher = byNum(pitcherNum);
+                    records.push({
+                        inning: 1 + Math.floor(rng() * 9), half: oppHalf,
+                        batterId: pl.id, batterName: pl.name,
+                        pitcherId: pitcher.id, pitcherName: pitcher.name,
+                        result: o.result, resultLabel: o.resultLabel,
+                        hadRunnerOnStart: rng() < 0.4,
+                        sequence: demoGenSequence(rng, o.result, pitcher.id, pitcher.name),
+                        pickoffCount: 0, maxConsecutivePickoffs: 0
+                    });
+                });
+            });
+            records.sort((a, b) => (a.inning - b.inning) || (a.half === b.half ? 0 : (a.half === 'top' ? -1 : 1)));
+
+            const strip = pl => { const c = Object.assign({}, pl); delete c._outcomes; delete c._num; if (c.dhPitcher === undefined) delete c.dhPitcher; return c; };
+            const ownTeamObj = { name: ownTeamName, innings: demoDistributeRuns(rng, ownTotalR), hits: ownTotalH, errors: Math.floor(rng() * 3), players: ownPlayers.map(strip) };
+            const oppTeamObj = { name: def.opp, innings: demoDistributeRuns(rng, oppTotalR), hits: oppTotalH, errors: Math.floor(rng() * 3), players: oppPlayers.map(strip) };
+            const awayTeam = def.ownAway ? ownTeamObj : oppTeamObj;
+            const homeTeam = def.ownAway ? oppTeamObj : ownTeamObj;
+            const awayR = awayTeam.innings.reduce((a, b) => a + b, 0);
+            const homeR = homeTeam.innings.reduce((a, b) => a + b, 0);
+
+            const data = {
+                meta: { tournament: def.tournament, date: def.date, stadium: 'デモ球場', useDH: !!def.dh, dhRuleMode: 'relaxed' },
+                live: {
+                    inning: 9, half: 'bottom', balls: 0, strikes: 0, outs: 3,
+                    bases: [null, null, null], awayBatterIdx: 0, homeBatterIdx: 0,
+                    pitchHistory: [], inningPitches: 0, pitcherPitchCounts: {},
+                    isTiebreakActive: false, pendingDefenseSubs: [], runnerResp: {}, bequeathed: {}, pitcherTenure: null
+                },
+                teams: { away: awayTeam, home: homeTeam },
+                logs: [],
+                atBatRecords: records
+            };
+            return {
+                id: def.id, date: def.date, tournament: def.tournament, reason: '試合終了',
+                summary: awayTeam.name + ' ' + awayR + ' - ' + homeR + ' ' + homeTeam.name,
+                data: data
+            };
+        }
+
+        function buildDemoGames(ownTeamName) {
+            return [
+                { id: DEMO_GAME_PREFIX + '1', date: '2026-10-04', tournament: 'デモ大会（秋季大会）', opp: 'デモ相手チームA', ownAway: true, dh: false, seed: 101 },
+                { id: DEMO_GAME_PREFIX + '2', date: '2026-10-18', tournament: 'デモ大会（秋季大会）', opp: 'デモ相手チームB', ownAway: false, dh: false, seed: 202 },
+                { id: DEMO_GAME_PREFIX + '3', date: '2026-11-01', tournament: 'デモ大会（練習試合）', opp: 'デモ相手チームC', ownAway: true, dh: true, seed: 303 },
+                { id: DEMO_GAME_PREFIX + '4', date: '2026-11-15', tournament: 'デモ大会（練習試合）', opp: 'デモ相手チームA', ownAway: false, dh: false, seed: 404 }
+            ].map(def => buildDemoGame(def, ownTeamName));
+        }
+
+        // ---- デモの体力測定記録（6カテゴリ・17種目 × 20人 × 3か月分） ----
+        const DEMO_FIT_RANGES = {
+            '除脂肪指数': { min: 17.2, max: 21.8, dec: 1 },
+            '垂直跳び': { min: 46, max: 74, dec: 0 },
+            '三段跳び': { min: 6.5, max: 8.4, dec: 2 },
+            'MBバックスロー': { min: 5.5, max: 14.5, dec: 1 },
+            'DL挙上速度': { min: 1.05, max: 1.95, dec: 2 },
+            'BSQ': { min: 95, max: 195, dec: 0 },
+            'BP': { min: 50, max: 108, dec: 0 },
+            '10m走': { min: 1.68, max: 1.95, dec: 2, low: true },
+            '30m走': { min: 3.85, max: 4.45, dec: 2, low: true }
+        };
+
+        function buildDemoFitnessRecords(ownKey) {
+            const rng = demoRng(20260910);
+            const dates = ['2026-09-10', '2026-10-10', '2026-11-10'];
+            const records = [];
+            for (let p = 1; p <= 20; p++) {
+                const name = 'デモ選手' + p;
+                const skill = 0.82 + rng() * 0.36;
+                dates.forEach((date, di) => {
+                    const growth = 1 + di * 0.045;
+                    FITNESS_TEST_DEFS.forEach((d, ti) => {
+                        const id = DEMO_FIT_PREFIX + p + '_' + di + '_' + ti;
+                        if (fitnessIsGradeTest(d.name)) {
+                            const score = skill * growth + (rng() - 0.5) * 0.22;
+                            let grade;
+                            if (d.name === 'KWテスト') {
+                                grade = score > 1.08 ? '支持なし可能' : (score > 0.97 ? '支持あり可能' : (score > 0.88 ? '支持あり不可' : '支持あり困難'));
+                            } else {
+                                grade = score > 1.10 ? '◎' : (score > 0.98 ? '○' : (score > 0.88 ? '△' : '×'));
+                            }
+                            records.push({ id: id, teamKey: ownKey, playerName: name, date: date, test: d.name, value: null, unit: '', memo: 'デモデータ', grade: grade });
+                        } else {
+                            const range = DEMO_FIT_RANGES[d.name];
+                            if (!range) return;
+                            let t = (skill * growth - 0.80) / 0.42;
+                            t = Math.max(0, Math.min(1, t)) + (rng() - 0.5) * 0.08;
+                            t = Math.max(0, Math.min(1, t));
+                            const raw = range.low ? (range.max - t * (range.max - range.min)) : (range.min + t * (range.max - range.min));
+                            const pow = Math.pow(10, range.dec);
+                            const value = Math.round(raw * pow) / pow;
+                            records.push({ id: id, teamKey: ownKey, playerName: name, date: date, test: d.name, value: value, unit: d.unit, memo: 'デモデータ' });
+                        }
+                    });
+                });
+            }
+            return records;
+        }
+
+        // ---- デモデータの投入（追加のみ・本物の記録は変更しない） ----
+        function insertDemoData() {
+            closeModal('modal-demo-insert');
+            if (!globalTeamRosters) globalTeamRosters = loadTeamRosters();
+            const ownKey = getOwnTeamKey();
+            if (!globalTeamRosters[ownKey]) globalTeamRosters[ownKey] = { name: '', players: [] };
+            if (!Array.isArray(globalTeamRosters[ownKey].players)) globalTeamRosters[ownKey].players = [];
+            const roster = globalTeamRosters[ownKey];
+
+            let addedPlayers = 0;
+            buildDemoRosterPlayers().forEach(p => {
+                if (!roster.players.some(x => x && x.id === p.id)) { roster.players.push(p); addedPlayers += 1; }
+            });
+            if (addedPlayers > 0) saveTeamRosters();
+
+            const ownName = roster.name || GENERIC_TEAM_NAMES[ownKey];
+            const archives = getArchivedGames();
+            let addedGames = 0;
+            buildDemoGames(ownName).forEach(g => {
+                if (!archives.some(a => a && a.id === g.id)) { archives.push(g); addedGames += 1; }
+            });
+            if (addedGames > 0) saveArchivedGames(archives);
+
+            if (!physicalData) physicalData = loadPhysicalData();
+            if (!Array.isArray(physicalData.fitness)) physicalData.fitness = [];
+            let addedFitness = 0;
+            buildDemoFitnessRecords(ownKey).forEach(r => {
+                if (!physicalData.fitness.some(x => x && x.id === r.id)) { physicalData.fitness.push(r); addedFitness += 1; }
+            });
+            if (addedFitness > 0) savePhysicalData();
+
+            // 総合評価と個人記録の確認（推移）は「画面上部で選択中の選手」だけを
+            // 表示する画面で、ランキングのように全選手を集計しない。そのため
+            // デモを入れても、記録のない選手が選択されたままだと両画面には
+            // 何も反映されない。デモ投入時は選択選手をデモ選手1に切り替え、
+            // 個人記録の推移の期間絞り込み・種目・比較対象も初期状態に戻して、
+            // デモ記録（2026年9〜11月）がそのまま表示されるようにする。
+            // すでにデモが入っている状態で再度押した場合も同じ切り替えを行う。
+            physicalPlayerName = 'デモ選手1';
+            physPersonalPeriod = { start: '', end: '' };
+            physComparePeriod = { start: '', end: '' };
+            physPersonalTest = '';
+            physPersonalCategory = '__overall__';
+            physCompareSelected = null;
+
+            try { updateHomeScreenUI(); } catch (e) { /* 画面更新の失敗で投入結果の通知を止めない */ }
+            updateDemoDataStatus();
+            if (addedPlayers + addedGames + addedFitness === 0) {
+                showToast('デモデータはすでに入っています。体力測定ではデモ選手1を選択した状態で総合評価・個人記録の確認が表示されます', 'info');
+            } else {
+                showToast('デモデータを入れました（選手' + addedPlayers + '名・試合' + addedGames + '試合・体力測定' + addedFitness + '件）', 'success');
+            }
+        }
+
+        // ---- デモデータの削除（デモ分だけ・本物の記録は残す） ----
+        function removeDemoData() {
+            closeModal('modal-demo-remove');
+            let removedPlayers = 0, removedGames = 0, removedFitness = 0;
+            const removedNames = [];
+            if (!globalTeamRosters) globalTeamRosters = loadTeamRosters();
+            const ownKey = getOwnTeamKey();
+            const roster = globalTeamRosters[ownKey];
+            if (roster && Array.isArray(roster.players)) {
+                roster.players = roster.players.filter(p => {
+                    const isDemo = !!(p && p.id && String(p.id).indexOf(DEMO_ROSTER_PREFIX) === 0);
+                    if (isDemo) { removedPlayers += 1; removedNames.push(p.name); }
+                    return !isDemo;
+                });
+                if (removedPlayers > 0) saveTeamRosters();
+            }
+            const archives = getArchivedGames();
+            const kept = archives.filter(a => !(a && a.id && String(a.id).indexOf(DEMO_GAME_PREFIX) === 0));
+            removedGames = archives.length - kept.length;
+            if (removedGames > 0) saveArchivedGames(kept);
+
+            if (!physicalData) physicalData = loadPhysicalData();
+            if (physicalData && Array.isArray(physicalData.fitness)) {
+                const before = physicalData.fitness.length;
+                physicalData.fitness = physicalData.fitness.filter(r => {
+                    if (!r) return true;
+                    if (r.id && String(r.id).indexOf(DEMO_FIT_PREFIX) === 0) return false;
+                    if (r.memo === 'デモデータ' && removedNames.indexOf(r.playerName) !== -1) return false;
+                    return true;
+                });
+                removedFitness = before - physicalData.fitness.length;
+                if (removedFitness > 0) savePhysicalData();
+            }
+            try { updateHomeScreenUI(); } catch (e) { /* 同上 */ }
+            updateDemoDataStatus();
+            if (removedPlayers + removedGames + removedFitness === 0) {
+                showToast('デモデータはありませんでした', 'info');
+            } else {
+                showToast('デモデータを削除しました（選手' + removedPlayers + '名・試合' + removedGames + '試合・体力測定' + removedFitness + '件）。本物の記録はそのまま残っています', 'success');
+            }
+        }
+
         // ================= HTMLハンドラ用に関数をグローバル公開 =================
         // 公開プレビュー（クライアント側の実行環境）では、このスクリプトが
         // ラッパーの関数スコープの中で実行されることがある。その場合、
@@ -13138,10 +14579,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             openOpponentTeams, openOpponentDetail, showOpponentList, renderOpponentList, renderOpponentDetail, renderOpponentPitcherDetail, exportOpponentStatsExcel, setOwnTeamKey,
             switchPlayerStatsBranch, switchBoxscoreBranch, refreshAggregatedStats,
             changePhysicalTeam, changePhysicalPlayer,
-            showPhysicalHub, openPhysicalOverall, openPhysicalPersonal, openPhysicalCompare, openPhysicalRankingHub, openPhysicalRanking, openPhysicalInput,
+            showPhysicalHub, openPhysicalOverall, openPhysicalPersonal, openPhysicalCompare, openPhysicalRankingHub, openPhysicalRanking, openPhysicalInput, downloadPhysicalRankingExcel, downloadPhysicalRankingPdf,
             togglePhysLine, changePhysPeriod, resetPhysPeriod, changePhysPersonalTest, switchPhysPersonalTab, changePhysPersonalCategory, togglePhysComparePlayer, changePhysCompareMetric,
             changePhysicalFitnessTest,
             addPhysicalFitness, addPhysicalFitnessBulk, clearPhysicalBulkForm, updatePhysicalBulkCount, renderPhysicalBulkForm, deletePhysicalFitness,
+            openDemoInsertModal, openDemoRemoveModal, insertDemoData, removeDemoData, updateDemoDataStatus,
             renderNewGameLineupRows, resetCount, resetWizard,
             resumeCurrentGameFromHome, saveAndRender, saveGameInfo,
             saveTeamNameSettings, selectKDetail, selectKDetailCause, selectKBatterTarget,
