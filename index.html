@@ -992,6 +992,85 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <p class="text-[11px] text-slate-400">各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、カテゴリごとに平均したものです。未記録・未採点の種目は平均に含まれません。</p>
             </div>
         </div>
+
+        <!-- 個人記録の確認：選択中の選手のレーダー（6カテゴリ平均点）と種目別推移を、目標ライン・期間指定つきで表示する -->
+        <div id="physical-personal" class="hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-5">
+                <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                    <i data-lucide="trending-up" class="w-5 h-5 text-orange-600"></i>個人記録の確認
+                </h3>
+                <div class="flex flex-wrap items-end gap-x-5 gap-y-3">
+                    <div class="flex items-end gap-2">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1" for="phys-personal-start">開始月</label>
+                            <input type="month" id="phys-personal-start" onchange="changePhysPeriod('personal')" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+                        </div>
+                        <span class="pb-2.5 text-slate-400 font-bold">〜</span>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1" for="phys-personal-end">終了月</label>
+                            <input type="month" id="phys-personal-end" onchange="changePhysPeriod('personal')" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+                        </div>
+                        <button type="button" onclick="resetPhysPeriod('personal')" class="mb-0.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition">全期間</button>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-500 mb-1.5">目標ライン（重ねて表示）</p>
+                        <div id="phys-personal-lines" class="flex flex-wrap gap-1.5"></div>
+                    </div>
+                </div>
+                <div id="physical-personal-summary"></div>
+                <div id="physical-personal-radar" class="w-full"></div>
+                <p class="text-[11px] text-slate-400">レーダーは期間内の各種目ベスト記録から採点したカテゴリ別平均点です。目標ラインを選ぶと、そのラインの点数の位置を破線で重ねます。</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                <div class="flex flex-wrap items-center gap-3">
+                    <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                        <i data-lucide="chart-line" class="w-5 h-5 text-orange-600"></i>種目別推移
+                    </h3>
+                    <select id="phys-personal-test" onchange="changePhysPersonalTest(this.value)" class="border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 bg-slate-50"></select>
+                </div>
+                <div id="physical-personal-chart" class="w-full"></div>
+                <div id="physical-personal-growth"></div>
+            </div>
+        </div>
+
+        <!-- 個人記録の比較：複数選手を色分けして、同じ指標の推移を重ねて表示する -->
+        <div id="physical-compare" class="hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-5">
+                <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                    <i data-lucide="users" class="w-5 h-5 text-orange-600"></i>個人記録の比較
+                </h3>
+                <div>
+                    <p class="text-[11px] font-bold text-slate-500 mb-1.5">比較する選手</p>
+                    <div id="phys-compare-players" class="flex flex-wrap gap-1.5"></div>
+                </div>
+                <div class="flex flex-wrap items-end gap-x-5 gap-y-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1" for="phys-compare-metric">比較する指標</label>
+                        <select id="phys-compare-metric" onchange="changePhysCompareMetric(this.value)" class="border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 bg-slate-50"></select>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1" for="phys-compare-start">開始月</label>
+                            <input type="month" id="phys-compare-start" onchange="changePhysPeriod('compare')" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+                        </div>
+                        <span class="pb-2.5 text-slate-400 font-bold">〜</span>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1" for="phys-compare-end">終了月</label>
+                            <input type="month" id="phys-compare-end" onchange="changePhysPeriod('compare')" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+                        </div>
+                        <button type="button" onclick="resetPhysPeriod('compare')" class="mb-0.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition">全期間</button>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-500 mb-1.5">目標ライン（重ねて表示）</p>
+                        <div id="phys-compare-lines" class="flex flex-wrap gap-1.5"></div>
+                    </div>
+                </div>
+                <div id="physical-compare-legend"></div>
+                <div id="physical-compare-chart" class="w-full"></div>
+                <div id="physical-compare-summary"></div>
+                <p class="text-[11px] text-slate-400">総合平均・カテゴリ平均点は、各測定日時点で直近の各種目記録から採点した平均点の推移です。種目を選ぶと、その種目の測定値（区分種目は点数）の推移を重ねます。</p>
+            </div>
+        </div>
     </div>
 
     <!-- ================= APP SCREEN 3: 選手成績（通算自動集計） ================= -->
@@ -3568,7 +3647,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // 「戻る」ボタンはスタックから1つ取り出してその状態を復元する。
         let navCurrentScreen = 'home';
         let navHomeSubView = 'hub'; // 'hub'（トップ選択） | 'scorebook-menu'
-        let navPhysicalSubView = 'hub'; // 'hub'（カテゴリ選択） | 'fitness'（カテゴリ画面） | 'overall'（総合評価）
+        let navPhysicalSubView = 'hub'; // 'hub'（カテゴリ選択） | 'fitness'（カテゴリ画面） | 'overall'（総合評価） | 'personal'（個人記録の確認） | 'compare'（個人記録の比較）
         let navPhysicalCategory = null; // 選択中のカテゴリ名（'__other__'＝その他の記録、null＝カテゴリ選択）
         let navPhysicalMode = 'view'; // 'view'（記録を見る画面） | 'input'（記録を入力する画面）
         const navHistoryStack = [];
@@ -3639,6 +3718,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (prev.screen === 'physical') {
                     if (prev.physicalSub === 'overall') {
                         openPhysicalOverall();
+                    } else if (prev.physicalSub === 'personal') {
+                        openPhysicalPersonal();
+                    } else if (prev.physicalSub === 'compare') {
+                        openPhysicalCompare();
                     } else if (prev.physicalSub === 'fitness' && prev.physicalCategory) {
                         openPhysicalCategory(prev.physicalCategory, prev.physicalMode);
                     } else {
@@ -3693,6 +3776,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 navPhysicalMode = 'view';
                 physicalCategory = null;
                 physicalOverallView = false;
+                physicalPersonalView = false;
+                physicalCompareView = false;
                 physicalMode = 'view';
                 initPhysicalScreen();
             } else if (screenName === 'scorebook') {
@@ -3762,15 +3847,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const hub = document.getElementById('physical-category-hub');
             const detail = document.getElementById('physical-detail');
             const overall = document.getElementById('physical-overall');
+            const personal = document.getElementById('physical-personal');
+            const compare = document.getElementById('physical-compare');
             const inOverall = !!physicalOverallView;
-            const inHub = !physicalCategory && !inOverall;
+            const inPersonal = !!physicalPersonalView;
+            const inCompare = !!physicalCompareView;
+            const inHub = !physicalCategory && !inOverall && !inPersonal && !inCompare;
             if (hub) hub.classList.toggle('hidden', !inHub);
-            if (detail) detail.classList.toggle('hidden', inHub || inOverall);
+            if (detail) detail.classList.toggle('hidden', inHub || inOverall || inPersonal || inCompare);
             if (overall) overall.classList.toggle('hidden', !inOverall);
-            // 最上部の「体力測定」の横に、開いているカテゴリを括弧書きで示す（カテゴリ選択では何も出さない）
+            if (personal) personal.classList.toggle('hidden', !inPersonal);
+            if (compare) compare.classList.toggle('hidden', !inCompare);
+            // 最上部の「体力測定」の横に、開いている画面・カテゴリを括弧書きで示す（カテゴリ選択では何も出さない）
             const headingCat = document.getElementById('physical-heading-category');
             if (headingCat) {
-                headingCat.textContent = inOverall ? '（総合評価）' : inHub ? '' : '（' + (physicalCategory === '__other__' ? 'その他の記録' : physicalCategory) + '）';
+                headingCat.textContent = inOverall ? '（総合評価）' : inPersonal ? '（個人記録の確認）' : inCompare ? '（個人記録の比較）' : inHub ? '' : '（' + (physicalCategory === '__other__' ? 'その他の記録' : physicalCategory) + '）';
             }
         }
 
@@ -3784,6 +3875,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             navPhysicalMode = 'view';
             physicalCategory = null;
             physicalOverallView = false;
+            physicalPersonalView = false;
+            physicalCompareView = false;
             physicalMode = 'view';
             renderPhysicalScreen();
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -3804,6 +3897,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             navPhysicalMode = targetMode;
             physicalCategory = category;
             physicalOverallView = false;
+            physicalPersonalView = false;
+            physicalCompareView = false;
             physicalMode = targetMode;
             physicalFitnessCategoryFilter = category || '';
             populatePhysicalFitnessTestSelect();
@@ -3822,11 +3917,51 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             navPhysicalCategory = null;
             navPhysicalMode = 'view';
             physicalOverallView = true;
+            physicalPersonalView = false;
+            physicalCompareView = false;
             physicalCategory = null;
             physicalMode = 'view';
             renderPhysicalScreen();
             if (typeof lucide !== 'undefined') lucide.createIcons();
             playViewIn(document.getElementById('physical-overall'));
+            scrollAppToTop();
+        }
+
+        // 個人記録の確認ページを開く（レーダー＋種目別推移、目標ライン・期間指定つき）
+        function openPhysicalPersonal() {
+            if (!navRestoring && navCurrentScreen === 'physical' && navPhysicalSubView !== 'personal') {
+                pushNavHistory();
+            }
+            navPhysicalSubView = 'personal';
+            navPhysicalCategory = null;
+            navPhysicalMode = 'view';
+            physicalPersonalView = true;
+            physicalCompareView = false;
+            physicalOverallView = false;
+            physicalCategory = null;
+            physicalMode = 'view';
+            renderPhysicalScreen();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            playViewIn(document.getElementById('physical-personal'));
+            scrollAppToTop();
+        }
+
+        // 個人記録の比較ページを開く（複数選手の推移を色分けして重ねる）
+        function openPhysicalCompare() {
+            if (!navRestoring && navCurrentScreen === 'physical' && navPhysicalSubView !== 'compare') {
+                pushNavHistory();
+            }
+            navPhysicalSubView = 'compare';
+            navPhysicalCategory = null;
+            navPhysicalMode = 'view';
+            physicalCompareView = true;
+            physicalPersonalView = false;
+            physicalOverallView = false;
+            physicalCategory = null;
+            physicalMode = 'view';
+            renderPhysicalScreen();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            playViewIn(document.getElementById('physical-compare'));
             scrollAppToTop();
         }
 
@@ -3881,6 +4016,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         let physicalTab = 'fitness'; // 体力測定のみ
         let physicalCategory = null; // 表示中のカテゴリ（null＝カテゴリ選択、'__other__'＝その他の記録）
         let physicalOverallView = false; // 総合評価ページを表示中かどうか
+        let physicalPersonalView = false; // 個人記録の確認ページを表示中かどうか
+        let physicalCompareView = false; // 個人記録の比較ページを表示中かどうか
         let physicalMode = 'view'; // 'view'（記録を見る画面） | 'input'（記録を入力する画面）
         let physicalFitnessChartTest = '';
         let physicalFitnessCategoryFilter = ''; // 記録一覧のカテゴリ絞り込み（''=すべて、'__other__'=その他の記録）
@@ -4036,6 +4173,18 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function renderPhysicalScreen() {
             renderPhysicalMeta();
             syncPhysicalHubUI();
+            if (physicalPersonalView) {
+                // 個人記録の確認：レーダー（6カテゴリ平均点）＋種目別推移（目標ライン・期間指定つき）
+                renderPhysicalPersonal();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                return;
+            }
+            if (physicalCompareView) {
+                // 個人記録の比較：複数選手の推移を色分けして重ねる
+                renderPhysicalCompare();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                return;
+            }
             if (physicalOverallView) {
                 // 総合評価ページ：カテゴリ別平均点のレーダーチャートと内訳を表示する
                 renderPhysicalOverall();
@@ -4286,7 +4435,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         // カテゴリ別平均点のレーダーチャート（SVG、1〜6点）。未採点のカテゴリは軸と「―」だけを表示する。
-        function buildPhysicalRadarChart(catResults) {
+        // targetLinePoints（任意）: 目標ラインの点数（6〜1）の配列。指定時はその点数の正多角形を破線で重ねる。
+        function buildPhysicalRadarChart(catResults, targetLinePoints) {
             const W = 680, H = 520, CX = W / 2, CY = 258, R = 160;
             const n = catResults.length;
             const ptAt = (i, ratio) => {
@@ -4297,6 +4447,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             [1, 5 / 6, 4 / 6, 3 / 6, 2 / 6, 1 / 6].forEach(ratio => {
                 const pts = catResults.map((c, i) => ptAt(i, ratio).map(v => v.toFixed(1)).join(',')).join(' ');
                 svg += `<polygon points="${pts}" fill="${ratio === 1 ? 'rgba(248,250,252,0.7)' : 'none'}" stroke="#e2e8f0" stroke-width="1"/>`;
+            });
+            (targetLinePoints || []).forEach(p => {
+                if (p == null || isNaN(p) || p <= 0 || p > 6) return;
+                const pts = catResults.map((c, i) => ptAt(i, p / 6).map(v => v.toFixed(1)).join(',')).join(' ');
+                svg += `<polygon points="${pts}" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 4"/>`;
+                const lp = ptAt(0, p / 6);
+                const lineDef = FITNESS_SCORE_LINES.find(l => l.points === p);
+                svg += `<text x="${(lp[0] - 8).toFixed(1)}" y="${(lp[1] + 3).toFixed(1)}" text-anchor="end" font-size="10" font-weight="700" fill="#64748b">${lineDef ? lineDef.label.replace('ライン', '') : p + '点'}</text>`;
             });
             [2, 4, 6].forEach(v => {
                 const p = ptAt(0, v / 6);
@@ -4376,6 +4534,471 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (stdEl) stdEl.innerHTML = '<h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">採点基準（150キロライン＝6点 〜 115キロライン＝1点）</h4>' + buildPhysicalStandardsTable();
         }
 
+        // ===== 個人記録の確認／個人記録の比較 =====
+        // pitchers.test の「個人記録の確認」「個人間記録の比較」の構成を、ポータルの
+        // 6カテゴリ・17種目と既存の採点基準（FITNESS_SCORE_STANDARDS）で再構成したもの。
+        // データは端末内保存の体力測定記録だけを使い、保存データの形式は変えない。
+        // 目標ライン・期間・比較選手などの表示条件はセッション内だけの状態として保持する。
+        let physPersonalLines = { 6: true };   // 個人記録の確認：重ねる目標ライン（点数→表示）
+        let physCompareLines = { 6: true };    // 個人記録の比較：重ねる目標ライン
+        let physPersonalPeriod = { start: '', end: '' }; // 'YYYY-MM'（空＝その側は制限なし）
+        let physComparePeriod = { start: '', end: '' };
+        let physPersonalTest = '';             // 個人記録の確認：推移を表示する種目
+        let physCompareMetric = '__overall__'; // 個人記録の比較：'__overall__' | カテゴリ名 | 種目名
+        let physComparePlayerNames = [];       // 比較チェックボックスの表示順（選手名）
+        let physCompareSelected = null;        // 比較対象の選手（名前→true）。null＝未初期化
+        const PHYS_COMPARE_COLORS = ['#ea580c', '#2563eb', '#059669', '#dc2626', '#7c3aed', '#0891b2', '#db2777', '#65a30d', '#b45309', '#475569'];
+
+        function physSelectedLinePoints(map) {
+            return FITNESS_SCORE_LINES.filter(l => map[l.points]).map(l => l.points);
+        }
+
+        // 目標ラインのチェックボックス群（150〜115キロライン）
+        function physLineChecksHtml(kind, map) {
+            return FITNESS_SCORE_LINES.map(l => `
+                <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border ${map[l.points] ? 'border-orange-400 bg-orange-50 text-orange-800' : 'border-slate-200 bg-white text-slate-500'} text-xs font-bold cursor-pointer transition">
+                    <input type="checkbox" onchange="togglePhysLine('${kind}', ${l.points}, this.checked)"${map[l.points] ? ' checked' : ''} class="accent-orange-600 w-3.5 h-3.5">
+                    ${l.label}（${l.points}点）
+                </label>`).join('');
+        }
+
+        function togglePhysLine(kind, points, checked) {
+            if (kind === 'personal') physPersonalLines[points] = !!checked;
+            else physCompareLines[points] = !!checked;
+            renderPhysicalScreen();
+        }
+
+        function changePhysPeriod(kind) {
+            if (kind === 'personal') {
+                const s = document.getElementById('phys-personal-start');
+                const e = document.getElementById('phys-personal-end');
+                physPersonalPeriod.start = s ? (s.value || '') : '';
+                physPersonalPeriod.end = e ? (e.value || '') : '';
+            } else {
+                const s = document.getElementById('phys-compare-start');
+                const e = document.getElementById('phys-compare-end');
+                physComparePeriod.start = s ? (s.value || '') : '';
+                physComparePeriod.end = e ? (e.value || '') : '';
+            }
+            renderPhysicalScreen();
+        }
+
+        function resetPhysPeriod(kind) {
+            if (kind === 'personal') physPersonalPeriod = { start: '', end: '' };
+            else physComparePeriod = { start: '', end: '' };
+            renderPhysicalScreen();
+        }
+
+        // 期間（開始月〜終了月）で記録を絞る。月は 'YYYY-MM' の文字列比較で判定する。
+        function physFilterByPeriod(records, period) {
+            return records.filter(r => {
+                const m = String(r.date || '').slice(0, 7);
+                if (!m) return false;
+                if (period.start && m < period.start) return false;
+                if (period.end && m > period.end) return false;
+                return true;
+            });
+        }
+
+        // 指定選手の体力測定記録（日付昇順）。現在の選択選手以外も取得できる。
+        function physPlayerRecordsAsc(playerName) {
+            if (!physicalData || !Array.isArray(physicalData.fitness)) return [];
+            return physicalData.fitness
+                .filter(r => r.teamKey === physicalTeamKey && r.playerName === playerName)
+                .slice()
+                .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+        }
+
+        // 任意の記録配列から種目別ベストを求める（getPhysicalFitnessBests と同じ判定）
+        function physBestsFromRecords(records) {
+            const map = {};
+            records.forEach(r => {
+                const cur = map[r.test];
+                if (!cur) { map[r.test] = r; return; }
+                const def = fitnessTestDef(r.test);
+                const lowBetter = def && def.better === 'low' && !fitnessIsGradeTest(r.test);
+                const ra = fitnessRecordRank(r), rb = fitnessRecordRank(cur);
+                if (lowBetter ? ra < rb : ra > rb) map[r.test] = r;
+            });
+            return map;
+        }
+
+        // 任意の記録配列からカテゴリ別評価を組み立てる（computePhysicalOverall と同じ形）
+        function physOverallFromRecords(records) {
+            const bestByTest = physBestsFromRecords(records);
+            return FITNESS_CATEGORIES.map(cat => {
+                const tests = FITNESS_TEST_DEFS.filter(d => d.category === cat).map(d => {
+                    const record = bestByTest[d.name] || null;
+                    return { def: d, record: record, score: record ? fitnessRecordScore(record) : null };
+                });
+                const scored = tests.filter(t => t.score != null);
+                const avg = scored.length ? Math.round(scored.reduce((s, t) => s + t.score, 0) / scored.length * 10) / 10 : null;
+                return { category: cat, tests: tests, avg: avg };
+            });
+        }
+
+        // 目標ラインの点数に対応する、種目グラフ上の値。
+        // 区分種目は点数そのもの、数値種目は基準表の境界値。1点（115キロライン）は
+        // 数値種目では下限の境界がないため null（線を引かない）。
+        function physTargetValueForTest(testName, points) {
+            const std = FITNESS_SCORE_STANDARDS[testName];
+            if (!std) return null;
+            if (std.kind === 'grade') return points;
+            if (points === 1) return null;
+            return std.thresholds[6 - points];
+        }
+
+        // 選択中の目標ラインをグラフ用の {value, label} 配列にする。
+        // testName が null のときは点数スケールのグラフ（平均点・区分種目）として点数をそのまま値にする。
+        function physTargetLinesFor(testName, lineMap) {
+            const out = [];
+            physSelectedLinePoints(lineMap).forEach(p => {
+                const v = testName ? physTargetValueForTest(testName, p) : p;
+                if (v == null || isNaN(v)) return;
+                const def = FITNESS_SCORE_LINES.find(l => l.points === p);
+                out.push({ value: v, label: def ? def.label : p + '点' });
+            });
+            return out;
+        }
+
+        function physFmtNum(v) {
+            return String(Math.round(v * 100) / 100);
+        }
+
+        function physEmptyMsg(text) {
+            return '<p class="text-[13px] text-slate-500 italic py-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">' + physicalEscapeHtml(text) + '</p>';
+        }
+
+        // 伸びのバッジ：値の増減を矢印で、改善／悪化を色で示す（improved: true=改善, false=悪化, null=中立表示）
+        function physDiffBadge(diff, unit, improved) {
+            const r = Math.round(diff * 100) / 100;
+            if (r === 0) return '<span class="font-bold text-slate-400">±0 ' + physicalEscapeHtml(unit) + '</span>';
+            const cls = improved == null ? 'text-slate-600' : improved ? 'text-emerald-600' : 'text-rose-500';
+            const arrow = r > 0 ? '▲' : '▼';
+            return '<span class="font-extrabold ' + cls + '">' + arrow + ' ' + (r > 0 ? '+' : '') + r + ' ' + physicalEscapeHtml(unit) + '</span>';
+        }
+
+        // 日付ベースの複数系列ライングラフ（SVG）。seriesList: [{label, color, points:[{date, value}]}]
+        // targetLines: [{value, label}] を破線の横線で重ね、右端にライン名を出す。
+        function buildPhysTrendChart(seriesList, unit, targetLines) {
+            const allPts = [];
+            seriesList.forEach(s => (s.points || []).forEach(p => allPts.push(p)));
+            if (allPts.length === 0) return physEmptyMsg('まだ記録がありません。');
+            const W = 720, H = 280, PL = 48, PR = 92, PT = 20, PB = 32;
+            const tOf = ds => new Date(ds + 'T00:00:00').getTime();
+            let dMin = null, dMax = null;
+            allPts.forEach(p => {
+                if (!dMin || p.date < dMin) dMin = p.date;
+                if (!dMax || p.date > dMax) dMax = p.date;
+            });
+            let tMin = tOf(dMin), tMax = tOf(dMax);
+            if (tMin === tMax) { const d = 15 * 86400000; tMin -= d; tMax += d; }
+            let vMin = Infinity, vMax = -Infinity;
+            allPts.forEach(p => { vMin = Math.min(vMin, p.value); vMax = Math.max(vMax, p.value); });
+            (targetLines || []).forEach(t => { vMin = Math.min(vMin, t.value); vMax = Math.max(vMax, t.value); });
+            if (vMin === vMax) { vMin -= 1; vMax += 1; }
+            const pad = (vMax - vMin) * 0.12;
+            vMin -= pad; vMax += pad;
+            const x = t => PL + (W - PL - PR) * ((t - tMin) / (tMax - tMin));
+            const y = v => PT + (H - PT - PB) * (1 - (v - vMin) / (vMax - vMin));
+            let svg = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-auto" role="img" aria-label="推移グラフ">`;
+            [vMin + (vMax - vMin) * 0.06, (vMin + vMax) / 2, vMax - (vMax - vMin) * 0.06].forEach(gv => {
+                const gy = y(gv);
+                svg += `<line x1="${PL}" y1="${gy}" x2="${W - PR}" y2="${gy}" stroke="#e2e8f0" stroke-width="1"/>`;
+                svg += `<text x="${PL - 6}" y="${gy + 4}" text-anchor="end" font-size="11" fill="#64748b">${physFmtNum(Math.round(gv * 10) / 10)}</text>`;
+            });
+            (targetLines || []).forEach(t => {
+                const gy = y(t.value);
+                svg += `<line x1="${PL}" y1="${gy.toFixed(1)}" x2="${W - PR}" y2="${gy.toFixed(1)}" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="6 4"/>`;
+                svg += `<text x="${W - PR + 6}" y="${(gy + 3.5).toFixed(1)}" font-size="10" font-weight="700" fill="#64748b">${physicalEscapeHtml(t.label)}</text>`;
+            });
+            const multi = seriesList.length > 1;
+            seriesList.forEach(s => {
+                const pts = (s.points || []).slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+                if (pts.length >= 2) {
+                    svg += `<polyline fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${pts.map(p => x(tOf(p.date)).toFixed(1) + ',' + y(p.value).toFixed(1)).join(' ')}"/>`;
+                }
+                pts.forEach((p, i) => {
+                    const isLast = i === pts.length - 1;
+                    svg += `<circle cx="${x(tOf(p.date)).toFixed(1)}" cy="${y(p.value).toFixed(1)}" r="${isLast ? 5 : 3.5}" fill="${s.color}" stroke="#fff" stroke-width="1.5"><title>${physicalEscapeHtml(s.label)} ${physicalFormatDate(p.date)}：${physFmtNum(p.value)}${physicalEscapeHtml(unit)}</title></circle>`;
+                    if (isLast || (!multi && pts.length <= 8)) {
+                        svg += `<text x="${x(tOf(p.date)).toFixed(1)}" y="${(y(p.value) - 10).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">${physFmtNum(p.value)}</text>`;
+                    }
+                });
+            });
+            svg += `<text x="${x(tOf(dMin)).toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="11" fill="#64748b">${physicalEscapeHtml(physicalFormatDate(dMin))}</text>`;
+            if (dMax !== dMin) {
+                svg += `<text x="${x(tOf(dMax)).toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="11" fill="#64748b">${physicalEscapeHtml(physicalFormatDate(dMax))}</text>`;
+            }
+            if (unit) svg += `<text x="6" y="${PT - 8}" font-size="11" fill="#64748b">(${physicalEscapeHtml(unit)})</text>`;
+            svg += '</svg>';
+            return svg;
+        }
+
+        // ===== 個人記録の確認の描画 =====
+        function renderPhysicalPersonal() {
+            const linesEl = document.getElementById('phys-personal-lines');
+            const summaryEl = document.getElementById('physical-personal-summary');
+            const radarEl = document.getElementById('physical-personal-radar');
+            const sel = document.getElementById('phys-personal-test');
+            const chartEl = document.getElementById('physical-personal-chart');
+            const growthEl = document.getElementById('physical-personal-growth');
+            if (!summaryEl || !radarEl || !sel || !chartEl || !growthEl) return;
+            if (linesEl) linesEl.innerHTML = physLineChecksHtml('personal', physPersonalLines);
+            const startEl = document.getElementById('phys-personal-start');
+            const endEl = document.getElementById('phys-personal-end');
+            if (startEl && startEl.value !== physPersonalPeriod.start) startEl.value = physPersonalPeriod.start;
+            if (endEl && endEl.value !== physPersonalPeriod.end) endEl.value = physPersonalPeriod.end;
+
+            const allAsc = physPlayerRecordsAsc(physicalPlayerName);
+            const periodRecs = physFilterByPeriod(allAsc, physPersonalPeriod);
+            const linePoints = physSelectedLinePoints(physPersonalLines);
+            const periodLabel = (physPersonalPeriod.start || physPersonalPeriod.end)
+                ? (physPersonalPeriod.start ? physPersonalPeriod.start.replace('-', '/') : '最初') + ' 〜 ' + (physPersonalPeriod.end ? physPersonalPeriod.end.replace('-', '/') : '最新')
+                : '全期間';
+
+            if (allAsc.length === 0) {
+                summaryEl.innerHTML = physEmptyMsg('まだ記録がありません。カテゴリ画面の入力画面から記録を追加してください。');
+                radarEl.innerHTML = '';
+                sel.innerHTML = '<option value="">（記録なし）</option>';
+                chartEl.innerHTML = '';
+                growthEl.innerHTML = '';
+                return;
+            }
+            if (periodRecs.length === 0) {
+                summaryEl.innerHTML = physEmptyMsg('指定した期間（' + periodLabel + '）内の記録がありません。期間を広げて確認してください。');
+                radarEl.innerHTML = '';
+                sel.innerHTML = '<option value="">（期間内の記録なし）</option>';
+                chartEl.innerHTML = '';
+                growthEl.innerHTML = '';
+                return;
+            }
+
+            // 総合平均＋レーダー（期間内の種目別ベストから採点、目標ラインを破線で重ねる）
+            const results = physOverallFromRecords(periodRecs);
+            const overallAvg = overallAverageOf(results);
+            const scoredCats = results.filter(c => c.avg != null).length;
+            summaryEl.innerHTML = overallAvg != null ? `
+                <div class="flex flex-wrap items-end gap-x-6 gap-y-2">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-500">総合平均（${physicalEscapeHtml(periodLabel)}）</p>
+                        <p><span class="text-4xl font-extrabold text-orange-600">${fmtScore(overallAvg)}</span><span class="text-sm font-bold text-slate-500 ml-1">点 / 6点</span></p>
+                    </div>
+                    <p class="text-xs text-slate-500 pb-1.5">${scoredCats} / ${results.length} カテゴリを採点${fitnessLineLabel(overallAvg) ? '（' + fitnessLineLabel(overallAvg) + '相当）' : ''}</p>
+                </div>` : physEmptyMsg('期間内に採点できる記録がありません。');
+            radarEl.innerHTML = buildPhysicalRadarChart(results, linePoints);
+
+            // 種目別推移（目標ライン重ね）
+            const tests = Array.from(new Set(periodRecs.map(r => r.test))).sort(fitnessCompareTestNames);
+            if (!tests.includes(physPersonalTest)) physPersonalTest = tests[0];
+            sel.innerHTML = tests.map(t => `<option value="${physicalEscapeHtml(t)}"${t === physPersonalTest ? ' selected' : ''}>${physicalEscapeHtml(t)}</option>`).join('');
+            const def = fitnessTestDef(physPersonalTest);
+            const rows = periodRecs.filter(r => r.test === physPersonalTest);
+            let pts = [], unit = '';
+            if (fitnessIsGradeTest(physPersonalTest)) {
+                pts = rows.filter(r => fitnessRecordScore(r) != null).map(r => ({ date: r.date, value: fitnessRecordScore(r) }));
+                unit = '点';
+            } else {
+                const numRows = rows.filter(r => r.value != null && !isNaN(Number(r.value)));
+                pts = numRows.map(r => ({ date: r.date, value: Number(r.value) }));
+                unit = (numRows[0] && numRows[0].unit) || (def ? def.unit : '');
+            }
+            chartEl.innerHTML = pts.length
+                ? buildPhysTrendChart([{ label: physicalPlayerName, color: '#ea580c', points: pts }], unit, physTargetLinesFor(physPersonalTest, physPersonalLines))
+                : physEmptyMsg('この種目の記録が期間内にありません。');
+
+            growthEl.innerHTML = physGrowthTableHtml(periodRecs);
+        }
+
+        // 期間内の種目別の伸び（期間の初め→終わり）の一覧
+        function physGrowthTableHtml(recordsAsc) {
+            const byTest = {};
+            recordsAsc.forEach(r => { (byTest[r.test] = byTest[r.test] || []).push(r); });
+            const names = Object.keys(byTest).sort(fitnessCompareTestNames);
+            if (names.length === 0) return '';
+            const rowHtml = name => {
+                const rows = byTest[name];
+                const first = rows[0], last = rows[rows.length - 1];
+                const def = fitnessTestDef(name);
+                let firstText, lastText, diffHtml;
+                if (fitnessIsGradeTest(name)) {
+                    const fs = fitnessRecordScore(first), ls = fitnessRecordScore(last);
+                    firstText = first.grade ? first.grade + (fs != null ? '（' + fs + '点）' : '') : '―';
+                    lastText = last.grade ? last.grade + (ls != null ? '（' + ls + '点）' : '') : '―';
+                    diffHtml = (fs != null && ls != null)
+                        ? physDiffBadge(ls - fs, '点', ls === fs ? null : ls > fs)
+                        : '<span class="text-slate-400">―</span>';
+                } else {
+                    const fv = Number(first.value), lv = Number(last.value);
+                    const unit = last.unit || (def ? def.unit : '');
+                    firstText = isNaN(fv) ? '―' : physFmtNum(fv) + ' ' + unit;
+                    lastText = isNaN(lv) ? '―' : physFmtNum(lv) + ' ' + unit;
+                    if (!isNaN(fv) && !isNaN(lv)) {
+                        const diff = lv - fv;
+                        const improved = diff === 0 ? null : (def && def.better === 'low' ? diff < 0 : diff > 0);
+                        diffHtml = physDiffBadge(diff, unit, improved);
+                    } else {
+                        diffHtml = '<span class="text-slate-400">―</span>';
+                    }
+                }
+                return `<tr class="border-t border-slate-100">
+                    <td class="py-2 px-3 font-bold text-slate-800 whitespace-nowrap">${physicalEscapeHtml(name)}</td>
+                    <td class="py-2 px-3 text-slate-600 whitespace-nowrap">${physicalEscapeHtml(firstText)}<span class="block text-[10px] text-slate-400">${physicalEscapeHtml(physicalFormatDate(first.date))}</span></td>
+                    <td class="py-2 px-3 text-slate-600 whitespace-nowrap">${physicalEscapeHtml(lastText)}<span class="block text-[10px] text-slate-400">${physicalEscapeHtml(physicalFormatDate(last.date))}</span></td>
+                    <td class="py-2 px-3 text-right whitespace-nowrap">${diffHtml}</td>
+                </tr>`;
+            };
+            return `<h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">期間内の伸び（種目別）</h4>
+            <div class="overflow-x-auto"><table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[520px]">
+                <thead><tr class="bg-slate-900 text-slate-200 font-semibold"><th class="py-2 px-3">種目</th><th class="py-2 px-3">期間の初め</th><th class="py-2 px-3">期間の終わり</th><th class="py-2 px-3 text-right">伸び</th></tr></thead>
+                <tbody>${names.map(rowHtml).join('')}</tbody>
+            </table></div>`;
+        }
+
+        function changePhysPersonalTest(test) {
+            physPersonalTest = test;
+            renderPhysicalScreen();
+        }
+
+        // ===== 個人記録の比較の描画 =====
+        // 指標の時系列：種目はその種目の記録そのもの（区分種目は点数）。
+        // 総合平均・カテゴリ平均点は、測定日ごとに「その日までの直近の各種目記録」を採点して平均する。
+        function physMetricSeries(playerName, metric) {
+            const recs = physPlayerRecordsAsc(playerName);
+            if (recs.length === 0) return [];
+            if (fitnessTestDef(metric)) {
+                if (fitnessIsGradeTest(metric)) {
+                    return recs.filter(r => r.test === metric && fitnessRecordScore(r) != null)
+                        .map(r => ({ date: r.date, value: fitnessRecordScore(r) }));
+                }
+                return recs.filter(r => r.test === metric && r.value != null && !isNaN(Number(r.value)))
+                    .map(r => ({ date: r.date, value: Number(r.value) }));
+            }
+            const scope = metric === '__overall__'
+                ? FITNESS_TEST_DEFS.map(d => d.name)
+                : FITNESS_TEST_DEFS.filter(d => d.category === metric).map(d => d.name);
+            const dates = Array.from(new Set(recs.map(r => r.date))).sort();
+            const pts = [];
+            dates.forEach(d => {
+                const latest = {};
+                recs.forEach(r => { if (r.date <= d) latest[r.test] = r; });
+                const scores = scope.map(t => latest[t] ? fitnessRecordScore(latest[t]) : null).filter(s => s != null);
+                if (scores.length) pts.push({ date: d, value: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 100) / 100 });
+            });
+            return pts;
+        }
+
+        function togglePhysComparePlayer(index, checked) {
+            const name = physComparePlayerNames[index];
+            if (!name) return;
+            if (!physCompareSelected) physCompareSelected = {};
+            physCompareSelected[name] = !!checked;
+            renderPhysicalScreen();
+        }
+
+        function changePhysCompareMetric(metric) {
+            physCompareMetric = metric;
+            renderPhysicalScreen();
+        }
+
+        function renderPhysicalCompare() {
+            const playersEl = document.getElementById('phys-compare-players');
+            const metricSel = document.getElementById('phys-compare-metric');
+            const linesEl = document.getElementById('phys-compare-lines');
+            const legendEl = document.getElementById('physical-compare-legend');
+            const chartEl = document.getElementById('physical-compare-chart');
+            const summaryEl = document.getElementById('physical-compare-summary');
+            if (!playersEl || !metricSel || !chartEl || !summaryEl) return;
+            if (linesEl) linesEl.innerHTML = physLineChecksHtml('compare', physCompareLines);
+            const startEl = document.getElementById('phys-compare-start');
+            const endEl = document.getElementById('phys-compare-end');
+            if (startEl && startEl.value !== physComparePeriod.start) startEl.value = physComparePeriod.start;
+            if (endEl && endEl.value !== physComparePeriod.end) endEl.value = physComparePeriod.end;
+
+            const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || { players: [] };
+            const rosterNames = (roster.players || []).map(p => p.name).filter(n => n);
+            physComparePlayerNames = rosterNames;
+            const colorOf = name => PHYS_COMPARE_COLORS[Math.max(0, rosterNames.indexOf(name)) % PHYS_COMPARE_COLORS.length];
+
+            // 初期表示では、記録のある選手を先頭から最大3名まで選択しておく
+            if (physCompareSelected === null) {
+                physCompareSelected = {};
+                let picked = 0;
+                rosterNames.forEach(n => {
+                    if (picked < 3 && physPlayerRecordsAsc(n).length > 0) { physCompareSelected[n] = true; picked++; }
+                });
+                if (picked === 0 && physicalPlayerName) physCompareSelected[physicalPlayerName] = true;
+            }
+
+            playersEl.innerHTML = rosterNames.length ? rosterNames.map((n, i) => {
+                const color = PHYS_COMPARE_COLORS[i % PHYS_COMPARE_COLORS.length];
+                const cnt = physPlayerRecordsAsc(n).length;
+                const on = !!physCompareSelected[n];
+                return `<label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border ${on ? 'border-slate-300 bg-slate-50 text-slate-800' : 'border-slate-200 bg-white text-slate-400'} text-xs font-bold cursor-pointer transition">
+                    <input type="checkbox" onchange="togglePhysComparePlayer(${i}, this.checked)"${on ? ' checked' : ''} class="w-3.5 h-3.5" style="accent-color:${color}">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${color}"></span>${physicalEscapeHtml(n)}<span class="text-[10px] text-slate-400 font-bold">${cnt}件</span>
+                </label>`;
+            }).join('') : '<p class="text-[13px] text-slate-500">選手が登録されていません。先に「チーム設定」で選手を登録してください。</p>';
+
+            // 指標プルダウン：総合平均・カテゴリ平均点・各種目
+            const metricOptions = [`<optgroup label="平均点"><option value="__overall__">総合平均</option>${FITNESS_CATEGORIES.map(c => `<option value="${physicalEscapeHtml(c)}">${physicalEscapeHtml(c)}の平均点</option>`).join('')}</optgroup>`]
+                .concat(FITNESS_CATEGORIES.map(cat => `<optgroup label="${physicalEscapeHtml(cat)}">${FITNESS_TEST_DEFS.filter(d => d.category === cat).map(d => `<option value="${physicalEscapeHtml(d.name)}">${physicalEscapeHtml(d.name)}</option>`).join('')}</optgroup>`))
+                .join('');
+            metricSel.innerHTML = metricOptions;
+            const metricValid = physCompareMetric === '__overall__' || FITNESS_CATEGORIES.includes(physCompareMetric) || !!fitnessTestDef(physCompareMetric);
+            if (!metricValid) physCompareMetric = '__overall__';
+            metricSel.value = physCompareMetric;
+
+            const selected = rosterNames.filter(n => physCompareSelected[n]);
+            const isScoreMetric = physCompareMetric === '__overall__' || FITNESS_CATEGORIES.includes(physCompareMetric) || fitnessIsGradeTest(physCompareMetric);
+            const metricDef = fitnessTestDef(physCompareMetric);
+            const unit = isScoreMetric ? '点' : ((metricDef ? metricDef.unit : '') || '');
+            const targetLines = isScoreMetric ? physTargetLinesFor(null, physCompareLines) : physTargetLinesFor(physCompareMetric, physCompareLines);
+
+            const seriesList = selected.map(n => ({
+                label: n,
+                color: colorOf(n),
+                points: physFilterByPeriod(physMetricSeries(n, physCompareMetric), physComparePeriod)
+            }));
+
+            if (legendEl) {
+                legendEl.innerHTML = selected.length ? '<div class="flex flex-wrap gap-x-4 gap-y-1">' + selected.map(n =>
+                    `<span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700"><span class="w-4 h-[3px] rounded-full" style="background:${colorOf(n)}"></span>${physicalEscapeHtml(n)}</span>`).join('') + '</div>' : '';
+            }
+
+            if (selected.length === 0) {
+                chartEl.innerHTML = physEmptyMsg('比較する選手を選んでください。');
+                summaryEl.innerHTML = '';
+                return;
+            }
+            const withData = seriesList.filter(s => s.points.length > 0);
+            chartEl.innerHTML = withData.length
+                ? buildPhysTrendChart(withData, unit, targetLines)
+                : physEmptyMsg('選択した選手の記録が期間内にありません。期間を広げて確認してください。');
+
+            // 期間内の伸び（選手別）：系列の最初と最後の差
+            const lowerBetter = metricDef && metricDef.better === 'low' && !isScoreMetric;
+            const rowHtml = s => {
+                if (s.points.length === 0) {
+                    return `<tr class="border-t border-slate-100"><td class="py-2 px-3 font-bold text-slate-800 whitespace-nowrap"><span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:${s.color}"></span>${physicalEscapeHtml(s.label)}</span></td><td colspan="3" class="py-2 px-3 text-slate-400">期間内の記録なし</td></tr>`;
+                }
+                const first = s.points[0], last = s.points[s.points.length - 1];
+                const diff = last.value - first.value;
+                const improved = diff === 0 ? null : (lowerBetter ? diff < 0 : diff > 0);
+                return `<tr class="border-t border-slate-100">
+                    <td class="py-2 px-3 font-bold text-slate-800 whitespace-nowrap"><span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:${s.color}"></span>${physicalEscapeHtml(s.label)}</span></td>
+                    <td class="py-2 px-3 text-slate-600 whitespace-nowrap">${physFmtNum(first.value)} ${physicalEscapeHtml(unit)}<span class="block text-[10px] text-slate-400">${physicalEscapeHtml(physicalFormatDate(first.date))}</span></td>
+                    <td class="py-2 px-3 text-slate-600 whitespace-nowrap">${physFmtNum(last.value)} ${physicalEscapeHtml(unit)}<span class="block text-[10px] text-slate-400">${physicalEscapeHtml(physicalFormatDate(last.date))}</span></td>
+                    <td class="py-2 px-3 text-right whitespace-nowrap">${physDiffBadge(diff, unit, improved)}</td>
+                </tr>`;
+            };
+            summaryEl.innerHTML = `<h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">期間内の伸び（選手別）</h4>
+            <div class="overflow-x-auto"><table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[520px]">
+                <thead><tr class="bg-slate-900 text-slate-200 font-semibold"><th class="py-2 px-3">選手</th><th class="py-2 px-3">期間の初め</th><th class="py-2 px-3">期間の終わり</th><th class="py-2 px-3 text-right">伸び</th></tr></thead>
+                <tbody>${seriesList.map(rowHtml).join('')}</tbody>
+            </table></div>`;
+        }
+
         // 採点基準表：種目ごとに6ライン分の基準値を並べる（FITNESS_SCORE_STANDARDS の lines から生成）
         function buildPhysicalStandardsTable() {
             const head = FITNESS_SCORE_LINES.map(l => `<th class="py-2 px-2 text-center whitespace-nowrap">${l.label}<br><span class="text-orange-400">${l.points}点</span></th>`).join('');
@@ -4440,7 +5063,42 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition"></i>
                     </div>
                 </div>`;
-            let html = overallCard + FITNESS_CATEGORIES.map(cat => cardHtml(cat, cat)).join('');
+            // 個人記録の確認／比較カード（総合評価の次に置く）
+            const personalCard = `
+                <div onclick="openPhysicalPersonal()" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-orange-500 p-7 cursor-pointer transition flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-xl bg-orange-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                            <i data-lucide="trending-up" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-orange-700 transition">個人記録の確認</h3>
+                            <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">レーダーチャートと種目別推移を、目標ライン・期間指定つきで確認</p>
+                        </div>
+                    </div>
+                    <div class="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-orange-700">
+                        <span>${records.length > 0 ? records.length + '件の記録' : '記録なし'}</span>
+                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>`;
+            const teamFitnessAll = (physicalData && Array.isArray(physicalData.fitness)) ? physicalData.fitness.filter(r => r.teamKey === physicalTeamKey) : [];
+            const comparePlayerCount = new Set(teamFitnessAll.map(r => r.playerName)).size;
+            const compareCard = `
+                <div onclick="openPhysicalCompare()" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-orange-500 p-7 cursor-pointer transition flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-xl bg-orange-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                            <i data-lucide="users" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-orange-700 transition">個人記録の比較</h3>
+                            <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">複数選手の推移を色分けして重ね、目標ラインと比べて確認</p>
+                        </div>
+                    </div>
+                    <div class="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-orange-700">
+                        <span>${comparePlayerCount > 0 ? '記録のある選手 ' + comparePlayerCount + '名' : '記録なし'}</span>
+                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>`;
+            let html = overallCard + personalCard + compareCard + FITNESS_CATEGORIES.map(cat => cardHtml(cat, cat)).join('');
             // 過去の旧種目など、カテゴリに属さない記録がある場合のみ「その他の記録」カードを出す
             if (records.some(r => !fitnessCategoryOf(r.test))) html += cardHtml('__other__', 'その他の記録');
             grid.innerHTML = html;
@@ -12079,7 +12737,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             openOpponentTeams, openOpponentDetail, showOpponentList, renderOpponentList, renderOpponentDetail, renderOpponentPitcherDetail, exportOpponentStatsExcel, setOwnTeamKey,
             switchPlayerStatsBranch, switchBoxscoreBranch, refreshAggregatedStats,
             changePhysicalTeam, changePhysicalPlayer,
-            switchPhysicalTab, openPhysicalDetail, openPhysicalMode, showPhysicalHub, openPhysicalCategory, openPhysicalOverall, changePhysicalFitnessTest, changePhysicalFitnessChartTest,
+            switchPhysicalTab, openPhysicalDetail, openPhysicalMode, showPhysicalHub, openPhysicalCategory, openPhysicalOverall, openPhysicalPersonal, openPhysicalCompare,
+            togglePhysLine, changePhysPeriod, resetPhysPeriod, changePhysPersonalTest, togglePhysComparePlayer, changePhysCompareMetric,
+            changePhysicalFitnessTest, changePhysicalFitnessChartTest,
             addPhysicalFitness, deletePhysicalFitness,
             renderNewGameLineupRows, resetCount, resetWizard,
             resumeCurrentGameFromHome, saveAndRender, saveGameInfo,
