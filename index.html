@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baseball Official Scorebook & Analytics</title>
+    <title>〇〇高校野球部　チームポータル</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffffff' stroke='%2394a3b8' stroke-width='4'/%3E%3Cpath d='M29 13 Q56 50 29 87' fill='none' stroke='%23dc2626' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M71 13 Q44 50 71 87' fill='none' stroke='%23dc2626' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
     <!-- Tailwind CSS: 外部CDNに依存せず動作するよう、コンパイル済みCSSをこのファイル内に内蔵 -->
     <!-- Google Fonts: Inter & Noto Sans JP -->
@@ -87,20 +87,37 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        .tab-active { border-bottom: 2px solid #0f172a; color: #0f172a; font-weight: 700; }
+        .tab-active { border-bottom: 2px solid #059669; color: #065f46; font-weight: 700; }
+        /* === セクションテーマ色の補完（コンパイル済みTailwindに無いユーティリティ）
+           スコアブック／成績=緑(emerald) / 体力測定=オレンジ(orange) / チーム設定=青(blue) === */
+        .bg-blue-50 { background-color: #eff6ff; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .text-blue-600 { color: #2563eb; }
+        .text-blue-700 { color: #1d4ed8; }
+        .border-blue-200 { border-color: #bfdbfe; }
+        .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
+        .hover\:border-blue-500:hover { border-color: #3b82f6; }
+        .group:hover .group-hover\:text-blue-700 { color: #1d4ed8; }
+        .bg-orange-100 { background-color: #ffedd5; }
+        .text-orange-800 { color: #9a3412; }
+        .border-orange-300 { border-color: #fdba74; }
+        .bg-orange-50\/60 { background-color: rgb(255 247 237 / 0.6); }
+        .hover\:bg-orange-50\/40:hover { background-color: rgb(255 247 237 / 0.4); }
+        .bg-emerald-700 { background-color: #047857; }
+        .bg-emerald-800 { background-color: #065f46; }
         .diamond-base { transition: all 0.15s ease; }
         .diamond-base:hover { filter: brightness(1.08); }
         .no-select { user-select: none; -webkit-user-select: none; }
         /* === 成績表ヘッダーのソート（指標名タップで降順／昇順） === */
         th.sortable-th { cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
-        th.sortable-th.pressing { background-color: rgba(56, 189, 248, 0.38); transition: background-color 0.45s ease; }
+        th.sortable-th.pressing { background-color: rgba(16, 185, 129, 0.38); transition: background-color 0.45s ease; }
         th.sortable-th:hover { text-decoration: underline; text-underline-offset: 3px; }
-        th.sortable-th:focus-visible { outline: 2px solid #38bdf8; outline-offset: -2px; }
+        th.sortable-th:focus-visible { outline: 2px solid #10b981; outline-offset: -2px; }
         th.sortable-th .sort-ind { display: inline-block; margin-left: 3px; font-size: 9px; line-height: 1; opacity: 0.45; vertical-align: middle; font-weight: 700; }
-        th.sortable-th.sort-active { background-color: rgba(56, 189, 248, 0.22); }
-        th.sortable-th.sort-active .sort-ind { opacity: 1; color: #0284c7; }
+        th.sortable-th.sort-active { background-color: rgba(16, 185, 129, 0.22); }
+        th.sortable-th.sort-active .sort-ind { opacity: 1; color: #059669; }
         tr.bg-slate-900 th.sortable-th.sort-active .sort-ind,
-        thead tr.bg-slate-900 th.sortable-th.sort-active .sort-ind { color: #7dd3fc; }
+        thead tr.bg-slate-900 th.sortable-th.sort-active .sort-ind { color: #6ee7b7; }
 
         /* ============================================================
            視認性改善レイヤー
@@ -182,7 +199,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         #screen-player-stats tbody tr:nth-child(even) > td,
         #screen-team-stats tbody tr:nth-child(even) > td { background-color: #f8fafc; }
         #screen-player-stats tbody tr:hover > td,
-        #screen-team-stats tbody tr:hover > td { background-color: #eff6ff; }
+        #screen-team-stats tbody tr:hover > td { background-color: #ecfdf5; }
 
         /* スコアボード：チーム名はゴシックで、数字と区別する */
         #scoreboard-body td:first-child { font-family: "Inter", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif; font-weight: 700; }
@@ -216,7 +233,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <i data-lucide="clipboard-list" class="w-5 h-5 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg font-bold tracking-tight leading-none">OFFICIAL SCOREBOOK</h1>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight leading-none">〇〇高校野球部　チームポータル</h1>
                     <p class="text-[11px] text-slate-400 mt-0.5 hidden sm:block">高校野球・アマチュア野球 公式記録管理システム</p>
                 </div>
             </div>
@@ -256,7 +273,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div id="screen-home" class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
         <div class="text-center space-y-2">
             <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">BASEBALL ANALYTICS & SCOREBOOK</span>
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug">チーム＆公式スコア管理ホーム</h2>
         </div>
 
         <!-- トップ選択：スコアブック / 体力測定 / チーム設定 -->
@@ -279,34 +295,34 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
 
             <!-- 体力測定を開く -->
-            <div onclick="navigateApp('physical')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-emerald-500 p-7 cursor-pointer transition flex flex-col justify-between">
+            <div onclick="navigateApp('physical')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-orange-500 p-7 cursor-pointer transition flex flex-col justify-between">
                 <div class="space-y-4">
-                    <div class="w-14 h-14 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                    <div class="w-14 h-14 rounded-xl bg-orange-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
                         <i data-lucide="timer" class="w-7 h-7"></i>
                     </div>
                     <div>
-                        <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-emerald-700 transition">体力測定</h3>
+                        <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-orange-700 transition">体力測定</h3>
                         <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">体組成・プライオ・筋力・スプリント・柔軟性の記録。</p>
                     </div>
                 </div>
-                <div class="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-emerald-700">
+                <div class="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-orange-700">
                     <span>体力測定へ進む</span>
                     <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition"></i>
                 </div>
             </div>
 
             <!-- チーム設定を開く -->
-            <div onclick="navigateApp('team-settings')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-indigo-500 p-7 cursor-pointer transition flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+            <div onclick="navigateApp('team-settings')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-blue-500 p-7 cursor-pointer transition flex flex-col justify-between sm:col-span-2 lg:col-span-1">
                 <div class="space-y-4">
-                    <div class="w-14 h-14 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                    <div class="w-14 h-14 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
                         <i data-lucide="users" class="w-7 h-7"></i>
                     </div>
                     <div>
-                        <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-indigo-700 transition">チーム設定</h3>
+                        <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-blue-700 transition">チーム設定</h3>
                         <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">自チームの登録。Excel一括登録も可。</p>
                     </div>
                 </div>
-                <div class="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-indigo-700">
+                <div class="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-blue-700">
                     <span>チーム・選手を登録する</span>
                     <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition"></i>
                 </div>
@@ -342,51 +358,51 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
 
             <!-- 選手成績 -->
-            <div onclick="navigateApp('player-stats')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-200 hover:border-sky-500 p-6 cursor-pointer transition flex flex-col justify-between">
+            <div onclick="navigateApp('player-stats')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-200 hover:border-emerald-500 p-6 cursor-pointer transition flex flex-col justify-between">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-700 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
                         <i data-lucide="user-check" class="w-6 h-6"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-extrabold text-slate-900 group-hover:text-sky-700 transition">選手成績</h3>
+                        <h3 class="text-lg font-extrabold text-slate-900 group-hover:text-emerald-700 transition">選手成績</h3>
                         <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">自チームの全試合から自動集計。打者／投手を切替表示。</p>
                     </div>
                 </div>
-                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-sky-700">
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700">
                     <span>通算個人成績を見る</span>
                     <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
                 </div>
             </div>
 
             <!-- チーム成績 -->
-            <div onclick="navigateApp('team-stats')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-200 hover:border-amber-500 p-6 cursor-pointer transition flex flex-col justify-between">
+            <div onclick="navigateApp('team-stats')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-200 hover:border-emerald-500 p-6 cursor-pointer transition flex flex-col justify-between">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-800 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
                         <i data-lucide="trophy" class="w-6 h-6"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-extrabold text-slate-900 group-hover:text-amber-700 transition">チーム成績</h3>
+                        <h3 class="text-lg font-extrabold text-slate-900 group-hover:text-emerald-700 transition">チーム成績</h3>
                         <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">自チームの勝敗とチーム成績を表示。</p>
                     </div>
                 </div>
-                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-amber-700">
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700">
                     <span>通算チーム戦績を見る</span>
                     <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
                 </div>
             </div>
 
             <!-- 他チーム情報一覧 -->
-            <div onclick="openOpponentTeams()" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-200 hover:border-rose-500 p-6 cursor-pointer transition flex flex-col justify-between">
+            <div onclick="openOpponentTeams()" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-200 hover:border-emerald-500 p-6 cursor-pointer transition flex flex-col justify-between">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-xl bg-rose-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-900 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
                         <i data-lucide="swords" class="w-6 h-6"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-extrabold text-slate-900 group-hover:text-rose-700 transition">他チーム情報一覧</h3>
+                        <h3 class="text-lg font-extrabold text-slate-900 group-hover:text-emerald-700 transition">他チーム情報一覧</h3>
                         <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">対戦経歴のあるチームの成績分析。</p>
                     </div>
                 </div>
-                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-rose-700">
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700">
                     <span>対戦相手の成績を見る</span>
                     <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
                 </div>
@@ -447,7 +463,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
             <div>
                 <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="users" class="w-5 h-5 text-indigo-600"></i>チーム＆選手設定
+                    <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>チーム＆選手設定
                 </h2>
                 <p class="text-[13px] text-slate-600 mt-1 leading-relaxed">登録するのは自チームのみです。対戦相手は登録せず、試合ごとに入力します。</p>
             </div>
@@ -461,10 +477,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
 
         <!-- 登録内容の反映状況（スコアブック／体力測定と共通の登録データ） -->
-        <div class="bg-indigo-50 rounded-xl border border-indigo-200 p-4">
+        <div class="bg-blue-50 rounded-xl border border-blue-200 p-4">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-start gap-2.5 min-w-0">
-                    <i data-lucide="refresh-ccw" class="w-5 h-5 text-indigo-600 shrink-0 mt-0.5"></i>
+                    <i data-lucide="refresh-ccw" class="w-5 h-5 text-blue-600 shrink-0 mt-0.5"></i>
                     <div>
                         <h3 class="text-sm font-extrabold text-slate-900">登録内容は両アプリに自動反映されます</h3>
                         <p id="settings-linkage-summary" class="text-xs text-slate-600 mt-1 leading-relaxed">読み込み中…</p>
@@ -472,7 +488,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
                 <div class="flex flex-wrap items-center gap-2 shrink-0">
                     <button onclick="navigateApp('home'); openScorebookHub();" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">スコアブックで確認</button>
-                    <button onclick="navigateApp('physical')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">体力測定で確認</button>
+                    <button onclick="navigateApp('physical')" class="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold transition">体力測定で確認</button>
                 </div>
             </div>
         </div>
@@ -482,7 +498,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider">チーム名変更</h3>
             <div class="flex items-center gap-3">
                 <input type="text" id="settings-team-name-input" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-800">
-                <button onclick="saveTeamNameSettings()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-2xs transition">チーム名保存</button>
+                <button onclick="saveTeamNameSettings()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-2xs transition">チーム名保存</button>
             </div>
         </div>
 
@@ -500,7 +516,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <button onclick="downloadRosterTemplateExcel()" class="flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded-lg text-xs font-bold transition" title="現在の登録内容をExcelファイルでダウンロード（編集して読み込み直せます）">
                         <i data-lucide="download" class="w-3.5 h-3.5"></i>登録内容をExcel出力
                     </button>
-                    <button onclick="addNewPlayerToSettings()" class="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition">
+                    <button onclick="addNewPlayerToSettings()" class="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition">
                         <i data-lucide="plus" class="w-3.5 h-3.5"></i>選手を追加
                     </button>
                 </div>
@@ -567,7 +583,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
             <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex flex-wrap justify-end gap-2 shrink-0">
                 <button onclick="closeModal('modal-roster-import')" class="px-4 py-2 text-xs font-bold text-slate-600">キャンセル</button>
-                <button onclick="applyRosterImport('append')" class="px-4 py-2 text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white rounded-lg transition">既存リストに追加</button>
+                <button onclick="applyRosterImport('append')" class="px-4 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">既存リストに追加</button>
                 <button onclick="applyRosterImport('replace')" class="px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition">全員入れ替え</button>
             </div>
         </div>
@@ -578,7 +594,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
             <div>
                 <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="timer" class="w-5 h-5 text-emerald-600"></i>体力測定<span id="physical-heading-category" class="text-slate-500"></span>
+                    <i data-lucide="timer" class="w-5 h-5 text-orange-600"></i>体力測定<span id="physical-heading-category" class="text-slate-500"></span>
                 </h2>
 
             </div>
@@ -603,14 +619,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         <!-- カテゴリ画面。カテゴリ名は最上部の「体力測定」の横に括弧書きで示す。カテゴリ選択へは右上の「戻る」で戻る -->
         <div id="physical-detail" class="hidden space-y-6">
-            <p id="physical-saved-notice" class="hidden rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800">記録を保存しました。</p>
+            <p id="physical-saved-notice" class="hidden rounded-xl border border-orange-300 bg-orange-50 px-4 py-3 text-sm font-bold text-orange-800">記録を保存しました。</p>
 
         <!-- ========== 体力測定 ========== -->
         <div id="physical-panel-fitness" class="space-y-6">
         <!-- 体力測定 管理：閲覧画面は種目プルダウン＋推移グラフが先頭に来る -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-5">
             <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
-                <i data-lucide="timer" class="w-5 h-5 text-emerald-600"></i><span id="physical-card-title-fitness">体力測定</span>
+                <i data-lucide="timer" class="w-5 h-5 text-orange-600"></i><span id="physical-card-title-fitness">体力測定</span>
             </h3>
 
             <div class="phys-view-only space-y-2">
@@ -690,7 +706,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <label class="block text-[11px] font-bold text-slate-500 mb-1">メモ（任意）</label>
                         <input type="text" id="physical-fitness-memo" placeholder="例：追い風・スパイク着用など" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold transition flex items-center gap-1.5">
+                    <button type="submit" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-bold transition flex items-center gap-1.5">
                         <i data-lucide="plus" class="w-4 h-4"></i>記録する
                     </button>
                 </div>
@@ -721,10 +737,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
         </div><!-- /physical-panel-fitness -->
         <!-- 画面下部の遷移ボタン：閲覧画面⇔入力画面を行き来する -->
-        <button type="button" onclick="openPhysicalMode('input')" class="phys-view-only w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-extrabold transition shadow-sm">
+        <button type="button" onclick="openPhysicalMode('input')" class="phys-view-only w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-sm font-extrabold transition shadow-sm">
             <i data-lucide="pen-line" class="w-5 h-5"></i>新しい記録を入力する（入力画面へ）
         </button>
-        <button type="button" onclick="openPhysicalMode('view')" class="phys-input-only w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-extrabold transition shadow-sm">
+        <button type="button" onclick="openPhysicalMode('view')" class="phys-input-only w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-sm font-extrabold transition shadow-sm">
             <i data-lucide="eye" class="w-5 h-5"></i>保存した記録を見る（閲覧画面へ）
         </button>
         </div><!-- /physical-detail -->
@@ -735,7 +751,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
             <div>
                 <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="user-check" class="w-5 h-5 text-sky-600"></i>通算選手成績（自動集計）
+                    <i data-lucide="user-check" class="w-5 h-5 text-emerald-600"></i>通算選手成績（自動集計）
                 </h2>
                 <p id="player-stats-own-label" class="text-[13px] text-slate-600 mt-1 leading-relaxed">自チームのみ表示します。</p>
             </div>
@@ -751,7 +767,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         <!-- 個人成績の分岐：打者成績 ／ 投手成績 -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-2 grid grid-cols-2 gap-2" role="tablist" aria-label="個人成績の種類">
-            <button type="button" id="btn-player-branch-batter" onclick="switchPlayerStatsBranch('batter')" role="tab" aria-selected="true" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition bg-sky-600 text-white shadow-sm">
+            <button type="button" id="btn-player-branch-batter" onclick="switchPlayerStatsBranch('batter')" role="tab" aria-selected="true" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition bg-emerald-600 text-white shadow-sm">
                 <i data-lucide="zap" class="w-4 h-4 shrink-0"></i>
                 <span class="text-left leading-tight">打者成績<span class="block text-[11px] font-bold opacity-80">打率・OPS・長打率・出塁率 ほか</span></span>
             </button>
@@ -762,8 +778,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
 
         <div id="player-stats-batter-panel" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-sky-400"></i>打者成績（通算）</h3>
+            <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-emerald-400"></i>打者成績（通算）</h3>
                 <div class="flex items-center gap-2">
                     <span class="text-[11px] text-slate-300">タップ：並び替え／長押し：指標の説明</span>
                     <button onclick="exportPlayerStatsExcel('batter')" class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 border border-white/25 text-white text-[11px] font-bold transition" title="打者成績だけをExcelでダウンロード"><i data-lucide="download" class="w-3.5 h-3.5"></i>Excel</button>
@@ -809,8 +825,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         <!-- 投手成績（通算）― K/BB・BB/K・WHIP・K/9・BB/9・IR率・ERA ＋ ストライク率 -->
         <div id="player-stats-pitcher-panel" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 text-amber-400"></i>投手成績（通算）― K/BB・WHIP・防御率ほか</h3>
+            <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>投手成績（通算）― K/BB・WHIP・防御率ほか</h3>
                 <div class="flex items-center gap-2">
                     <span class="text-[11px] text-slate-300">タップ：並び替え／長押し：指標の説明</span>
                     <button onclick="exportPlayerStatsExcel('pitcher')" class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 border border-white/25 text-white text-[11px] font-bold transition" title="投手成績とカウント別ストライク率をExcelでダウンロード"><i data-lucide="download" class="w-3.5 h-3.5"></i>Excel</button>
@@ -863,7 +879,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
             <div class="min-w-0">
                 <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="trophy" class="w-5 h-5 text-amber-600"></i>通算チーム成績（自動集計）
+                    <i data-lucide="trophy" class="w-5 h-5 text-emerald-600"></i>通算チーム成績（自動集計）
                 </h2>
                 <p id="team-stats-own-label" class="text-[13px] text-slate-600 mt-1 leading-relaxed">自チームのみ表示します。</p>
             </div>
@@ -875,8 +891,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
 
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>基本成績（勝敗・得失点）</h3>
+            <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="trophy" class="w-4 h-4 text-emerald-400"></i>基本成績（勝敗・得失点）</h3>
                 <div class="flex items-center gap-2">
                     <span class="text-[11px] text-slate-300">タップ：並び替え／長押し：指標の説明</span>
                     <button onclick="exportTeamStatsExcel('basic')" class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 border border-white/25 text-white text-[11px] font-bold transition" title="基本成績だけをExcelでダウンロード"><i data-lucide="download" class="w-3.5 h-3.5"></i>Excel</button>
@@ -905,8 +921,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         <!-- 打者成績（チーム平均・通算）― 個人成績と同じ指標 -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-sky-400"></i>打者成績（チーム平均・通算）</h3>
+            <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-emerald-400"></i>打者成績（チーム平均・通算）</h3>
                 <div class="flex items-center gap-2">
                     <span class="text-[11px] text-slate-300">タップ：並び替え／長押し：指標の説明</span>
                     <button onclick="exportTeamStatsExcel('batter')" class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 border border-white/25 text-white text-[11px] font-bold transition" title="打者成績（チーム平均）と1試合平均をExcelでダウンロード"><i data-lucide="download" class="w-3.5 h-3.5"></i>Excel</button>
@@ -954,8 +970,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         <!-- 投手成績（チーム平均・通算）― K/BB・BB/K・WHIP・K/9・BB/9・IR率・ERA ＋ ストライク率（個人成績と同じ指標） -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 text-amber-400"></i>投手成績（チーム平均・通算）― K/BB・WHIP・防御率ほか</h3>
+            <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>投手成績（チーム平均・通算）― K/BB・WHIP・防御率ほか</h3>
                 <div class="flex items-center gap-2">
                     <span class="text-[11px] text-slate-300">タップ：並び替え／長押し：指標の説明</span>
                     <button onclick="exportTeamStatsExcel('pitcher')" class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 border border-white/25 text-white text-[11px] font-bold transition" title="投手成績（チーム平均）・カウント別・1試合平均をExcelでダウンロード"><i data-lucide="download" class="w-3.5 h-3.5"></i>Excel</button>
@@ -1009,7 +1025,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
             <div class="min-w-0">
                 <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="swords" class="w-5 h-5 text-rose-600"></i>他チーム情報一覧
+                    <i data-lucide="swords" class="w-5 h-5 text-emerald-600"></i>他チーム情報一覧
                 </h2>
                 <p class="text-[13px] text-slate-600 mt-1 leading-relaxed">対戦経歴のあるチームのみ表示します。</p>
             </div>
@@ -1040,15 +1056,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <div id="opp-detail-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
 
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-900 text-white px-4 py-2.5">
-                    <h4 class="font-bold text-sm flex items-center gap-2"><i data-lucide="history" class="w-4 h-4 text-rose-400"></i>自チームとの対戦履歴</h4>
+                <div class="bg-emerald-900 text-white px-4 py-2.5">
+                    <h4 class="font-bold text-sm flex items-center gap-2"><i data-lucide="history" class="w-4 h-4 text-emerald-400"></i>自チームとの対戦履歴</h4>
                 </div>
                 <div id="opp-detail-history" class="p-3 space-y-2"></div>
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                    <h4 class="font-bold text-sm flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-sky-400"></i>打者成績（通算）</h4>
+                <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                    <h4 class="font-bold text-sm flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-emerald-400"></i>打者成績（通算）</h4>
                     <span class="text-[11px] text-slate-300">タップ：並び替え／長押し：指標の説明</span>
                 </div>
                 <div class="overflow-x-auto">
@@ -1089,8 +1105,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                    <h4 class="font-bold text-sm flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 text-amber-400"></i>投手成績（通算）― K/BB・WHIP・防御率ほか</h4>
+                <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                    <h4 class="font-bold text-sm flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>投手成績（通算）― K/BB・WHIP・防御率ほか</h4>
                     <span class="text-[11px] text-slate-300">タップ：並び替え／長押し：指標の説明</span>
                 </div>
                 <div class="overflow-x-auto">
@@ -1135,8 +1151,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-900 text-white px-4 py-2.5">
-                    <h4 class="font-bold text-sm flex items-center gap-2"><i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>チーム成績（通算）</h4>
+                <div class="bg-emerald-900 text-white px-4 py-2.5">
+                    <h4 class="font-bold text-sm flex items-center gap-2"><i data-lucide="trophy" class="w-4 h-4 text-emerald-400"></i>チーム成績（通算）</h4>
                 </div>
                 <div id="opp-detail-team-stats" class="p-4 space-y-3"></div>
             </div>
@@ -1515,7 +1531,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div id="view-boxscore" class="hidden space-y-4">
             <!-- この試合の個人成績の分岐：打者成績 ／ 投手成績 -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-2 grid grid-cols-2 gap-2" role="tablist" aria-label="この試合の個人成績の種類">
-                <button type="button" id="btn-box-branch-batter" onclick="switchBoxscoreBranch('batter')" role="tab" aria-selected="true" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition bg-sky-600 text-white shadow-sm">
+                <button type="button" id="btn-box-branch-batter" onclick="switchBoxscoreBranch('batter')" role="tab" aria-selected="true" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition bg-emerald-600 text-white shadow-sm">
                     <i data-lucide="zap" class="w-4 h-4 shrink-0"></i>
                     <span class="text-left leading-tight">打者成績<span class="block text-[11px] font-bold opacity-80">両チームの打撃成績表</span></span>
                 </button>
@@ -1526,7 +1542,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
             <div id="boxscore-batter-panel" class="space-y-6">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between"><h3 id="box-away-title" class="font-bold text-sm">先攻チーム 成績表</h3></div>
+                <div class="bg-emerald-900 text-white px-4 py-2.5 flex items-center justify-between"><h3 id="box-away-title" class="font-bold text-sm">先攻チーム 成績表</h3></div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[760px]">
                         <thead><tr class="bg-slate-100 text-slate-600 border-b border-slate-200 font-semibold"><th class="py-2 px-2 text-center w-10">打順</th><th class="py-2 px-2 text-center w-12">守備</th><th class="py-2 px-3 min-w-[130px]">選手名</th><th class="py-2 px-2 text-center w-14">OPS</th><th class="py-2 px-2 text-center w-14">出塁率</th><th class="py-2 px-2 text-center w-14">打率</th><th class="py-2 px-2 text-center w-14">長打率</th><th class="py-2 px-2 text-center w-11">打数</th><th class="py-2 px-2 text-center w-11">得点</th><th class="py-2 px-2 text-center w-11">安打</th><th class="py-2 px-2 text-center w-11">打点</th><th class="py-2 px-2 text-center w-11">三振</th><th class="py-2 px-2 text-center w-12">四死球</th><th class="py-2 px-2 text-center w-11">犠打飛</th><th class="py-2 px-3">結果</th></tr></thead>
@@ -1535,7 +1551,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
             </div>
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between"><h3 id="box-home-title" class="font-bold text-sm">後攻チーム 成績表</h3></div>
+                <div class="bg-emerald-900 text-white px-4 py-2.5 flex items-center justify-between"><h3 id="box-home-title" class="font-bold text-sm">後攻チーム 成績表</h3></div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[760px]">
                         <thead><tr class="bg-slate-100 text-slate-600 border-b border-slate-200 font-semibold"><th class="py-2 px-2 text-center w-10">打順</th><th class="py-2 px-2 text-center w-12">守備</th><th class="py-2 px-3 min-w-[130px]">選手名</th><th class="py-2 px-2 text-center w-14">OPS</th><th class="py-2 px-2 text-center w-14">出塁率</th><th class="py-2 px-2 text-center w-14">打率</th><th class="py-2 px-2 text-center w-14">長打率</th><th class="py-2 px-2 text-center w-11">打数</th><th class="py-2 px-2 text-center w-11">得点</th><th class="py-2 px-2 text-center w-11">安打</th><th class="py-2 px-2 text-center w-11">打点</th><th class="py-2 px-2 text-center w-11">三振</th><th class="py-2 px-2 text-center w-12">四死球</th><th class="py-2 px-2 text-center w-11">犠打飛</th><th class="py-2 px-3">結果</th></tr></thead>
@@ -1545,7 +1561,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
             </div>
             <div id="boxscore-pitcher-panel" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
                     <h3 class="font-bold text-sm">投手成績（この試合）― K/BB・WHIP・防御率ほか</h3>
                     <span class="text-[11px] text-slate-300">タップ：並び替え／長押し：指標の説明</span>
                 </div>
@@ -3328,6 +3344,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             });
         }
 
+        // 画面遷移時は必ず一番上（先頭）から表示する。
+        // スムーズスクロールではなく即時に先頭へ戻し、描画直後のレイアウト変化で
+        // ずれた場合に備えて次のフレームでもう一度先頭へ合わせる。
+        if ('scrollRestoration' in history) {
+            try { history.scrollRestoration = 'manual'; } catch (e) { /* noop */ }
+        }
+
+        function scrollAppToTop() {
+            try { window.scrollTo(0, 0); } catch (e) { /* noop */ }
+            if (document.documentElement) document.documentElement.scrollTop = 0;
+            if (document.body) document.body.scrollTop = 0;
+            if (typeof requestAnimationFrame === 'function') {
+                requestAnimationFrame(function () {
+                    try { window.scrollTo(0, 0); } catch (e) { /* noop */ }
+                    if (document.documentElement) document.documentElement.scrollTop = 0;
+                    if (document.body) document.body.scrollTop = 0;
+                });
+            }
+        }
+
         function goBackScreen() {
             const prev = navHistoryStack.pop();
             if (!prev) { updateNavBackButtons(); return; }
@@ -3357,7 +3393,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 navRestoring = false;
             }
             updateNavBackButtons();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollAppToTop();
         }
 
         function navigateApp(screenName) {
@@ -3417,6 +3453,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 else renderOpponentList();
             }
             if (typeof lucide !== 'undefined') lucide.createIcons();
+            scrollAppToTop();
         }
 
         // ================= ホームのトップ選択（スコアブック / 体力測定 / チーム設定） =================
@@ -3431,6 +3468,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const menu = document.getElementById('home-scorebook-menu');
             if (hub) hub.classList.remove('hidden');
             if (menu) menu.classList.add('hidden');
+            scrollAppToTop();
         }
 
         function openScorebookHub() {
@@ -3443,7 +3481,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (hub) hub.classList.add('hidden');
             if (menu) menu.classList.remove('hidden');
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollAppToTop();
         }
 
         // ================= 体力測定の画面表示 =================
@@ -3475,7 +3513,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             physicalMode = 'view';
             renderPhysicalScreen();
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollAppToTop();
         }
 
         // カテゴリ画面を開く。category はカテゴリ名、または '__other__'（その他の記録）。
@@ -3495,7 +3533,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             populatePhysicalFitnessTestSelect();
             renderPhysicalScreen();
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollAppToTop();
         }
 
         // 互換用：カテゴリ名が渡されればそのカテゴリ画面を、そうでなければ現在の表示を開く。
@@ -3520,7 +3558,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             navPhysicalMode = targetMode;
             syncPhysicalModeUI();
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollAppToTop();
         }
 
         // 記録の保存が完了したら、保存を知らせて閲覧画面へ自動で移動する
@@ -3819,17 +3857,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const meta = PHYSICAL_CATEGORY_META[key] || { icon: 'timer', desc: '' };
                 const stat = items.length > 0 ? kinds + '種目・' + items.length + '件の記録' : '記録なし';
                 return `
-                <div onclick="openPhysicalCategory('${key}')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-emerald-500 p-7 cursor-pointer transition flex flex-col justify-between">
+                <div onclick="openPhysicalCategory('${key}')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-orange-500 p-7 cursor-pointer transition flex flex-col justify-between">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                        <div class="w-14 h-14 rounded-xl bg-orange-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
                             <i data-lucide="${meta.icon}" class="w-7 h-7"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-emerald-700 transition">${physicalEscapeHtml(label)}</h3>
+                            <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-orange-700 transition">${physicalEscapeHtml(label)}</h3>
                             <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">${physicalEscapeHtml(meta.desc)}</p>
                         </div>
                     </div>
-                    <div class="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-emerald-700">
+                    <div class="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-orange-700">
                         <span>${stat}</span>
                         <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition"></i>
                     </div>
@@ -3895,7 +3933,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const def = fitnessTestDef(r.test);
                 const note = def && def.better === 'low' ? '（小さいほど良い）' : '（大きいほど良い）';
                 return `
-                <div class="bg-emerald-50/60 border border-emerald-100 rounded-xl p-3.5">
+                <div class="bg-orange-50/60 border border-orange-100 rounded-xl p-3.5">
                     <p class="text-xs font-bold text-slate-600 truncate">${physicalEscapeHtml(r.test)}</p>
                     <p class="mt-1"><span class="text-xl font-extrabold text-slate-900">${r.value}</span><span class="text-[11px] font-bold text-slate-500 ml-1">${physicalEscapeHtml(r.unit || '')}</span></p>
                     <p class="text-[11px] text-slate-500 mt-0.5">${physicalFormatDate(r.date)} 達成 ${note}</p>
@@ -3903,7 +3941,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             };
             const groupHtml = (label, items) => items.length === 0 ? '' : `
                 <div>
-                    <h5 class="text-[11px] font-extrabold text-emerald-700 mb-2">${physicalEscapeHtml(label)}</h5>
+                    <h5 class="text-[11px] font-extrabold text-orange-700 mb-2">${physicalEscapeHtml(label)}</h5>
                     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">${items.map(cardHtml).join('')}</div>
                 </div>`;
             let bestsHtml = FITNESS_CATEGORIES.map(cat => groupHtml(cat, bests.filter(r => fitnessCategoryOf(r.test) === cat))).join('');
@@ -3934,7 +3972,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const rows = records.filter(r => r.test === physicalFitnessChartTest).slice().reverse(); // 日付昇順
             const unit = (rows[0] && rows[0].unit) || (fitnessTestDef(physicalFitnessChartTest) || {}).unit || '';
             const points = rows.map(r => ({ value: r.value, dateLabel: physicalFormatDate(r.date) }));
-            chartEl.innerHTML = buildPhysicalLineChart(points, unit, '#059669');
+            chartEl.innerHTML = buildPhysicalLineChart(points, unit, '#ea580c');
         }
 
         function changePhysicalFitnessCategoryFilter(value) {
@@ -3961,12 +3999,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const prev = idx > 0 ? sameAsc[idx - 1] : null;
                 const diff = prev ? fitnessSigned(r.value - prev.value) : '―';
                 const isBest = bests[r.test] === r.id;
-                return `<tr class="hover:bg-emerald-50/40">
+                return `<tr class="hover:bg-orange-50/40">
                     <td class="py-2.5 px-3 font-bold text-slate-700 whitespace-nowrap">${physicalFormatDate(r.date)}</td>
                     <td class="py-2.5 px-3 font-bold text-slate-800">${physicalEscapeHtml(r.test)}</td>
                     <td class="py-2.5 px-3 text-right font-extrabold text-slate-900">${r.value}<span class="text-[11px] font-bold text-slate-500 ml-0.5">${physicalEscapeHtml(r.unit || '')}</span></td>
                     <td class="py-2.5 px-3 text-right text-slate-600">${diff}</td>
-                    <td class="py-2.5 px-3 text-center">${isBest ? '<span class="text-[10px] font-extrabold bg-emerald-600 text-white px-2 py-0.5 rounded-full">ベスト</span>' : ''}</td>
+                    <td class="py-2.5 px-3 text-center">${isBest ? '<span class="text-[10px] font-extrabold bg-orange-600 text-white px-2 py-0.5 rounded-full">ベスト</span>' : ''}</td>
                     <td class="py-2.5 px-3 text-slate-600">${physicalEscapeHtml(r.memo || '')}</td>
                     <td class="py-2.5 px-3 text-center"><button onclick="deletePhysicalFitness('${r.id}')" class="text-rose-500 hover:text-rose-700 font-bold text-xs" title="この記録を削除">削除</button></td>
                 </tr>`;
@@ -3980,7 +4018,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const items = records.filter(r => g.key === '__other__' ? !fitnessCategoryOf(r.test) : fitnessCategoryOf(r.test) === g.key);
                 if (items.length === 0) return;
                 const sorted = items.slice().sort((a, b) => fitnessCompareTestNames(a.test, b.test));
-                html += `<tr class="bg-emerald-50"><td colspan="7" class="py-2 px-3 text-[11px] font-extrabold text-emerald-700">${physicalEscapeHtml(g.label)}<span class="ml-2 font-bold text-emerald-600/70">${items.length}件</span></td></tr>`;
+                html += `<tr class="bg-orange-50"><td colspan="7" class="py-2 px-3 text-[11px] font-extrabold text-orange-700">${physicalEscapeHtml(g.label)}<span class="ml-2 font-bold text-orange-500">${items.length}件</span></td></tr>`;
                 html += sorted.map(rowHtml).join('');
             });
             if (html === '') {
@@ -5045,8 +5083,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const pitcherPanel = document.getElementById('player-stats-pitcher-panel');
             if (batterPanel) batterPanel.classList.toggle('hidden', playerStatsBranch !== 'batter');
             if (pitcherPanel) pitcherPanel.classList.toggle('hidden', playerStatsBranch !== 'pitcher');
-            __setBranchButton(document.getElementById('btn-player-branch-batter'), playerStatsBranch === 'batter', 'bg-sky-600');
-            __setBranchButton(document.getElementById('btn-player-branch-pitcher'), playerStatsBranch === 'pitcher', 'bg-amber-600');
+            __setBranchButton(document.getElementById('btn-player-branch-batter'), playerStatsBranch === 'batter', 'bg-emerald-600');
+            __setBranchButton(document.getElementById('btn-player-branch-pitcher'), playerStatsBranch === 'pitcher', 'bg-emerald-700');
             if (playerStatsBranch === 'pitcher') renderAggregatedPitcherStrikeStats();
             else renderAggregatedPlayerStats();
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -5058,8 +5096,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const pitcherPanel = document.getElementById('boxscore-pitcher-panel');
             if (batterPanel) batterPanel.classList.toggle('hidden', boxscoreBranch !== 'batter');
             if (pitcherPanel) pitcherPanel.classList.toggle('hidden', boxscoreBranch !== 'pitcher');
-            __setBranchButton(document.getElementById('btn-box-branch-batter'), boxscoreBranch === 'batter', 'bg-sky-600');
-            __setBranchButton(document.getElementById('btn-box-branch-pitcher'), boxscoreBranch === 'pitcher', 'bg-amber-600');
+            __setBranchButton(document.getElementById('btn-box-branch-batter'), boxscoreBranch === 'batter', 'bg-emerald-600');
+            __setBranchButton(document.getElementById('btn-box-branch-pitcher'), boxscoreBranch === 'pitcher', 'bg-emerald-700');
             if (boxscoreBranch === 'pitcher' && typeof renderPitcherStrikeBoxscore === 'function') renderPitcherStrikeBoxscore();
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
@@ -5711,7 +5749,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <tr class="hover:bg-slate-50">
                         <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${p.name}</td>
                         <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${p.team}</td>
-                        <td class="py-2.5 px-3 text-center font-extrabold text-sky-800">${fmtRate3(rt.ops)}</td>
+                        <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtRate3(rt.ops)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.obp)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.iso)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.isod)}</td>
@@ -5846,7 +5884,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     return `
                         <tr class="hover:bg-slate-50">
                             <td class="py-2.5 px-3 font-sans font-extrabold text-slate-900">${t.name}</td>
-                            <td class="py-2.5 px-3 text-center font-extrabold text-sky-800">${fmtRate3(rt.ops)}</td>
+                            <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtRate3(rt.ops)}</td>
                             <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.obp)}</td>
                             <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.iso)}</td>
                             <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.isod)}</td>
@@ -5981,7 +6019,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 return `
                 <tr class="hover:bg-slate-50">
                     <td class="py-2.5 px-3 font-sans font-extrabold text-slate-900">${row.team}</td>
-                    <td class="py-2.5 px-3 text-center font-extrabold text-amber-800">${fmtDecimal2(rt.kbb)}</td>
+                    <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtDecimal2(rt.kbb)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.bbk)}</td>
                     <td class="py-2.5 px-3 text-center font-bold text-slate-900">${fmtDecimal2(rt.whip)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.k9)}</td>
@@ -6108,7 +6146,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
                     <div class="flex items-start justify-between gap-3">
                         <h3 class="font-extrabold text-slate-900 text-base leading-snug">${physicalEscapeHtml(t.name)}</h3>
-                        <span class="shrink-0 text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 rounded-full px-2 py-0.5">対戦 ${t.vsGames}試合</span>
+                        <span class="shrink-0 text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2 py-0.5">対戦 ${t.vsGames}試合</span>
                     </div>
                     <div class="grid grid-cols-3 gap-2 text-center">
                         <div class="bg-slate-50 border border-slate-200 rounded-lg py-2">
@@ -6126,7 +6164,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                     <div class="flex items-center justify-between gap-3">
                         <span class="text-[11px] text-slate-500 truncate">${t.lastDate ? ('最終対戦：' + physicalEscapeHtml(t.lastDate) + (t.lastTournament ? '｜' + physicalEscapeHtml(t.lastTournament) : '')) : '自チームとの対戦履歴なし'}</span>
-                        <button onclick="openOpponentDetail(${i})" class="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">分析を見る<i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+                        <button onclick="openOpponentDetail(${i})" class="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">分析を見る<i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
                     </div>
                 </div>
             `).join('');
@@ -6143,14 +6181,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (!navRestoring) pushNavHistory();
             selectedOpponentTeam = rec.name;
             renderOpponentDetail();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollAppToTop();
         }
 
         function showOpponentList() {
             if (!navRestoring && navCurrentScreen === 'opponents' && selectedOpponentTeam) pushNavHistory();
             selectedOpponentTeam = null;
             renderOpponentList();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollAppToTop();
         }
 
         function renderOpponentDetail() {
@@ -6270,7 +6308,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <tr class="hover:bg-slate-50">
                         <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${physicalEscapeHtml(p.name)}</td>
                         <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${physicalEscapeHtml(p.team)}</td>
-                        <td class="py-2.5 px-3 text-center font-extrabold text-sky-800">${fmtRate3(rt.ops)}</td>
+                        <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtRate3(rt.ops)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.obp)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.iso)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.isod)}</td>
@@ -6325,7 +6363,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <tr class="hover:bg-slate-50">
                     <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${physicalEscapeHtml(r.name)}</td>
                     <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${physicalEscapeHtml(r.team)}</td>
-                    <td class="py-2.5 px-3 text-center font-extrabold text-amber-800">${fmtDecimal2(rt.kbb)}</td>
+                    <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtDecimal2(rt.kbb)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.bbk)}</td>
                     <td class="py-2.5 px-3 text-center font-bold text-slate-900">${fmtDecimal2(rt.whip)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.k9)}</td>
@@ -10229,6 +10267,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 // 前回選んだ分岐（打者／投手）を維持する
                 try { switchBoxscoreBranch(boxscoreBranch); } catch (e) { /* 既定の打者表示のまま */ }
             }
+            scrollAppToTop();
         }
 
         function switchLineupViewMode(mode) {
@@ -10927,7 +10966,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <tr class="hover:bg-slate-50">
                         <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${L.name}</td>
                         <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${L.team}</td>
-                        <td class="py-2.5 px-3 text-center font-extrabold text-amber-800">${fmtDecimal2(rt.kbb)}</td>
+                        <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtDecimal2(rt.kbb)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.bbk)}</td>
                         <td class="py-2.5 px-3 text-center font-bold text-slate-900">${fmtDecimal2(rt.whip)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.k9)}</td>
@@ -11050,7 +11089,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <tr class="hover:bg-slate-50">
                     <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${r.name}</td>
                     <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${r.team}</td>
-                    <td class="py-2.5 px-3 text-center font-extrabold text-amber-800">${fmtDecimal2(rt.kbb)}</td>
+                    <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtDecimal2(rt.kbb)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.bbk)}</td>
                     <td class="py-2.5 px-3 text-center font-bold text-slate-900">${fmtDecimal2(rt.whip)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.k9)}</td>
