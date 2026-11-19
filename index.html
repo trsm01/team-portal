@@ -624,9 +624,58 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             header > div[class] > div:first-child > div:first-child { display: none; }
             header h1 { font-size: 13px; }
         }
+
+        /* --- ログイン選択画面（指導者／部員） ---
+           コンパイル済み Tailwind に無い指定（z-index・余白）はここで補う。
+           ヘッダー（z-30）やモーダル（z-50）より必ず前面に出す */
+        #screen-login { z-index: 100; }
+        #screen-login .login-wrap { min-height: 100%; padding: 2.5rem 1rem; }
+        #screen-login .login-head { margin-bottom: 2rem; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- ================= ログイン選択画面（指導者／部員） ================= -->
+    <!-- サイトを開いた最初に表示する。役割は sessionStorage に保持し、
+         ブラウザ（タブ）を閉じるまでは再読み込みしてもこの画面に戻らない。
+         パスワードはまだ無し（ボタンだけで役割を選ぶ）。照合は JS 側の
+         checkLoginPassword() に集約してあるので、後からそこへ追加する。 -->
+    <div id="screen-login" class="fixed inset-0 bg-slate-100 overflow-y-auto">
+        <div class="login-wrap flex items-center justify-center">
+            <div class="w-full max-w-md">
+                <div class="login-head text-center">
+                    <h2 class="text-2xl font-extrabold text-slate-900">ログイン方法を選んでください</h2>
+                    <p class="text-[13px] text-slate-600 mt-2 leading-relaxed">指導者と部員で、使える機能が変わります。</p>
+                </div>
+                <div class="space-y-4">
+                    <button onclick="loginAsRole('coach')" class="w-full text-left bg-white border-2 border-slate-200 hover:border-blue-500 rounded-2xl shadow-sm p-6 transition group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                                <i data-lucide="shield-check" class="w-7 h-7"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-lg font-extrabold text-slate-900 group-hover:text-blue-700 transition">指導者ログイン</div>
+                                <p class="text-[13px] text-slate-600 mt-1 leading-relaxed">全機能が使えます（スコアブック／成績・体力測定・チーム設定・デモデータ）。</p>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400 group-hover:text-blue-600 shrink-0 transition"></i>
+                        </div>
+                    </button>
+                    <button onclick="loginAsRole('player')" class="w-full text-left bg-white border-2 border-slate-200 hover:border-emerald-500 rounded-2xl shadow-sm p-6 transition group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                                <i data-lucide="users" class="w-7 h-7"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-lg font-extrabold text-slate-900 group-hover:text-emerald-700 transition">部員ログイン</div>
+                                <p class="text-[13px] text-slate-600 mt-1 leading-relaxed">スコアブック／成績と体力測定のみ使えます（チーム設定・データの削除はできません）。</p>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 shrink-0 transition"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ヘッダーナビゲーション -->
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30">
@@ -642,6 +691,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
             
             <div class="flex items-center space-x-2">
+                <span id="login-role-badge" class="hidden"></span>
+                <button id="btn-fiscal-year" onclick="openYearSelectModal()" class="hidden items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-700 transition" title="表示する年度を選び直す">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span id="fiscal-year-label">年度未選択</span>
+                </button>
+                <button id="btn-logout" onclick="logoutApp()" class="hidden items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span>ログアウト</span>
+                </button>
                 <button id="btn-nav-back" onclick="goBackScreen()" disabled title="ひとつ前の画面に戻る" class="js-nav-back-btn flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-700 transition opacity-40 pointer-events-none">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                     <span>戻る</span>
@@ -655,7 +713,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <i data-lucide="settings-2" class="w-4 h-4"></i>
                         <span class="hidden md:inline">試合設定</span>
                     </button>
-                    <button onclick="openDataIoModal()" class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                    <button data-coach-only onclick="openDataIoModal()" class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-700 transition">
                         <i data-lucide="database" class="w-4 h-4"></i>
                         <span class="hidden md:inline">データ管理</span>
                     </button>
@@ -714,8 +772,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
             </div>
 
-            <!-- チーム設定を開く -->
-            <div onclick="navigateApp('team-settings')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-blue-500 p-7 cursor-pointer transition flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+            <!-- チーム設定を開く（指導者ログインのみ） -->
+            <div data-coach-only onclick="navigateApp('team-settings')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-blue-500 p-7 cursor-pointer transition flex flex-col justify-between sm:col-span-2 lg:col-span-1">
                 <div class="space-y-4">
                     <div class="w-14 h-14 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
                         <i data-lucide="users" class="w-7 h-7"></i>
@@ -731,8 +789,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
             </div>
 
-            <!-- デモデータ -->
-            <div class="bg-white rounded-2xl shadow-sm border-2 border-dashed border-slate-300 p-6 sm:col-span-2 lg:col-span-3">
+            <!-- デモデータ（指導者ログインのみ） -->
+            <div data-coach-only class="bg-white rounded-2xl shadow-sm border-2 border-dashed border-slate-300 p-6 sm:col-span-2 lg:col-span-3">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                     <div class="flex items-start gap-4 flex-1">
                         <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm shrink-0">
@@ -945,10 +1003,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
             </div>
             <input type="file" id="roster-excel-file" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleRosterExcelFile(this)">
-            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">Excel登録は「ひな型Excel」の利用がおすすめです。列：背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー。何期生は数字（例：72）、学年カラーは青・赤・緑のいずれかで入力します（どちらも空欄可）。</p>
+            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">Excel登録は「ひな型Excel」の利用がおすすめです。列：背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー・入学年度。何期生は数字（例：72）、学年カラーは青・赤・緑のいずれかで入力します（どちらも空欄可）。入学年度は西暦（例：2025）で入力します。選択中の年度 − 入学年度 ＋ 1 がその年度の学年になり、1〜3年生の選手が表示対象になります（空欄でも登録できます）。</p>
+            <div class="flex flex-wrap items-center gap-2">
+                <span id="settings-year-filter-info" class="text-xs font-bold text-slate-600"></span>
+                <button id="settings-year-filter-btn" onclick="toggleSettingsShowAllYears()" class="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded-lg text-xs font-bold transition">対象外の選手も表示</button>
+            </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1020px]">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1140px]">
                     <thead>
                         <tr class="bg-slate-900 text-slate-200 font-semibold">
                             <th class="py-2.5 px-3 text-center w-14">背番号</th>
@@ -956,6 +1018,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <th class="py-2.5 px-3 text-center w-28">投 (投球)</th>
                             <th class="py-2.5 px-3 text-center w-28">打 (打席)</th>
                             <th class="py-2.5 px-3 text-center w-24">学年</th>
+                            <th class="py-2.5 px-3 text-center w-24">入学年度</th>
                             <th class="py-2.5 px-3 text-center w-24">身長（cm）</th>
                             <th class="py-2.5 px-3 text-center w-24">何期生</th>
                             <th class="py-2.5 px-3 text-center w-32">学年カラー</th>
@@ -982,7 +1045,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <p id="roster-import-summary" class="text-[13px] text-slate-600 mt-1 leading-relaxed"></p>
                 </div>
                 <div class="border border-slate-200 rounded-lg overflow-auto max-h-64">
-                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[680px]">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[780px]">
                         <thead>
                             <tr class="bg-slate-900 text-slate-200 font-semibold">
                                 <th class="py-2 px-3 text-center w-16">背番号</th>
@@ -994,6 +1057,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 <th class="py-2 px-3 text-center w-16">身長</th>
                                 <th class="py-2 px-3 text-center w-16">何期生</th>
                                 <th class="py-2 px-3 text-center w-20">学年カラー</th>
+                                <th class="py-2 px-3 text-center w-20">入学年度</th>
                             </tr>
                         </thead>
                         <tbody id="roster-import-preview-tbody" class="divide-y divide-slate-100"></tbody>
@@ -2979,6 +3043,32 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
     </div>
 
+    <!-- 年度選択モーダル（ログイン後に表示。選んだ年度の1〜3年生だけを表示する） -->
+    <div id="modal-year-select" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full overflow-hidden">
+            <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 class="font-bold text-base flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-slate-300"></i>年度を選択</h3>
+                <button onclick="closeYearSelectModal()"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-5 space-y-4 text-sm text-slate-700 leading-relaxed">
+                <p>表示する年度を選んでください。選んだ年度に<strong>1〜3年生</strong>に当たる選手（入学年度から計算）のデータが、成績・体力測定・チーム設定などに表示されます。</p>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5" for="year-select-dropdown">年度（西暦）</label>
+                    <select id="year-select-dropdown" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 bg-white"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5" for="year-select-custom">一覧にない年度は直接入力（西暦）</label>
+                    <input type="number" id="year-select-custom" min="1950" max="2100" step="1" placeholder="例：2026" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 bg-white">
+                    <p class="text-[11px] text-slate-400 mt-1">直接入力が優先されます。空欄のままなら上の選択が使われます。</p>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end space-x-2">
+                <button onclick="closeYearSelectModal()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
+                <button onclick="confirmYearSelection()" class="px-5 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-xs transition">この年度で表示</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 代打・代走 守備確認モーダル（その回が終わり攻守交替する際に表示） -->
     <div id="modal-defense-decision" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden max-h-[92vh] flex flex-col">
@@ -3646,6 +3736,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function deleteArchivedGame(idx) {
+            if (isPlayerLogin()) { showToast('試合データの削除は指導者ログインでのみ利用できます', 'warning'); return; }
             const archives = getArchivedGames();
             archives.splice(idx, 1);
             saveArchivedGames(archives);
@@ -3686,6 +3777,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function openDataIoModal() {
+            if (isPlayerLogin()) { showToast('データ管理は指導者ログインでのみ利用できます', 'warning'); return; }
             renderArchivedGamesInDataModal();
             openModal('modal-data-io');
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -3707,7 +3799,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                     <div class="flex items-center gap-1.5">
                         <button onclick="closeModal('modal-data-io'); loadArchivedGameToScorebook(${idx});" class="px-2.5 py-1 bg-emerald-600 text-white rounded font-bold text-[11px]">読込</button>
-                        <button onclick="deleteArchivedGame(${idx})" class="px-2 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded font-bold text-[11px]">削除</button>
+                        ${isPlayerLogin() ? '' : `<button onclick="deleteArchivedGame(${idx})" class="px-2 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded font-bold text-[11px]">削除</button>`}
                     </div>
                 </div>
             `).join('');
@@ -3807,10 +3899,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const buildPlayers = (prefix) => {
                 const players = [];
                 for (let i = 0; i < 9; i++) {
-                    players.push({ id: prefix + '_p_' + (i + 1), order: i + 1, pos: starterPos[i], number: String(i + 1), name: '選手' + (i + 1), throws: '右', bats: '右', grade: '', cohort: '', gradeColor: '', isActive: true });
+                    players.push({ id: prefix + '_p_' + (i + 1), order: i + 1, pos: starterPos[i], number: String(i + 1), name: '選手' + (i + 1), throws: '右', bats: '右', grade: '', cohort: '', gradeColor: '', entryYear: '', isActive: true });
                 }
                 for (let j = 0; j < 3; j++) {
-                    players.push({ id: prefix + '_p_' + (10 + j), order: 0, pos: benchPos[j], number: String(10 + j), name: '選手' + (10 + j), throws: '右', bats: '右', grade: '', cohort: '', gradeColor: '', isActive: false });
+                    players.push({ id: prefix + '_p_' + (10 + j), order: 0, pos: benchPos[j], number: String(10 + j), name: '選手' + (10 + j), throws: '右', bats: '右', grade: '', cohort: '', gradeColor: '', entryYear: '', isActive: false });
                 }
                 return players;
             };
@@ -4049,6 +4141,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function navigateApp(screenName) {
+            // 部員ログインではチーム設定を開けない（指導者専用）。ホームへ戻す。
+            if (screenName === 'team-settings' && isPlayerLogin()) {
+                showToast('チーム設定は指導者ログインでのみ利用できます', 'warning');
+                screenName = 'home';
+            }
             // 別の画面へ移るとき（およびホーム内でメニュー表示からトップへ戻るとき）は、
             // 離れる前の状態を履歴へ積んで「戻る」で復元できるようにする
             if (!navRestoring && (screenName !== navCurrentScreen ||
@@ -4466,13 +4563,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         function populatePhysicalPlayers() {
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || { players: [] };
-            const players = roster.players || [];
+            // 選択中の年度で1〜3年生に当たる選手だけを対象にする（入学年度未入力は常に対象）
+            const players = yearFilteredPlayers(roster.players || []);
             const sel = document.getElementById('physical-player-selector');
             const noPlayer = document.getElementById('physical-no-player');
             if (players.length === 0) {
-                sel.innerHTML = '<option value="">（選手未登録）</option>';
+                const rosterHasPlayers = (roster.players || []).length > 0;
+                sel.innerHTML = '<option value="">' + (rosterHasPlayers ? '（対象選手なし）' : '（選手未登録）') + '</option>';
                 physicalPlayerName = '';
-                if (noPlayer) noPlayer.classList.remove('hidden');
+                if (noPlayer) {
+                    noPlayer.textContent = rosterHasPlayers
+                        ? '選択中の年度の対象選手がいません。年度を選び直すか、チーム設定で入学年度を確認してください。'
+                        : 'このチームには選手が登録されていません。先に「チーム設定」で選手を登録してください。';
+                    noPlayer.classList.remove('hidden');
+                }
                 return;
             }
             if (noPlayer) noPlayer.classList.add('hidden');
@@ -5318,7 +5422,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (endEl && endEl.value !== physComparePeriod.end) endEl.value = physComparePeriod.end;
 
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || { players: [] };
-            const rosterNames = (roster.players || []).map(p => p.name).filter(n => n);
+            const rosterNames = (roster.players || []).filter(p => p && isPlayerInSelectedYear(p)).map(p => p.name).filter(n => n);
             physComparePlayerNames = rosterNames;
             const colorOf = name => PHYS_COMPARE_COLORS[Math.max(0, rosterNames.indexOf(name)) % PHYS_COMPARE_COLORS.length];
 
@@ -5529,7 +5633,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // 同点の場合は同じ順位とし、次の順位は人数分を飛ばす（例：1位・2位・2位・4位）。
         function physCategoryRankingRows(category) {
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || { players: [] };
-            const players = (roster.players || []).filter(p => p && p.name);
+            const players = (roster.players || []).filter(p => p && p.name && isPlayerInSelectedYear(p));
             const rows = players.map((p, idx) => {
                 const records = physPlayerRecordsAsc(p.name);
                 const catResults = physOverallFromRecords(records);
@@ -5562,7 +5666,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // 同点の場合は同じ順位とし、次の順位は人数分を飛ばす（カテゴリ別ランキングと同じ方式）。
         function physOverallRankingRows() {
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || { players: [] };
-            const players = (roster.players || []).filter(p => p && p.name);
+            const players = (roster.players || []).filter(p => p && p.name && isPlayerInSelectedYear(p));
             const rows = players.map((p, idx) => {
                 const records = physPlayerRecordsAsc(p.name);
                 const catResults = physOverallFromRecords(records);
@@ -6393,7 +6497,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             titleEl.textContent = cat + 'ランキング';
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || { players: [] };
-            const playerCount = (roster.players || []).filter(p => p && p.name).length;
+            const playerCount = (roster.players || []).filter(p => p && p.name && isPlayerInSelectedYear(p)).length;
             if (playerCount === 0) {
                 summaryEl.innerHTML = '';
                 sheetEl.innerHTML = physEmptyMsg('選手が登録されていません。先に「チーム設定」で選手を登録してください。');
@@ -6436,7 +6540,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function renderPhysicalOverallRanking(titleEl, summaryEl, sheetEl) {
             titleEl.textContent = '総合ランキング';
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || { players: [] };
-            const playerCount = (roster.players || []).filter(p => p && p.name).length;
+            const playerCount = (roster.players || []).filter(p => p && p.name && isPlayerInSelectedYear(p)).length;
             if (playerCount === 0) {
                 summaryEl.innerHTML = '';
                 sheetEl.innerHTML = physEmptyMsg('選手が登録されていません。先に「チーム設定」で選手を登録してください。');
@@ -6592,7 +6696,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <td class="py-2.5 px-3 text-right text-slate-600">${diff}</td>
                     <td class="py-2.5 px-3 text-center">${isBest ? '<span class="text-[10px] font-extrabold bg-orange-600 text-white px-2 py-0.5 rounded-full">ベスト</span>' : ''}</td>
                     <td class="py-2.5 px-3 text-slate-600">${physicalEscapeHtml(r.memo || '')}</td>
-                    <td class="py-2.5 px-3 text-center"><button onclick="deletePhysicalFitness('${r.id}')" class="text-rose-500 hover:text-rose-700 font-bold text-xs" title="この記録を削除">削除</button></td>
+                    <td class="py-2.5 px-3 text-center">${isPlayerLogin() ? '' : `<button onclick="deletePhysicalFitness('${r.id}')" class="text-rose-500 hover:text-rose-700 font-bold text-xs" title="この記録を削除">削除</button>`}</td>
                 </tr>`;
             };
             // カテゴリごとにグループ化して表示する。各グループ内は種目の定義順→日付の新しい順。
@@ -6770,6 +6874,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function deletePhysicalFitness(id) {
+            if (isPlayerLogin()) { showToast('記録の削除は指導者ログインでのみ利用できます', 'warning'); return; }
             if (!physicalData || !Array.isArray(physicalData.fitness)) return;
             physicalData.fitness = physicalData.fitness.filter(r => r.id !== id);
             savePhysicalData();
@@ -6809,7 +6914,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                     <div class="flex items-center space-x-2">
                         <button onclick="closeModal('modal-score-selector'); loadArchivedGameToScorebook(${idx});" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow-2xs transition">開く・確認</button>
-                        <button onclick="deleteArchivedGame(${idx}); updateHomeScreenUI();" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg font-bold text-xs transition">削除</button>
+                        ${isPlayerLogin() ? '' : `<button onclick="deleteArchivedGame(${idx}); updateHomeScreenUI();" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg font-bold text-xs transition">削除</button>`}
                     </div>
                 </div>
             `).join('');
@@ -7265,6 +7370,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             renderTeamSettingsScreen();
         }
 
+        // チーム設定の選手一覧で、選択中の年度の対象外の選手も表示するか
+        // （入学年度の修正や卒業生の確認のために切り替えられるようにする）
+        let settingsShowAllYears = false;
+        function toggleSettingsShowAllYears() {
+            settingsShowAllYears = !settingsShowAllYears;
+            renderTeamSettingsScreen();
+        }
+
         function renderTeamSettingsScreen() {
             // チーム設定で登録・編集できるのは自チームのみ
             currentSettingsTeam = getOwnTeamKey();
@@ -7284,10 +7397,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 summaryEl.textContent = `自チーム ${t.name}：${(t.players || []).length}名登録`;
             }
 
+            // 年度フィルタ情報：選択中の年度の対象人数と、対象外も表示する切替ボタン
+            const yearInfoEl = document.getElementById('settings-year-filter-info');
+            const yearBtnEl = document.getElementById('settings-year-filter-btn');
+            const inYearCount = (tData.players || []).filter(p => isPlayerInSelectedYear(p)).length;
+            if (yearInfoEl) {
+                yearInfoEl.textContent = selectedFiscalYear
+                    ? (selectedFiscalYear + '年度の表示対象：' + inYearCount + '名／全' + (tData.players || []).length + '名（入学年度が未入力の選手は常に対象）')
+                    : ('登録選手：' + (tData.players || []).length + '名');
+            }
+            if (yearBtnEl) {
+                yearBtnEl.textContent = settingsShowAllYears ? '年度の対象だけ表示' : '対象外の選手も表示';
+            }
+
             const tbody = document.getElementById('settings-players-tbody');
             tbody.innerHTML = '';
 
             tData.players.forEach((p, idx) => {
+                // 選択中の年度で1〜3年生に当たらない選手は一覧に出さない
+                // （データは残す。入学年度の修正などで必要なときは「対象外の選手も表示」で編集できる）
+                if (!settingsShowAllYears && !isPlayerInSelectedYear(p)) return;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="py-2 px-3 text-center"><input type="text" value="${p.number}" onchange="updateMasterPlayer(${idx}, 'number', this.value)" class="w-14 text-center border border-slate-200 rounded py-1 font-mono text-xs"></td>
@@ -7314,6 +7443,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <option value="他" ${p.grade === 'other' || p.grade === '他' ? 'selected' : ''}>他</option>
                         </select>
                     </td>
+                    <td class="py-2 px-3 text-center"><input type="number" step="1" min="1950" max="2100" value="${p.entryYear != null && p.entryYear !== '' ? p.entryYear : ''}" placeholder="未登録" onchange="updateMasterPlayer(${idx}, 'entryYear', this.value)" class="w-20 text-center border border-slate-200 rounded py-1 text-xs" title="入学年度（西暦。例：2025）"></td>
                     <td class="py-2 px-3 text-center"><input type="number" step="0.1" min="100" max="250" value="${p.height != null && p.height !== '' ? p.height : ''}" placeholder="未登録" onchange="updateMasterPlayer(${idx}, 'height', this.value)" class="w-20 text-center border border-slate-200 rounded py-1 text-xs" title="身長（cm）"></td>
                     <td class="py-2 px-3 text-center">
                         <input type="number" step="1" min="1" max="999" value="${p.cohort != null && p.cohort !== '' ? p.cohort : ''}" placeholder="未登録" onchange="updateMasterPlayer(${idx}, 'cohort', this.value)" class="w-16 text-center border border-slate-200 rounded py-1 text-xs" title="何期生（数字のみ。例：72）">
@@ -7373,6 +7503,24 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function updateMasterPlayer(idx, field, value) {
             const player = globalTeamRosters[currentSettingsTeam].players[idx];
             const oldName = field === 'name' ? player.name : null;
+            if (field === 'entryYear') {
+                // 入学年度は西暦4桁（例：2025）。空欄可。学年は「年度 − 入学年度 ＋ 1」で決まる
+                const raw = String(value == null ? '' : value).trim().replace(/[^\d]/g, '');
+                if (raw === '') {
+                    player.entryYear = '';
+                } else {
+                    const n = parseInt(raw, 10);
+                    if (isNaN(n) || n < 1950 || n > 2100) {
+                        showToast('入学年度は西暦4桁で入力してください（例：2025）', 'warning');
+                        renderTeamSettingsScreen();
+                        return;
+                    }
+                    player.entryYear = n;
+                }
+                saveTeamRosters();
+                renderTeamSettingsScreen();
+                return;
+            }
             if (field === 'cohort') {
                 // 何期生は数字のみ（例：72 → 72期生）。空欄可。1〜999の整数以外は受け付けない
                 const raw = String(value == null ? '' : value).trim().replace(/[^\d]/g, '');
@@ -7433,6 +7581,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 throws: '右',
                 bats: '右',
                 grade: '1年',
+                entryYear: '',
                 height: '',
                 cohort: '',
                 gradeColor: '',
@@ -7504,6 +7653,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (isNaN(n) || n < 1 || n > 999) return '';
             return n;
         }
+        function __rosterNormEntryYear(v) {
+            // 入学年度：数字だけを取り出し、西暦として妥当（1950〜2100）ならその数値を返す。それ以外は空（未登録）
+            const s = String(v === null || v === undefined ? '' : v).replace(/[^\d]/g, '');
+            if (!s) return '';
+            const n = parseInt(s, 10);
+            if (isNaN(n) || n < 1950 || n > 2100) return '';
+            return n;
+        }
         function __rosterNormGradeColor(v) {
             // 学年カラー：青・赤・緑（英語表記含む）を内部値へ正規化する。それ以外は空（未設定）
             return normalizeGradeColor(v);
@@ -7534,7 +7691,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return rows;
         }
         // シートの2次元配列 → 選手リスト。見出し行があれば列を自動判別し、
-        // 無ければ「背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー」の順とみなす。
+        // 無ければ「背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー・入学年度」の順とみなす。
         function __parseRosterAoa(aoa) {
             const aliases = {
                 number: ['背番号', '番号', '背番', '選手番号', 'No'],
@@ -7545,7 +7702,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 pos: ['守備位置', '守備', 'ポジション'],
                 height: ['身長', '身長cm', '身長（cm）', '身長(cm)'],
                 cohort: ['何期生', '期生', '期'],
-                gradeColor: ['学年カラー', '学年色', 'カラー', '色']
+                gradeColor: ['学年カラー', '学年色', 'カラー', '色'],
+                entryYear: ['入学年度', '入学年', '入学']
             };
             const normHead = v => String(v === null || v === undefined ? '' : v).replace(/[\s　]/g, '').toLowerCase();
             // 「チーム名」欄（ひな型のチーム名行など）があればチーム名も読み取る。
@@ -7571,7 +7729,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             let colMap = null, startRow = 0;
             for (let r = 0; r < Math.min(aoa.length, 15); r++) {
                 const row = aoa[r] || [];
-                const map = { number: -1, name: -1, throws: -1, bats: -1, grade: -1, pos: -1, height: -1, cohort: -1, gradeColor: -1 };
+                const map = { number: -1, name: -1, throws: -1, bats: -1, grade: -1, pos: -1, height: -1, cohort: -1, gradeColor: -1, entryYear: -1 };
                 row.forEach((cell, c) => {
                     const h = normHead(cell);
                     if (!h) return;
@@ -7581,7 +7739,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 });
                 if (map.name !== -1 && (map.number !== -1 || map.throws !== -1 || map.grade !== -1)) { colMap = map; startRow = r + 1; break; }
             }
-            if (!colMap) colMap = { number: 0, name: 1, throws: 2, bats: 3, grade: 4, pos: 5, height: 6, cohort: 7, gradeColor: 8 };
+            if (!colMap) colMap = { number: 0, name: 1, throws: 2, bats: 3, grade: 4, pos: 5, height: 6, cohort: 7, gradeColor: 8, entryYear: 9 };
             const players = [], skipped = [], seen = {};
             for (let r = startRow; r < aoa.length; r++) {
                 const row = aoa[r] || [];
@@ -7610,7 +7768,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     pos: __rosterNormPos(get(colMap.pos)),
                     height: height,
                     cohort: __rosterNormCohort(get(colMap.cohort)),
-                    gradeColor: __rosterNormGradeColor(get(colMap.gradeColor))
+                    gradeColor: __rosterNormGradeColor(get(colMap.gradeColor)),
+                    entryYear: __rosterNormEntryYear(get(colMap.entryYear))
                 });
             }
             return { players: players, skipped: skipped, teamName: teamName };
@@ -7681,7 +7840,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 '<td class="py-1.5 px-3 text-center">' + __excelEscapeHtml(p.pos || '-') + '</td>' +
                 '<td class="py-1.5 px-3 text-center">' + (p.height !== '' && p.height != null ? p.height + ' cm' : '-') + '</td>' +
                 '<td class="py-1.5 px-3 text-center">' + (p.cohort !== '' && p.cohort != null ? __excelEscapeHtml(cohortLabel(p.cohort)) : '-') + '</td>' +
-                '<td class="py-1.5 px-3 text-center">' + (gradeColorLabel(p.gradeColor) ? gradeColorBadgeHtml(p.gradeColor) : '-') + '</td></tr>').join('');
+                '<td class="py-1.5 px-3 text-center">' + (gradeColorLabel(p.gradeColor) ? gradeColorBadgeHtml(p.gradeColor) : '-') + '</td>' +
+                '<td class="py-1.5 px-3 text-center">' + (p.entryYear !== '' && p.entryYear != null ? p.entryYear + '年度' : '-') + '</td></tr>').join('');
             const skipWrap = document.getElementById('roster-import-skipped-wrap');
             if (parsed.skipped.length) {
                 skipWrap.classList.remove('hidden');
@@ -7715,6 +7875,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     height: p.height != null ? p.height : '',
                     cohort: p.cohort != null ? p.cohort : '',
                     gradeColor: p.gradeColor != null ? p.gradeColor : '',
+                    entryYear: p.entryYear != null ? p.entryYear : '',
                     isActive: i < 9
                 }));
                 if (newTeamName) tData.name = newTeamName;
@@ -7741,6 +7902,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     height: p.height != null ? p.height : '',
                     cohort: p.cohort != null ? p.cohort : '',
                     gradeColor: p.gradeColor != null ? p.gradeColor : '',
+                    entryYear: p.entryYear != null ? p.entryYear : '',
                     isActive: false
                 });
                 added++;
@@ -7764,15 +7926,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ['選手登録ひな型（チーム名・選手一括登録用）'],
                 ['チーム名', tData.name, '※ チーム名を登録・変更したい場合は、この行のチーム名（B列）を書き換えてください。読み込むとチーム名も一緒に登録されます。この行と見出し行は消さないでください'],
                 [],
-                ['背番号', '選手名', '投', '打', '学年', '守備位置', '身長', '何期生', '学年カラー'],
-                ['※例1', '山田 太郎', '右投', '右打', '3年', '投', 175, 71, '青'],
-                ['※例2', '佐藤 次郎', '左投', '左打', '2年', '捕', 168, 72, '赤'],
-                ['※例3', '鈴木 三郎', '右投', '両打', '1年', '外', 180, 73, '緑']
+                ['背番号', '選手名', '投', '打', '学年', '守備位置', '身長', '何期生', '学年カラー', '入学年度'],
+                ['※例1', '山田 太郎', '右投', '右打', '3年', '投', 175, 71, '青', 2024],
+                ['※例2', '佐藤 次郎', '左投', '左打', '2年', '捕', 168, 72, '赤', 2025],
+                ['※例3', '鈴木 三郎', '右投', '両打', '1年', '外', 180, 73, '緑', 2026]
             ];
-            for (let i = 0; i < 25; i++) sheet1.push(['', '', '', '', '', '', '', '', '']);
+            for (let i = 0; i < 25; i++) sheet1.push(['', '', '', '', '', '', '', '', '', '']);
             sheet1.push([]);
             sheet1.push(['※ 記入例の行（背番号が「※例」から始まる行）は読み込まれません。例を参考に、空の行へ実際の選手を1行に1名ずつ入力してください。例の行は消しても構いません。']);
-            sheet1.push(['※ 投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。背番号は空欄でも登録できますが、選手名は必須です。身長はcm単位の数値（例：175）で入力してください。空欄でも登録できます。何期生は数字（例：72）で入力してください（「72期生」という表記でも判別します）。学年カラーは 青・赤・緑 のいずれかで入力してください。どちらも空欄でも登録できます。']);
+            sheet1.push(['※ 投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。背番号は空欄でも登録できますが、選手名は必須です。身長はcm単位の数値（例：175）で入力してください。空欄でも登録できます。何期生は数字（例：72）で入力してください（「72期生」という表記でも判別します）。学年カラーは 青・赤・緑 のいずれかで入力してください。どちらも空欄でも登録できます。入学年度は西暦（例：2025）で入力してください。ログイン時に選んだ年度 − 入学年度 ＋ 1 がその年度の学年になり、1〜3年生の選手が表示対象になります（空欄でも登録できます）。']);
             sheet1.push(['※ 入力が終わったらファイルを保存し、チーム設定画面で読み込み先のチームが選択されていることを確認してから「Excelで読み込み」でこのファイルを選んでください。「全員入れ替え」で登録すると先頭9名がスタメン（打順1〜9番）になります。詳しくは2枚目の「入力方法」シートをご覧ください。']);
             const sheet2 = [
                 ['ひな型の入力方法・記入例'],
@@ -7782,7 +7944,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 [],
                 ['手順1', 'チーム設定画面で、登録したいチーム（チームA／チームB）をプルダウンで選んでから「ひな型Excelをダウンロード」を押してください。ひな型は選んだチーム用です。もう一方のチーム分は、チームを切り替えて同じ手順を繰り返してください。'],
                 ['手順2', 'ひな型の1枚目「選手登録ひな型」シートを開き、2行目のチーム名を確認します（変更する場合はB列を書き換えます）。'],
-                ['手順3', '見出し行（背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー）の下の空の行に、1行に1選手ずつ入力します。記入例の行は読み込まれないので、参考用に残しても消しても構いません。見出し行とチーム名の行は消さず、列の並びも変えないでください。'],
+                ['手順3', '見出し行（背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー・入学年度）の下の空の行に、1行に1選手ずつ入力します。記入例の行は読み込まれないので、参考用に残しても消しても構いません。見出し行とチーム名の行は消さず、列の並びも変えないでください。'],
                 ['手順4', 'ファイルを保存し、チーム設定画面の「Excelで読み込み」からこのファイルを選ぶと、確認画面で読み込んだ内容をチェックしてから登録できます。'],
                 ['背番号', '半角数字で入力します（例：1、18）。空欄でも登録できます。'],
                 ['選手名', '必須です。空欄の行は読み込めません。同じ選手名・背番号の組み合わせがファイル内に重複していると、その行は読み込めません。'],
@@ -7793,6 +7955,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ['身長', 'cm単位の数値で入力します（例：175、175.5）。空欄でも登録できます。100〜250の範囲外の値は読み込まれません。'],
                 ['何期生', '数字で入力します（例：72）。「72期生」という表記でも判別します。空欄でも登録できます。'],
                 ['学年カラー', '青・赤・緑 のいずれかで入力します（学年ごとの色分け）。空欄でも登録できます。'],
+                ['入学年度', '西暦で入力します（例：2025）。ログイン時に選んだ年度 − 入学年度 ＋ 1 がその年度の学年になり、1〜3年生の選手が成績・体力測定・チーム設定などの表示対象になります。空欄でも登録できます（空欄の選手は常に対象になります）。'],
                 ['登録方法（追加）', '「既存リストに追加」では現在の登録を残したまま、読み込んだ選手をベンチメンバーとして追加します。同じ選手名がすでに登録されている場合は追加されません。'],
                 ['登録方法（入れ替え）', '「全員入れ替え」では現在の登録選手をすべて削除し、読み込んだ選手だけで登録し直します。先頭の9名がスタメン（打順1〜9番）になります。'],
                 ['チーム名の登録', 'ひな型の「チーム名」欄を書き換えて読み込むと、読み込み先チームのチーム名も一緒に更新され、スコアブックと体力測定に反映されます。選手行を入れずにチーム名だけのファイルを読み込んだ場合は、チーム名だけが登録されます。']
@@ -7811,14 +7974,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ['選手登録シート（' + tData.name + '）'],
                 ['出力日時: ' + __excelNowText()],
                 [],
-                ['背番号', '選手名', '投', '打', '学年', '守備位置', '身長', '何期生', '学年カラー']
+                ['背番号', '選手名', '投', '打', '学年', '守備位置', '身長', '何期生', '学年カラー', '入学年度']
             ];
             tData.players.forEach(p => {
-                aoa.push([p.number, p.name, p.throws + '投', p.bats + '打', (p.grade === 'other' ? '他' : p.grade), p.pos || '', (p.height != null && p.height !== '' ? p.height : ''), (p.cohort != null && p.cohort !== '' ? p.cohort : ''), gradeColorLabel(p.gradeColor)]);
+                aoa.push([p.number, p.name, p.throws + '投', p.bats + '打', (p.grade === 'other' ? '他' : p.grade), p.pos || '', (p.height != null && p.height !== '' ? p.height : ''), (p.cohort != null && p.cohort !== '' ? p.cohort : ''), gradeColorLabel(p.gradeColor), (p.entryYear != null && p.entryYear !== '' ? p.entryYear : '')]);
             });
             aoa.push([]);
             aoa.push(['※ このファイルを編集して、チーム設定画面の「Excelで読み込み」から読み込むと、選手を一括で登録できます。']);
-            aoa.push(['※ 見出し行（背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー）は残したまま、選手の行を追加・編集・削除してください。投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。身長はcm単位の数値で入力してください（空欄でも登録できます）。何期生は数字（例：72）で、学年カラーは 青・赤・緑 のいずれかで入力してください（どちらも空欄でも登録できます）。']);
+            aoa.push(['※ 見出し行（背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー・入学年度）は残したまま、選手の行を追加・編集・削除してください。投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。身長はcm単位の数値で入力してください（空欄でも登録できます）。何期生は数字（例：72）で、学年カラーは 青・赤・緑 のいずれかで入力してください（どちらも空欄でも登録できます）。入学年度は西暦（例：2025）で入力してください（空欄でも登録できます）。']);
             __downloadExcelWorkbook([{ name: '選手登録', aoa: aoa }], '選手登録_' + tData.name);
             showToast('現在の登録内容をExcelファイルでダウンロードしました', 'success');
         }
@@ -8496,7 +8659,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
 
             const tbody = document.getElementById('aggregated-player-tbody');
-            const list = Object.values(playerMap).filter(p => filterTeam === 'ALL' || p.team === filterTeam);
+            // 選択中の年度で1〜3年生に当たる選手だけを表示（名簿で入学年度が判定できる選手のみ絞り込む）
+            const list = Object.values(playerMap).filter(p => (filterTeam === 'ALL' || p.team === filterTeam) && isNameInSelectedYear(p.name));
             list.sort((a, b) => {
                 const avgA = a.ab > 0 ? a.h / a.ab : -1;
                 const avgB = b.ab > 0 ? b.h / b.ab : -1;
@@ -13789,6 +13953,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             // 'ALL' は「自チーム全体」の意味。他チームの投手は選手成績には出さない。
             if (filterTeam && filterTeam !== 'ALL') rows = rows.filter(r => r.team === filterTeam);
             else rows = rows.filter(r => isOwnTeamName(r.team));
+            // 選択中の年度で1〜3年生に当たる投手だけを表示（名簿で入学年度が判定できる投手のみ絞り込む）
+            rows = rows.filter(r => isNameInSelectedYear(r.name));
             rows.sort((a, b) => ((b.strike ? b.strike.total : 0) - (a.strike ? a.strike.total : 0)) || ((b.line ? b.line.outs : 0) - (a.line ? a.line.outs : 0)));
 
             if (rows.length === 0) {
@@ -13936,6 +14102,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             let list = aggregatePitcherStrikeStats(games);
             if (filterTeam && filterTeam !== 'ALL') list = list.filter(st => st.team === filterTeam);
             else list = list.filter(st => isOwnTeamName(st.team));
+            list = list.filter(st => isNameInSelectedYear(st.name));
             if (list.length === 0) aoa.push(['（投球記録がありません）']);
             list.forEach(st => {
                 STRIKE_COUNT_KEYS.forEach(c => {
@@ -14106,7 +14273,280 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     try { gameState = createInitialGameState(); } catch (e2) { /* navigateApp 側のガードに任せる */ }
                 }
             }
+            initLoginRole();
+            initFiscalYear();
             navigateApp('home');
+            applyLoginGate();
+        }
+
+        // ================= ログイン（指導者／部員の役割分け） =================
+        // 役割は sessionStorage に保持する：ブラウザ（タブ）を閉じるまでは
+        // 再読み込みしてもログイン選択画面に戻らない。sessionStorage が
+        // 使えない環境ではメモリ保持にフォールバックする（safeStorage と同じ考え方）。
+        const LOGIN_ROLE_KEY = 'baseball_login_role_v1';
+        const safeSession = (() => {
+            const memoryStore = {};
+            let backend = null;
+            try {
+                const testKey = '__scorebook_session_test__';
+                window.sessionStorage.setItem(testKey, '1');
+                window.sessionStorage.removeItem(testKey);
+                backend = window.sessionStorage;
+            } catch (e) {
+                backend = null;
+            }
+            return {
+                getItem(key) {
+                    try { if (backend) return backend.getItem(key); } catch (e) { /* フォールバックへ */ }
+                    return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null;
+                },
+                setItem(key, value) {
+                    try { if (backend) { backend.setItem(key, String(value)); return; } } catch (e) { /* フォールバックへ */ }
+                    memoryStore[key] = String(value);
+                },
+                removeItem(key) {
+                    try { if (backend) backend.removeItem(key); } catch (e) { /* 無視 */ }
+                    delete memoryStore[key];
+                }
+            };
+        })();
+        let loginRole = null; // 'coach'（指導者） | 'player'（部員） | null（未ログイン）
+
+        // ============================================================
+        // 【パスワードを後から追加する場所】
+        // 現在はパスワードなし：ボタンで役割を選ぶだけでログインできる。
+        // パスワードを設定する場合は、この checkLoginPassword(role) の中で
+        // 入力されたパスワードと照合し、一致しなければ false を返すよう
+        // 実装すること。ログイン処理（loginAsRole）はこの関数の結果だけを
+        // 見ているので、他の場所は変更不要。
+        // ============================================================
+        function checkLoginPassword(role) {
+            // TODO: パスワード認証を入れる場合はここに実装する（現状は常に許可）
+            return true;
+        }
+
+        function isPlayerLogin() {
+            return loginRole === 'player';
+        }
+
+        // 起動時に sessionStorage から役割を復元する
+        function initLoginRole() {
+            try {
+                const saved = safeSession.getItem(LOGIN_ROLE_KEY);
+                if (saved === 'coach' || saved === 'player') loginRole = saved;
+            } catch (e) { /* 復元できなければ未ログイン扱い */ }
+        }
+
+        // ================= 年度選択（表示対象の年度） =================
+        // ログイン後に年度を選ぶ。選んだ年度は役割と同じく sessionStorage に
+        // 保持し、ログアウトするまで（タブを閉じるまで）維持する。
+        // 学年は「選んだ年度 − 入学年度 ＋ 1」で計算し、1〜3年生に当たる選手
+        // だけを成績・体力測定・チーム設定などの一覧に表示する。
+        // 入学年度が未入力の選手は学年を判定できないため、従来どおり常に
+        // 表示する（既存データが年度選択で消えてしまわないようにするため）。
+        // 対象外の選手もデータ自体は削除せず、年度を変えれば再び表示される。
+        const LOGIN_YEAR_KEY = 'baseball_fiscal_year_v1';
+        let selectedFiscalYear = null; // 表示対象の年度（西暦）。null は未選択
+
+        // 今年度（4月始まり）：4〜12月はその年、1〜3月は前年が年度になる
+        function currentFiscalYearDefault() {
+            const now = new Date();
+            return now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+        }
+
+        // 起動時に sessionStorage から選択中の年度を復元する
+        function initFiscalYear() {
+            try {
+                const saved = parseInt(safeSession.getItem(LOGIN_YEAR_KEY), 10);
+                if (!isNaN(saved) && saved >= 1950 && saved <= 2100) selectedFiscalYear = saved;
+            } catch (e) { /* 復元できなければ未選択扱い */ }
+        }
+
+        // 入学年度（player.entryYear）を数値として取り出す。未入力・不正値は null
+        function parseEntryYear(v) {
+            if (v === null || v === undefined || v === '') return null;
+            const n = parseInt(String(v).replace(/[^\d]/g, ''), 10);
+            if (isNaN(n) || n < 1950 || n > 2100) return null;
+            return n;
+        }
+
+        // 指定年度における選手の学年（1〜3）。入学年度が無ければ null（判定不可）
+        function playerGradeInYear(player, year) {
+            const ey = parseEntryYear(player ? player.entryYear : null);
+            if (ey === null || !year) return null;
+            return year - ey + 1;
+        }
+
+        // 選択中の年度で表示対象かどうか。入学年度が未入力の選手は常に対象。
+        // 年度が未選択のときも全員対象（絞り込まない）。
+        function isPlayerInSelectedYear(player) {
+            if (!selectedFiscalYear) return true;
+            const g = playerGradeInYear(player, selectedFiscalYear);
+            if (g === null) return true;
+            return g >= 1 && g <= 3;
+        }
+
+        // 選手名から名簿（自チーム・相手チーム両方）を引いて年度対象か判定する。
+        // 名簿に無い名前（旧データ等）は判定できないため表示対象とする。
+        function isNameInSelectedYear(name) {
+            if (!selectedFiscalYear || !name) return true;
+            try {
+                const rosters = globalTeamRosters || {};
+                const keys = Object.keys(rosters);
+                for (let i = 0; i < keys.length; i++) {
+                    const players = (rosters[keys[i]] && rosters[keys[i]].players) || [];
+                    const found = players.find(p => p && p.name === name);
+                    if (found) return isPlayerInSelectedYear(found);
+                }
+            } catch (e) { /* 名簿が読めない場合は表示対象とする */ }
+            return true;
+        }
+
+        // 選手配列を選択中の年度の対象だけに絞る（表示専用。データは変えない）
+        function yearFilteredPlayers(players) {
+            return (players || []).filter(p => isPlayerInSelectedYear(p));
+        }
+
+        // 年度選択ポップアップを開く（ログイン直後と、ヘッダーの年度ボタンから）
+        function openYearSelectModal() {
+            const sel = document.getElementById('year-select-dropdown');
+            if (sel) {
+                const base = currentFiscalYearDefault();
+                const years = [];
+                for (let y = base + 1; y >= base - 6; y--) years.push(y);
+                if (selectedFiscalYear && years.indexOf(selectedFiscalYear) === -1) years.unshift(selectedFiscalYear);
+                sel.innerHTML = years.map(y => '<option value="' + y + '">' + y + '年度</option>').join('');
+                sel.value = String(selectedFiscalYear || base);
+            }
+            const custom = document.getElementById('year-select-custom');
+            if (custom) custom.value = '';
+            openModal('modal-year-select');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // 年度を確定する（直接入力があればそちらを優先）
+        function confirmYearSelection() {
+            const custom = document.getElementById('year-select-custom');
+            const sel = document.getElementById('year-select-dropdown');
+            let y = null;
+            if (custom && String(custom.value).trim() !== '') y = parseInt(custom.value, 10);
+            else if (sel) y = parseInt(sel.value, 10);
+            if (!y || isNaN(y) || y < 1950 || y > 2100) {
+                showToast('年度は西暦で選んでください（例：2026）', 'warning');
+                return;
+            }
+            setFiscalYear(y);
+            closeModal('modal-year-select');
+            showToast(y + '年度を表示します（1〜3年生が対象です）', 'success');
+        }
+
+        // 閉じる／キャンセル：まだ年度が未選択なら今年度を仮の選択にする
+        // （年度未選択のまま画面が使えなくならないようにするため）
+        function closeYearSelectModal() {
+            if (!selectedFiscalYear) setFiscalYear(currentFiscalYearDefault());
+            closeModal('modal-year-select');
+        }
+
+        function setFiscalYear(y) {
+            selectedFiscalYear = y;
+            try { safeSession.setItem(LOGIN_YEAR_KEY, String(y)); } catch (e) { /* 保存できなくても表示は継続 */ }
+            updateFiscalYearUI();
+            refreshYearDependentViews();
+        }
+
+        // ヘッダーの年度ボタンの表示を更新する
+        function updateFiscalYearUI() {
+            const btn = document.getElementById('btn-fiscal-year');
+            const label = document.getElementById('fiscal-year-label');
+            const loggedIn = loginRole === 'coach' || loginRole === 'player';
+            if (label) label.textContent = selectedFiscalYear ? (selectedFiscalYear + '年度') : '年度を選択';
+            if (btn) {
+                btn.classList.toggle('hidden', !loggedIn);
+                btn.classList.toggle('flex', loggedIn);
+            }
+        }
+
+        // 年度が変わったら、年度で絞り込まれる一覧を描き直す
+        function refreshYearDependentViews() {
+            try { renderAggregatedPlayerStats(); } catch (e) { /* 画面未初期化時は無視 */ }
+            try { renderAggregatedPitcherStrikeStats(); } catch (e) { /* 同上 */ }
+            try { if (typeof physicalData !== 'undefined' && physicalData) { populatePhysicalPlayers(); renderPhysicalScreen(); } } catch (e) { /* 同上 */ }
+            try { renderTeamSettingsScreen(); } catch (e) { /* 同上 */ }
+        }
+
+        function loginAsRole(role) {
+            if (role !== 'coach' && role !== 'player') return;
+            if (!checkLoginPassword(role)) {
+                showToast('パスワードが違います', 'warning');
+                return;
+            }
+            loginRole = role;
+            try { safeSession.setItem(LOGIN_ROLE_KEY, role); } catch (e) { /* 保存できなくてもログインは継続 */ }
+            navHistoryStack.length = 0;
+            updateNavBackButtons();
+            applyLoginGate();
+            navigateApp('home');
+            showToast(role === 'coach' ? '指導者としてログインしました' : '部員としてログインしました', 'success');
+        }
+
+        function logoutApp() {
+            loginRole = null;
+            selectedFiscalYear = null;
+            try { safeSession.removeItem(LOGIN_ROLE_KEY); } catch (e) { /* 無視 */ }
+            try { safeSession.removeItem(LOGIN_YEAR_KEY); } catch (e) { /* 無視 */ }
+            navHistoryStack.length = 0;
+            updateNavBackButtons();
+            navigateApp('home');
+            applyLoginGate();
+        }
+
+        // ログイン状態に応じて、選択画面の表示・ヘッダーのバッジと
+        // ログアウトボタン・指導者専用要素の表示を切り替える
+        function applyLoginGate() {
+            const loggedIn = loginRole === 'coach' || loginRole === 'player';
+            const gate = document.getElementById('screen-login');
+            if (gate) gate.classList.toggle('hidden', loggedIn);
+            const badge = document.getElementById('login-role-badge');
+            if (badge) {
+                if (!loggedIn) {
+                    badge.className = 'hidden';
+                    badge.textContent = '';
+                } else if (loginRole === 'coach') {
+                    badge.className = 'inline-flex items-center text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-blue-600 text-white whitespace-nowrap';
+                    badge.textContent = '指導者ログイン中';
+                } else {
+                    badge.className = 'inline-flex items-center text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white whitespace-nowrap';
+                    badge.textContent = '部員ログイン中';
+                }
+            }
+            const logoutBtn = document.getElementById('btn-logout');
+            if (logoutBtn) {
+                logoutBtn.classList.toggle('hidden', !loggedIn);
+                logoutBtn.classList.toggle('flex', loggedIn);
+            }
+            updateFiscalYearUI();
+            applyRoleVisibility();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            // ログイン済みで年度がまだ選ばれていなければ、年度選択ポップアップを出す
+            if (loggedIn && !selectedFiscalYear) openYearSelectModal();
+        }
+
+        // 部員ログインでは指導者専用要素（[data-coach-only]）を隠す。
+        // 対象：ホームのチーム設定カード・デモデータカード、ヘッダーのデータ管理ボタン。
+        // 関数側でも isPlayerLogin() でガードしているため、万一表示されても実行できない。
+        function applyRoleVisibility() {
+            const player = isPlayerLogin();
+            document.querySelectorAll('[data-coach-only]').forEach(el => {
+                el.classList.toggle('hidden', player);
+            });
+            // 部員ログインではホームのカードが2枚になるため、グリッドを2列に詰める
+            const hub = document.getElementById('home-hub');
+            if (hub) {
+                hub.classList.toggle('lg:grid-cols-3', !player);
+                hub.classList.toggle('lg:grid-cols-2', player);
+                hub.classList.toggle('max-w-6xl', !player);
+                hub.classList.toggle('max-w-4xl', player);
+            }
         }
 
         // ================= デモデータ =================
@@ -14163,11 +14603,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function openDemoInsertModal() {
+            if (isPlayerLogin()) { showToast('デモデータの操作は指導者ログインでのみ利用できます', 'warning'); return; }
             openModal('modal-demo-insert');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function openDemoRemoveModal() {
+            if (isPlayerLogin()) { showToast('デモデータの操作は指導者ログインでのみ利用できます', 'warning'); return; }
             const c = demoCounts();
             const sumEl = document.getElementById('demo-remove-summary');
             if (sumEl) {
@@ -14184,10 +14626,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const posList = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指', '投', '投', '外', '内', '外', '捕', '内', '投', '外', '内'];
             // 学年ごとに何期生と学年カラーを割り当てる（3年＝71期生・青／2年＝72期生・赤／1年＝73期生・緑）
             const demoGradeInfo = { '3年': { cohort: 71, gradeColor: 'blue' }, '2年': { cohort: 72, gradeColor: 'red' }, '1年': { cohort: 73, gradeColor: 'green' } };
+            // 入学年度は選択中の年度（未選択なら今年度）を基準に学年から逆算する
+            const demoBaseYear = selectedFiscalYear || currentFiscalYearDefault();
             const players = [];
             for (let i = 1; i <= 20; i++) {
                 const grade = ['3年', '2年', '1年'][i % 3];
                 const gi = demoGradeInfo[grade];
+                const gradeNum = parseInt(grade, 10) || 1;
                 players.push({
                     id: DEMO_ROSTER_PREFIX + i,
                     order: i <= 9 ? i : 0,
@@ -14197,6 +14642,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     throws: (i % 5 === 3) ? '左' : '右',
                     bats: (i % 7 === 5) ? '両' : ((i % 4 === 2) ? '左' : '右'),
                     grade: grade,
+                    entryYear: demoBaseYear - gradeNum + 1,
                     height: String(168 + ((i * 7) % 16)),
                     cohort: gi.cohort,
                     gradeColor: gi.gradeColor,
@@ -14532,6 +14978,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         // ---- デモデータの投入（追加のみ・本物の記録は変更しない） ----
         function insertDemoData() {
+            if (isPlayerLogin()) { showToast('デモデータの操作は指導者ログインでのみ利用できます', 'warning'); return; }
             closeModal('modal-demo-insert');
             if (!globalTeamRosters) globalTeamRosters = loadTeamRosters();
             const ownKey = getOwnTeamKey();
@@ -14586,6 +15033,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         // ---- デモデータの削除（デモ分だけ・本物の記録は残す） ----
         function removeDemoData() {
+            if (isPlayerLogin()) { showToast('デモデータの操作は指導者ログインでのみ利用できます', 'warning'); return; }
             closeModal('modal-demo-remove');
             let removedPlayers = 0, removedGames = 0, removedFitness = 0;
             const removedNames = [];
@@ -14663,6 +15111,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             triggerRosterExcelSelect, handleRosterExcelFile, downloadRosterTemplateExcel, downloadRosterBlankTemplate, applyRosterImport,
             exportPlayerStatsExcel, exportTeamStatsExcel,
             renderAggregatedPlayerStats, renderAggregatedPitcherStrikeStats, renderAggregatedTeamStats, renderAggregatedTeamPitcherStats, renderAggregatedTeamPitcherDetail, renderInteractiveFieldMap,
+            loginAsRole, logoutApp,
+            openYearSelectModal, confirmYearSelection, closeYearSelectModal, toggleSettingsShowAllYears,
             openOpponentTeams, openOpponentDetail, showOpponentList, renderOpponentList, renderOpponentDetail, renderOpponentPitcherDetail, exportOpponentStatsExcel, setOwnTeamKey,
             switchPlayerStatsBranch, switchBoxscoreBranch, refreshAggregatedStats,
             changePhysicalTeam, changePhysicalPlayer,
