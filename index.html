@@ -1329,11 +1329,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1560px]">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1450px]">
                     <thead>
                         <tr class="bg-slate-900 text-slate-200 font-semibold">
                             <th class="py-2.5 px-3">選手名</th>
-                            <th class="py-2.5 px-3">所属チーム</th>
                             <th class="py-2.5 px-3 text-center">OPS</th>
                             <th class="py-2.5 px-3 text-center">出塁率</th>
                             <th class="py-2.5 px-3 text-center">ISO</th>
@@ -1358,7 +1357,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         </div>
 
-        <!-- 投手成績（通算）― K/BB・BB/K・WHIP・K/9・BB/9・IR率・ERA ＋ ストライク率 -->
+        <!-- 投手成績（通算）― K/BB・BB/K・WHIP・K/9・BB/9・球数/9・IR率・ERA ＋ ストライク率 -->
         <div id="player-stats-pitcher-panel" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
                 <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>投手成績（通算）― K/BB・WHIP・防御率ほか</h3>
@@ -1368,16 +1367,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1080px]">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1060px]">
                     <thead>
                         <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 font-semibold">
                             <th class="py-2.5 px-3">投手名</th>
-                            <th class="py-2.5 px-3">所属チーム</th>
                             <th class="py-2.5 px-3 text-center">K/BB</th>
                             <th class="py-2.5 px-3 text-center">BB/K</th>
                             <th class="py-2.5 px-3 text-center">WHIP</th>
                             <th class="py-2.5 px-3 text-center">K/9</th>
                             <th class="py-2.5 px-3 text-center">BB/9</th>
+                            <th class="py-2.5 px-3 text-center">球数/9</th>
                             <th class="py-2.5 px-3 text-center">IR率</th>
                             <th class="py-2.5 px-3 text-center">ERA</th>
                             <th class="py-2.5 px-2 text-center">投球回</th>
@@ -1485,7 +1484,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
         </div>
 
-        <!-- 投手成績（チーム平均・通算）― K/BB・BB/K・WHIP・K/9・BB/9・IR率・ERA ＋ 投球回・与四球（ストライク率系は個人成績の投手成績に掲載） -->
+        <!-- 投手成績（チーム平均・通算）― K/BB・BB/K・WHIP・K/9・BB/9・球数/9・IR率・ERA ＋ 投球回・与四球（ストライク率系は個人成績の投手成績に掲載） -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
                 <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>投手成績（チーム平均・通算）― K/BB・WHIP・防御率ほか</h3>
@@ -1495,7 +1494,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[860px]">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[950px]">
                     <thead>
                         <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 font-semibold">
                             <th class="py-2.5 px-3">チーム名</th>
@@ -1504,6 +1503,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <th class="py-2.5 px-3 text-center">WHIP</th>
                             <th class="py-2.5 px-3 text-center">K/9</th>
                             <th class="py-2.5 px-3 text-center">BB/9</th>
+                            <th class="py-2.5 px-3 text-center">球数/9</th>
                             <th class="py-2.5 px-3 text-center">IR率</th>
                             <th class="py-2.5 px-3 text-center">ERA</th>
                             <th class="py-2.5 px-2 text-center">投球回</th>
@@ -7904,15 +7904,18 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function fmtPct1(v) { return v.toFixed(1) + '%'; }
 
         // ===== 投手指標の計算（指定された定義・計算式に準拠／優先順位順） =====
-        // 入力 s: { outs, bf, h, bb, so, r, er, ir, irs }
+        // 入力 s: { outs, bf, h, bb, so, r, er, ir, irs, pitches }
         //   outs = 記録したアウト数（投球回 IP = outs / 3。端数 1/3・2/3 は outs のまま保持し、
-        //          割るときに正確な分数として扱うため、WHIP・K/9・BB/9・ERA の端数計算がずれない）
+        //          割るときに正確な分数として扱うため、WHIP・K/9・BB/9・球数/9・ERA の端数計算がずれない）
         //   ir / irs = 継承走者総数／継承走者の生還数（定義：降板時に残した走者のうち生還した数）
-        // 優先順位: 1.K/BB 2.BB/K 3.WHIP 4.K/9 5.BB/9 6.IR率 7.ERA
+        //   pitches = 投球数（打席記録の投球シーケンス集計＝ストライク率の分母と同じ総投球数。
+        //             球数/9 の分子にだけ使い、保存データには追加しない）
+        // 優先順位: 1.K/BB 2.BB/K 3.WHIP 4.K/9 5.BB/9 6.球数/9 7.IR率 8.ERA
         // 分母が0の場合はエラーとせず 0 として扱い、表示側で 0.00 / 0.0% になる。
         function computePitcherRates(s) {
             const outs = s.outs || 0, h = s.h || 0, bb = s.bb || 0, so = s.so || 0;
             const er = s.er || 0, ir = s.ir || 0, irs = s.irs || 0;
+            const pitches = s.pitches || 0;
             const ip = outs / 3;
             return {
                 ip: ip,
@@ -7922,12 +7925,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 whip: ip > 0 ? (h + bb) / ip : 0,
                 k9: ip > 0 ? (so * 9) / ip : 0,
                 bb9: ip > 0 ? (bb * 9) / ip : 0,
+                p9: ip > 0 ? (pitches * 9) / ip : 0,
                 irPct: ir > 0 ? (irs / ir) * 100 : 0,
                 era: ip > 0 ? (er * 9) / ip : 0
             };
         }
 
-        // WHIP・ERA・K/BB・BB/K・K/9・BB/9 は小数第2位まで
+        // WHIP・ERA・K/BB・BB/K・K/9・BB/9・球数/9 は小数第2位まで
         function fmtDecimal2(v) { return (typeof v === 'number' && isFinite(v) ? v : 0).toFixed(2); }
         // 投球回は野球表記（アウト数ベース：7アウト＝2.1、8アウト＝2.2）
         function fmtIPFromOuts(outs) { const o = Math.max(0, outs || 0); return Math.floor(o / 3) + '.' + (o % 3); }
@@ -8303,6 +8307,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             'WHIP': { body: '1イニングあたりに許した走者（安打と四球）の数です。低いほど優秀です。', formula: '（被安打＋与四球）÷ 投球回' },
             'K/9': { body: '9イニング投げた場合に換算した奪三振数です。', formula: '奪三振 × 9 ÷ 投球回' },
             'BB/9': { body: '9イニング投げた場合に換算した与四球数です。', formula: '与四球 × 9 ÷ 投球回' },
+            '球数/9': { body: '9イニング投げた場合に換算した投球数です。1試合あたりの球数の目安になります。', formula: '投球数 × 9 ÷ 投球回' },
             'IR率': { body: '前の投手が残した走者（継承走者）のうち、生還を許した割合です。低いほど優秀です。', formula: '継承生還 ÷ 継承走者' },
             'ERA': { body: '防御率です。9イニング投げた場合に換算した自責点の平均で、低いほど優秀です。', formula: '自責点 × 9 ÷ 投球回' },
             '防御率': { body: '9イニング投げた場合に換算した自責点の平均です。低いほど優秀です。', formula: '自責点 × 9 ÷ 投球回' },
@@ -8499,7 +8504,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             });
 
             if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="18" class="py-8 text-center text-slate-400 font-sans">試合データがありません。</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="17" class="py-8 text-center text-slate-400 font-sans">試合データがありません。</td></tr>';
                 return;
             }
 
@@ -8508,7 +8513,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 return `
                     <tr class="hover:bg-slate-50">
                         <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(p.name)}${p.name}</td>
-                        <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${p.team}</td>
                         <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtRate3(rt.ops)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.obp)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.iso)}</td>
@@ -8728,21 +8732,24 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ['outs', 'bf', 'h', 'bb', 'so', 'r', 'er', 'ir', 'irs'].forEach(f => { t[f] += l[f] || 0; });
             });
             teamPitcherLineByTeam = lineByTeam;
+            // 球数/9 用に、チームごとの総投球数（ストライク率集計の合計）を用意する
+            const pitchByTeam = {};
+            aggregateTeamPitcherStrikeStats(games).forEach(st => { pitchByTeam[st.team] = st.total || 0; });
             const teamNames = Object.keys(lineByTeam).filter(n => isOwnTeamName(n));
             const mergedRows = teamNames.map(team => ({ team: team, line: lineByTeam[team] }));
             mergedRows.sort((a, b) => b.line.outs - a.line.outs);
 
             if (mergedRows.length === 0) {
                 tbody.innerHTML = games.length === 0
-                    ? '<tr><td colspan="10" class="py-8 text-center text-slate-400 font-sans">投球記録がありません。</td></tr>'
-                    : '<tr><td colspan="10" class="py-8 text-center text-slate-400 font-sans">投球記録のあるチームがありません。</td></tr>';
+                    ? '<tr><td colspan="11" class="py-8 text-center text-slate-400 font-sans">投球記録がありません。</td></tr>'
+                    : '<tr><td colspan="11" class="py-8 text-center text-slate-400 font-sans">投球記録のあるチームがありません。</td></tr>';
                 if (pergameEl) pergameEl.innerHTML = '';
                 return;
             }
 
             tbody.innerHTML = mergedRows.map(row => {
                 const L = row.line;
-                const rt = computePitcherRates(L);
+                const rt = computePitcherRates(Object.assign({}, L, { pitches: pitchByTeam[row.team] || 0 }));
                 return `
                 <tr class="hover:bg-slate-50">
                     <td class="py-2.5 px-3 font-sans font-extrabold text-slate-900">${row.team}</td>
@@ -8751,6 +8758,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <td class="py-2.5 px-3 text-center font-bold text-slate-900">${fmtDecimal2(rt.whip)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.k9)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.bb9)}</td>
+                    <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.p9)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtPct1(rt.irPct)}</td>
                     <td class="py-2.5 px-3 text-center font-extrabold text-slate-900">${fmtDecimal2(rt.era)}</td>
                     <td class="py-2.5 px-2 text-center">${rt.ipText}</td>
@@ -13756,7 +13764,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         // 通算の投手成績（選手成績画面：蓄積アーカイブから集計）
-        // 7指標（K/BB・BB/K・WHIP・K/9・BB/9・IR率・ERA）を優先順位順に先頭へ置き、
+        // 8指標（K/BB・BB/K・WHIP・K/9・BB/9・球数/9・IR率・ERA）を優先順位順に先頭へ置き、
         // 後ろに投球回・与四球とストライク率系（全体／初球）を並べる。
         // 対戦打者・被安打・奪三振・失点・自責点・継承走者・継承生還・投球数・ストライク・
         // 対象打席などの合算系は表示しない（集計・保存データは従来どおり保持する）。
@@ -13794,17 +13802,18 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
             tbody.innerHTML = rows.map(r => {
                 const L = r.line || { outs: 0, bf: 0, h: 0, bb: 0, so: 0, r: 0, er: 0, ir: 0, irs: 0 };
-                const rt = computePitcherRates(L);
                 const st = r.strike;
+                // 球数/9 の投球数はストライク率集計の総投球数（st.total）を使う
+                const rt = computePitcherRates(Object.assign({}, L, { pitches: st ? st.total : 0 }));
                 return `
                 <tr class="hover:bg-slate-50">
                     <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(r.name)}${r.name}</td>
-                    <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${r.team}</td>
                     <td class="py-2.5 px-3 text-center font-extrabold text-emerald-800">${fmtDecimal2(rt.kbb)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.bbk)}</td>
                     <td class="py-2.5 px-3 text-center font-bold text-slate-900">${fmtDecimal2(rt.whip)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.k9)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.bb9)}</td>
+                    <td class="py-2.5 px-3 text-center text-slate-700">${fmtDecimal2(rt.p9)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtPct1(rt.irPct)}</td>
                     <td class="py-2.5 px-3 text-center font-extrabold text-slate-900">${fmtDecimal2(rt.era)}</td>
                     <td class="py-2.5 px-2 text-center">${rt.ipText}</td>
@@ -13999,7 +14008,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return true;
         }
         const __BATTER_NOTE = '※ 打率＝安打÷打数／出塁率＝（安打＋四球＋死球）÷（打数＋四球＋死球＋犠飛）※分母に犠打は含めない／長打率＝塁打数÷打数（塁打数＝単打＋2×二塁打＋3×三塁打＋4×本塁打）／OPS＝出塁率＋長打率／ISO＝長打率−打率／IsoD＝出塁率−打率／四球率＝四球÷打席／三振率＝三振÷打席／盗塁成功率＝盗塁成功÷（盗塁成功＋盗塁刺）／犠打成功率＝犠打成功÷（犠打成功＋犠打失敗）。分母が0の場合は .000 または 0.0% と表示します。投球回は野球表記（2.1＝2回1/3）です。';
-        const __PITCHER_NOTE = '※ K/BB＝奪三振÷与四球／BB/K＝与四球÷奪三振／WHIP＝（被安打＋与四球）÷投球回／K/9＝奪三振×9÷投球回／BB/9＝与四球×9÷投球回／IR率＝継承走者の生還数÷継承走者総数／ERA（防御率）＝自責点×9÷投球回。投球回はアウト数から計算し1/3回・2/3回の端数も正確に扱います（表示は野球表記：2.1＝2回1/3）。分母が0の場合は 0.00 または 0.0% と表示します。';
+        const __PITCHER_NOTE = '※ K/BB＝奪三振÷与四球／BB/K＝与四球÷奪三振／WHIP＝（被安打＋与四球）÷投球回／K/9＝奪三振×9÷投球回／BB/9＝与四球×9÷投球回／球数/9＝投球数×9÷投球回／IR率＝継承走者の生還数÷継承走者総数／ERA（防御率）＝自責点×9÷投球回。投球回はアウト数から計算し1/3回・2/3回の端数も正確に扱います（表示は野球表記：2.1＝2回1/3）。分母が0の場合は 0.00 または 0.0% と表示します。';
         // 個人成績のExcel出力。scope: 'all' | 'batter' | 'pitcher'
         function exportPlayerStatsExcel(scope) {
             const mode = scope || 'all';
