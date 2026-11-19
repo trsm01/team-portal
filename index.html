@@ -913,11 +913,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             </optgroup>
                         </select>
                     </div>
-                    <div>
+                    <div id="physical-fitness-value-wrap">
                         <label class="block text-[11px] font-bold text-slate-500 mb-1">測定値</label>
                         <input type="number" id="physical-fitness-value" step="0.01" min="-100000" max="100000" placeholder="例：60.0" class="w-28 border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
                     </div>
-                    <div>
+                    <div id="physical-fitness-unit-wrap">
                         <label class="block text-[11px] font-bold text-slate-500 mb-1">単位</label>
                         <select id="physical-fitness-unit" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
                             <option>秒</option>
@@ -931,6 +931,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <option>%</option>
                             <option>kg/m²</option>
                         </select>
+                    </div>
+                    <div id="physical-fitness-grade-wrap" class="hidden">
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1">区分</label>
+                        <select id="physical-fitness-grade" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white"></select>
                     </div>
                     <div class="flex-1 min-w-[140px]">
                         <label class="block text-[11px] font-bold text-slate-500 mb-1">メモ（任意）</label>
@@ -984,7 +988,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <div id="physical-overall-summary"></div>
                 <div id="physical-overall-chart" class="w-full"></div>
                 <div id="physical-overall-categories"></div>
-                <p class="text-[11px] text-slate-400">各種目のベスト記録を基準値で100点満点に換算し、カテゴリごとに平均したものです。基準値が未設定の種目は採点されず、平均にも含まれません。</p>
+                <div id="physical-overall-standards"></div>
+                <p class="text-[11px] text-slate-400">各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、カテゴリごとに平均したものです。未記録・未採点の種目は平均に含まれません。</p>
             </div>
         </div>
     </div>
@@ -4142,30 +4147,113 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             '__other__': { icon: 'folder-open', desc: 'カテゴリ外の種目（過去の記録）' }
         };
 
-        // ===== 総合評価の採点基準（大枠） =====
-        // 種目ごとの基準値は後からここへ設定する。設定した種目だけが採点対象になる。
-        // 形式: '種目名': { full: 100点になる測定値, zero: 0点になる測定値 }
-        //   大きいほど良い種目（better:'high'）は zero→full の間を直線補間で点数化し、
-        //   小さいほど良い種目（スプリント等、better:'low'）は full→zero の間を直線補間する。
-        //   範囲外の測定値は 0〜100 点に丸める。
-        // 例: '垂直跳び': { full: 75, zero: 40 }, '10m走': { full: 1.70, zero: 2.10 }
+        // ===== 総合評価の採点基準 =====
+        // 150キロライン＝6点 / 140キロライン＝5点 / 130キロライン＝4点 /
+        // 125キロライン＝3点 / 120キロライン＝2点 / 115キロライン＝1点 で採点する。
+        const FITNESS_SCORE_LINES = [
+            { points: 6, label: '150キロライン' },
+            { points: 5, label: '140キロライン' },
+            { points: 4, label: '130キロライン' },
+            { points: 3, label: '125キロライン' },
+            { points: 2, label: '120キロライン' },
+            { points: 1, label: '115キロライン' }
+        ];
+        // 基準値はすべてこの表に集約する。
+        // 数値種目（kind:'number'）: thresholds は [6点, 5点, 4点, 3点, 2点] の境界値。
+        //   大きいほど良い種目は「6点のみ境界超え（>）、他は境界以上（>=）」で判定し、
+        //   小さいほど良い種目（スプリント）は「6点のみ境界未満（<）、他は境界以下（<=）」で判定する。
+        //   2点の境界に届かない記録は1点になる。lines は基準表の表示用（6点→1点の順）。
+        // 区分種目（kind:'grade'）: 数値ではなく区分で記録し、points の対応で採点する。
+        //   KWテストは同じ区分が2ラインにまたがるため、高い方のラインの点数を採用する
+        //   （支持なし可能＝6点、支持あり可能＝4点、支持あり不可＝2点、支持あり困難＝1点）。
+        //   柔軟系の △ は125キロライン相当で3点、× は1点とする。
+        //   立位前屈・広背筋は ○ が130キロラインのため4点（他の柔軟系の ○ は140キロラインで5点）。
         const FITNESS_SCORE_STANDARDS = {
+            '除脂肪指数': { kind: 'number', thresholds: [22, 21, 20, 19, 18], lines: ['>22', '21', '20', '19', '18', '<18'] },
+            '垂直跳び': { kind: 'number', thresholds: [75, 65, 60, 55, 45], lines: ['>75cm', '65cm', '60cm', '55cm', '45cm', '<45cm'] },
+            '三段跳び': { kind: 'number', thresholds: [8.5, 8.0, 7.5, 7.0, 6.8], lines: ['>8.5m', '8.0m', '7.5m', '7.0m', '6.8m', '<6.5m'] },
+            'MBバックスロー': { kind: 'number', thresholds: [15, 13, 11, 9, 7], lines: ['>15m', '13m', '11m', '9m', '7m', '<5m'] },
+            'DL挙上速度': { kind: 'number', thresholds: [2.0, 1.8, 1.6, 1.4, 1.2], lines: ['>2.0m/秒', '1.8m/秒', '1.6m/秒', '1.4m/秒', '1.2m/秒', '<1.0m/秒'] },
+            'BSQ': { kind: 'number', thresholds: [200, 185, 160, 140, 120], lines: ['>200kg', '185kg', '160kg', '140kg', '120kg', '<110kg'] },
+            'BP': { kind: 'number', thresholds: [110, 100, 85, 75, 65], lines: ['>110kg', '100kg', '85kg', '75kg', '65kg', '<55kg'] },
+            '10m走': { kind: 'number', thresholds: [1.65, 1.75, 1.8, 1.85, 1.9], lines: ['<1.65秒', '1.75秒', '1.8秒', '1.85秒', '1.9秒', '>2.0秒'] },
+            '30m走': { kind: 'number', thresholds: [3.8, 4.0, 4.1, 4.2, 4.3], lines: ['<3.8秒', '4.0秒', '4.1秒', '4.2秒', '4.3秒', '>4.4秒'] },
+            'KWテスト': { kind: 'grade', options: ['支持なし可能', '支持あり可能', '支持あり不可', '支持あり困難'], points: { '支持なし可能': 6, '支持あり可能': 4, '支持あり不可': 2, '支持あり困難': 1 }, lines: ['支持なし可能', '支持なし可能', '支持あり可能', '支持あり可能', '支持あり不可', '支持あり困難'] },
+            'ブリッジ': { kind: 'grade', options: ['◎', '○', '△', '×'], points: { '◎': 6, '○': 5, '△': 3, '×': 1 }, lines: ['◎', '○', '○', '△、×', '△、×', '△、×'] },
+            '90-90': { kind: 'grade', options: ['◎', '○', '△', '×'], points: { '◎': 6, '○': 5, '△': 3, '×': 1 }, lines: ['◎', '○', '○', '△、×', '△、×', '△、×'] },
+            '開脚': { kind: 'grade', options: ['◎', '○', '△', '×'], points: { '◎': 6, '○': 5, '△': 3, '×': 1 }, lines: ['◎', '○', '○', '△、×', '△、×', '△、×'] },
+            '股関節外旋': { kind: 'grade', options: ['◎', '○', '△', '×'], points: { '◎': 6, '○': 5, '△': 3, '×': 1 }, lines: ['◎', '○', '○', '△、×', '△、×', '△、×'] },
+            '立位前屈': { kind: 'grade', options: ['◎', '○', '△', '×'], points: { '◎': 6, '○': 4, '△': 3, '×': 1 }, lines: ['◎', '◎', '○', '△、×', '△、×', '△、×'] },
+            '胸郭回旋': { kind: 'grade', options: ['◎', '○', '△', '×'], points: { '◎': 6, '○': 5, '△': 3, '×': 1 }, lines: ['◎', '○', '○', '△、×', '△、×', '△、×'] },
+            '広背筋': { kind: 'grade', options: ['◎', '○', '△', '×'], points: { '◎': 6, '○': 4, '△': 3, '×': 1 }, lines: ['◎', '◎', '○', '△、×', '△、×', '△、×'] }
         };
 
-        // 測定値を基準値で 0〜100 点に換算する。基準値が未設定の種目は null（採点対象外）。
-        function fitnessScoreOf(testName, value) {
+        // 区分で記録する種目かどうか（KWテストと柔軟系）
+        function fitnessIsGradeTest(testName) {
             const std = FITNESS_SCORE_STANDARDS[testName];
-            if (!std || value == null || isNaN(value)) return null;
-            const full = Number(std.full);
-            const zero = Number(std.zero);
-            if (isNaN(full) || isNaN(zero) || full === zero) return null;
+            return !!(std && std.kind === 'grade');
+        }
+
+        // 数値を基準表の閾値で 6〜1 点に換算する。対象外・不正値は null。
+        function fitnessNumericScore(testName, value) {
+            const std = FITNESS_SCORE_STANDARDS[testName];
+            if (!std || std.kind !== 'number' || value == null || isNaN(value)) return null;
+            const th = std.thresholds;
             const def = fitnessTestDef(testName);
-            let ratio;
-            if (def && def.better === 'low') ratio = (zero - value) / (zero - full);
-            else ratio = (value - zero) / (full - zero);
-            if (ratio < 0) ratio = 0;
-            if (ratio > 1) ratio = 1;
-            return Math.round(ratio * 1000) / 10;
+            if (def && def.better === 'low') {
+                if (value < th[0]) return 6;
+                if (value <= th[1]) return 5;
+                if (value <= th[2]) return 4;
+                if (value <= th[3]) return 3;
+                if (value <= th[4]) return 2;
+                return 1;
+            }
+            if (value > th[0]) return 6;
+            if (value >= th[1]) return 5;
+            if (value >= th[2]) return 4;
+            if (value >= th[3]) return 3;
+            if (value >= th[4]) return 2;
+            return 1;
+        }
+
+        // 1件の記録を 6〜1 点に換算する。数値種目は value から、区分種目は grade から採点する。
+        // 採点できない記録（区分なし・対象外）は null を返し、平均から除外される。
+        function fitnessRecordScore(record) {
+            if (!record) return null;
+            const std = FITNESS_SCORE_STANDARDS[record.test];
+            if (!std) return null;
+            if (std.kind === 'grade') {
+                if (!record.grade) return null;
+                const p = std.points[record.grade];
+                return p == null ? null : p;
+            }
+            return fitnessNumericScore(record.test, Number(record.value));
+        }
+
+        // 互換用：種目名＋数値から点数を返す（区分種目は null）
+        function fitnessScoreOf(testName, value) {
+            return fitnessNumericScore(testName, value);
+        }
+
+        // 平均点に最も近いキロラインの名称（例：4.3点 → 130キロライン）
+        function fitnessLineLabel(points) {
+            if (points == null || isNaN(points)) return '';
+            const line = FITNESS_SCORE_LINES.find(l => l.points === Math.round(points));
+            return line ? line.label : '';
+        }
+
+        // 記録の表示用テキスト：区分種目は区分、数値種目は測定値
+        function fitnessRecordValueText(record) {
+            if (!record) return '';
+            if (record.grade) return record.grade;
+            if (record.value == null || isNaN(Number(record.value))) return '―';
+            return String(record.value);
+        }
+
+        function fitnessRecordLabel(record, def) {
+            if (!record) return '記録なし';
+            if (record.grade) return record.grade;
+            return fitnessRecordValueText(record) + ' ' + (record.unit || (def ? def.unit : ''));
         }
 
         // カテゴリごとの評価を組み立てる：各種目のベスト記録と点数、採点済み種目の平均点。
@@ -4175,7 +4263,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return FITNESS_CATEGORIES.map(cat => {
                 const tests = FITNESS_TEST_DEFS.filter(d => d.category === cat).map(d => {
                     const record = bestByTest[d.name] || null;
-                    return { def: d, record: record, score: record ? fitnessScoreOf(d.name, record.value) : null };
+                    return { def: d, record: record, score: record ? fitnessRecordScore(record) : null };
                 });
                 const scored = tests.filter(t => t.score != null);
                 const avg = scored.length ? Math.round(scored.reduce((s, t) => s + t.score, 0) / scored.length * 10) / 10 : null;
@@ -4183,18 +4271,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             });
         }
 
-        // 総合平均＝採点できたカテゴリの平均点の平均
+        // 総合平均＝採点済み種目すべての平均点（未記録・未採点の種目は含めない）
         function overallAverageOf(catResults) {
-            const avgs = catResults.filter(c => c.avg != null).map(c => c.avg);
-            if (!avgs.length) return null;
-            return Math.round(avgs.reduce((s, v) => s + v, 0) / avgs.length * 10) / 10;
+            let sum = 0, count = 0;
+            catResults.forEach(c => c.tests.forEach(t => {
+                if (t.score != null) { sum += t.score; count++; }
+            }));
+            if (!count) return null;
+            return Math.round(sum / count * 10) / 10;
         }
 
         function fmtScore(v) {
             return v == null ? '―' : String(Math.round(v * 10) / 10);
         }
 
-        // カテゴリ別平均点のレーダーチャート（SVG）。未採点のカテゴリは軸と「―」だけを表示する。
+        // カテゴリ別平均点のレーダーチャート（SVG、1〜6点）。未採点のカテゴリは軸と「―」だけを表示する。
         function buildPhysicalRadarChart(catResults) {
             const W = 680, H = 520, CX = W / 2, CY = 258, R = 160;
             const n = catResults.length;
@@ -4203,12 +4294,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 return [CX + R * ratio * Math.cos(ang), CY + R * ratio * Math.sin(ang)];
             };
             let svg = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-auto max-w-[560px] mx-auto" role="img" aria-label="カテゴリ別平均点レーダーチャート">`;
-            [1, 0.75, 0.5, 0.25].forEach(ratio => {
+            [1, 5 / 6, 4 / 6, 3 / 6, 2 / 6, 1 / 6].forEach(ratio => {
                 const pts = catResults.map((c, i) => ptAt(i, ratio).map(v => v.toFixed(1)).join(',')).join(' ');
                 svg += `<polygon points="${pts}" fill="${ratio === 1 ? 'rgba(248,250,252,0.7)' : 'none'}" stroke="#e2e8f0" stroke-width="1"/>`;
             });
-            [25, 50, 75, 100].forEach(v => {
-                const p = ptAt(0, v / 100);
+            [2, 4, 6].forEach(v => {
+                const p = ptAt(0, v / 6);
                 svg += `<text x="${(p[0] + 6).toFixed(1)}" y="${(p[1] + 4).toFixed(1)}" font-size="10" fill="#94a3b8">${v}</text>`;
             });
             catResults.forEach((c, i) => {
@@ -4217,14 +4308,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             });
             const scoredIdx = catResults.map((c, i) => c.avg != null ? i : -1).filter(i => i >= 0);
             if (scoredIdx.length >= 3) {
-                const pts = scoredIdx.map(i => ptAt(i, catResults[i].avg / 100).map(v => v.toFixed(1)).join(',')).join(' ');
+                const pts = scoredIdx.map(i => ptAt(i, catResults[i].avg / 6).map(v => v.toFixed(1)).join(',')).join(' ');
                 svg += `<polygon points="${pts}" fill="rgba(249,115,22,0.16)" stroke="#ea580c" stroke-width="2.5" stroke-linejoin="round"/>`;
             } else if (scoredIdx.length === 2) {
-                const pts = scoredIdx.map(i => ptAt(i, catResults[i].avg / 100).map(v => v.toFixed(1)).join(',')).join(' ');
+                const pts = scoredIdx.map(i => ptAt(i, catResults[i].avg / 6).map(v => v.toFixed(1)).join(',')).join(' ');
                 svg += `<polyline points="${pts}" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round"/>`;
             }
             scoredIdx.forEach(i => {
-                const p = ptAt(i, catResults[i].avg / 100);
+                const p = ptAt(i, catResults[i].avg / 6);
                 svg += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="5" fill="#ea580c" stroke="#fff" stroke-width="1.5"><title>${physicalEscapeHtml(catResults[i].category)}：平均 ${fmtScore(catResults[i].avg)} 点</title></circle>`;
             });
             catResults.forEach((c, i) => {
@@ -4255,12 +4346,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <div class="flex flex-wrap items-end gap-x-6 gap-y-2">
                     <div>
                         <p class="text-[11px] font-bold text-slate-500">総合平均</p>
-                        <p><span class="text-4xl font-extrabold text-orange-600">${fmtScore(overallAvg)}</span><span class="text-sm font-bold text-slate-500 ml-1">点 / 100点</span></p>
+                        <p><span class="text-4xl font-extrabold text-orange-600">${fmtScore(overallAvg)}</span><span class="text-sm font-bold text-slate-500 ml-1">点 / 6点</span></p>
                     </div>
-                    <p class="text-xs text-slate-500 pb-1.5">${scoredCats} / ${results.length} カテゴリを採点</p>
+                    <p class="text-xs text-slate-500 pb-1.5">${scoredCats} / ${results.length} カテゴリを採点${fitnessLineLabel(overallAvg) ? '（' + fitnessLineLabel(overallAvg) + '相当）' : ''}</p>
                 </div>`;
             } else {
-                summaryEl.innerHTML = '<p class="text-[13px] text-slate-500 italic py-3 px-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">' + (hasRecords ? '基準値が未設定のため、まだ採点できません。' : 'まだ記録がありません。') + '</p>';
+                summaryEl.innerHTML = '<p class="text-[13px] text-slate-500 italic py-3 px-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">' + (hasRecords ? '採点できる記録がまだありません。' : 'まだ記録がありません。') + '</p>';
             }
 
             chartEl.innerHTML = hasRecords ? buildPhysicalRadarChart(results) : '';
@@ -4275,12 +4366,30 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     ${c.tests.map(t => `
                     <div class="flex items-center gap-3 py-2">
                         <span class="text-[13px] font-bold text-slate-700 flex-1 min-w-0 truncate">${physicalEscapeHtml(t.def.name)}</span>
-                        <span class="text-[13px] text-slate-500 whitespace-nowrap">${t.record ? t.record.value + ' ' + physicalEscapeHtml(t.record.unit || t.def.unit) : '記録なし'}</span>
+                        <span class="text-[13px] text-slate-500 whitespace-nowrap">${physicalEscapeHtml(fitnessRecordLabel(t.record, t.def))}</span>
                         <span class="text-[13px] font-extrabold w-14 text-right whitespace-nowrap ${t.score != null ? 'text-slate-900' : 'text-slate-300'}">${t.score != null ? fmtScore(t.score) + ' 点' : '―'}</span>
                     </div>`).join('')}
                 </div>
             </div>`;
             catsEl.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' + results.map(cardHtml).join('') + '</div>';
+            const stdEl = document.getElementById('physical-overall-standards');
+            if (stdEl) stdEl.innerHTML = '<h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">採点基準（150キロライン＝6点 〜 115キロライン＝1点）</h4>' + buildPhysicalStandardsTable();
+        }
+
+        // 採点基準表：種目ごとに6ライン分の基準値を並べる（FITNESS_SCORE_STANDARDS の lines から生成）
+        function buildPhysicalStandardsTable() {
+            const head = FITNESS_SCORE_LINES.map(l => `<th class="py-2 px-2 text-center whitespace-nowrap">${l.label}<br><span class="text-orange-400">${l.points}点</span></th>`).join('');
+            let rows = '';
+            FITNESS_CATEGORIES.forEach(cat => {
+                rows += `<tr class="bg-orange-50"><td colspan="7" class="py-1.5 px-3 text-[11px] font-extrabold text-orange-700">${physicalEscapeHtml(cat)}</td></tr>`;
+                FITNESS_TEST_DEFS.filter(d => d.category === cat).forEach(d => {
+                    const std = FITNESS_SCORE_STANDARDS[d.name];
+                    if (!std || !std.lines) return;
+                    rows += `<tr class="border-t border-slate-100"><td class="py-2 px-3 font-bold text-slate-800 whitespace-nowrap">${physicalEscapeHtml(d.name)}</td>` +
+                        std.lines.map(v => `<td class="py-2 px-2 text-center text-slate-600 whitespace-nowrap">${physicalEscapeHtml(v)}</td>`).join('') + '</tr>';
+                });
+            });
+            return `<div class="overflow-x-auto"><table class="w-full text-left border-collapse text-xs min-w-[680px]"><thead><tr class="bg-slate-900 text-slate-200 font-semibold"><th class="py-2 px-3">種目</th>${head}</tr></thead><tbody>${rows}</tbody></table></div>`;
         }
 
         function renderPhysicalCategoryHub() {
@@ -4367,11 +4476,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return (r > 0 ? '+' : '') + r;
         }
 
+        // ベスト判定用の順位値：区分種目は点数（高いほど良い）、数値種目は測定値そのもの。
+        // 区分のない区分種目の記録（旧データ等）は最下位として扱い、区分つきの記録を優先する。
+        function fitnessRecordRank(r) {
+            if (fitnessIsGradeTest(r.test)) {
+                const p = r.grade ? fitnessRecordScore(r) : null;
+                return p == null ? -Infinity : p;
+            }
+            const v = Number(r.value);
+            return isNaN(v) ? -Infinity : v;
+        }
+
         function getPhysicalFitnessBests() {
             const map = {};
             getPhysicalFitness().forEach(r => {
                 const cur = map[r.test];
-                if (!cur || fitnessIsBetter(r.value, cur.value, r.test)) map[r.test] = r;
+                if (!cur) { map[r.test] = r; return; }
+                const def = fitnessTestDef(r.test);
+                const lowBetter = def && def.better === 'low' && !fitnessIsGradeTest(r.test);
+                const ra = fitnessRecordRank(r), rb = fitnessRecordRank(cur);
+                if (lowBetter ? ra < rb : ra > rb) map[r.test] = r;
             });
             return Object.keys(map).sort(fitnessCompareTestNames).map(k => map[k]);
         }
@@ -4389,11 +4513,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             const cardHtml = r => {
                 const def = fitnessTestDef(r.test);
-                const note = def && def.better === 'low' ? '（小さいほど良い）' : '（大きいほど良い）';
+                const score = fitnessRecordScore(r);
+                const note = r.grade
+                    ? (score != null ? score + '点' : '未採点')
+                    : (def && def.better === 'low' ? '（小さいほど良い）' : '（大きいほど良い）');
                 return `
                 <div class="bg-orange-50/60 border border-orange-100 rounded-xl p-3.5">
                     <p class="text-xs font-bold text-slate-600 truncate">${physicalEscapeHtml(r.test)}</p>
-                    <p class="mt-1"><span class="text-xl font-extrabold text-slate-900">${r.value}</span><span class="text-[11px] font-bold text-slate-500 ml-1">${physicalEscapeHtml(r.unit || '')}</span></p>
+                    <p class="mt-1"><span class="text-xl font-extrabold text-slate-900">${physicalEscapeHtml(fitnessRecordValueText(r))}</span>${r.grade ? '' : `<span class="text-[11px] font-bold text-slate-500 ml-1">${physicalEscapeHtml(r.unit || '')}</span>`}</p>
                     <p class="text-[11px] text-slate-500 mt-0.5">${physicalFormatDate(r.date)} 達成 ${note}</p>
                 </div>`;
             };
@@ -4428,8 +4555,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             // カテゴリ画面では、そのカテゴリの種目だけをプルダウンに出す
             sel.innerHTML = tests.map(chartOptionHtml).join('');
             const rows = records.filter(r => r.test === physicalFitnessChartTest).slice().reverse(); // 日付昇順
-            const unit = (rows[0] && rows[0].unit) || (fitnessTestDef(physicalFitnessChartTest) || {}).unit || '';
-            const points = rows.map(r => ({ value: r.value, dateLabel: physicalFormatDate(r.date) }));
+            const chartDef = fitnessTestDef(physicalFitnessChartTest);
+            let points = null;
+            let unit = '';
+            // 区分種目は点数（1〜6点）の推移で表示する
+            if (chartDef && fitnessIsGradeTest(chartDef.name)) {
+                const graded = rows.filter(r => r.grade && fitnessRecordScore(r) != null);
+                if (graded.length > 0) {
+                    points = graded.map(r => ({ value: fitnessRecordScore(r), dateLabel: physicalFormatDate(r.date) }));
+                    unit = '点';
+                }
+            }
+            if (!points) {
+                const numRows = rows.filter(r => r.value != null && !isNaN(Number(r.value)));
+                if (numRows.length === 0) {
+                    chartEl.innerHTML = '<p class="text-[13px] text-slate-500 italic py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">まだ記録がありません。</p>';
+                    return;
+                }
+                unit = (numRows[0] && numRows[0].unit) || (chartDef || {}).unit || '';
+                points = numRows.map(r => ({ value: r.value, dateLabel: physicalFormatDate(r.date) }));
+            }
             chartEl.innerHTML = buildPhysicalLineChart(points, unit, '#ea580c');
         }
 
@@ -4455,12 +4600,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const sameAsc = asc.filter(x => x.test === r.test);
                 const idx = sameAsc.indexOf(r);
                 const prev = idx > 0 ? sameAsc[idx - 1] : null;
-                const diff = prev ? fitnessSigned(r.value - prev.value) : '―';
+                const diff = (!fitnessIsGradeTest(r.test) && prev) ? fitnessSigned(r.value - prev.value) : '―';
                 const isBest = bests[r.test] === r.id;
+                const valueCell = r.grade
+                    ? physicalEscapeHtml(r.grade)
+                    : `${r.value}<span class="text-[11px] font-bold text-slate-500 ml-0.5">${physicalEscapeHtml(r.unit || '')}</span>`;
                 return `<tr class="hover:bg-orange-50/40">
                     <td class="py-2.5 px-3 font-bold text-slate-700 whitespace-nowrap">${physicalFormatDate(r.date)}</td>
                     <td class="py-2.5 px-3 font-bold text-slate-800">${physicalEscapeHtml(r.test)}</td>
-                    <td class="py-2.5 px-3 text-right font-extrabold text-slate-900">${r.value}<span class="text-[11px] font-bold text-slate-500 ml-0.5">${physicalEscapeHtml(r.unit || '')}</span></td>
+                    <td class="py-2.5 px-3 text-right font-extrabold text-slate-900">${valueCell}</td>
                     <td class="py-2.5 px-3 text-right text-slate-600">${diff}</td>
                     <td class="py-2.5 px-3 text-center">${isBest ? '<span class="text-[10px] font-extrabold bg-orange-600 text-white px-2 py-0.5 rounded-full">ベスト</span>' : ''}</td>
                     <td class="py-2.5 px-3 text-slate-600">${physicalEscapeHtml(r.memo || '')}</td>
@@ -4488,7 +4636,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function changePhysicalFitnessTest(name) {
             const def = fitnessTestDef(name);
             const unitSel = document.getElementById('physical-fitness-unit');
-            if (def && unitSel) unitSel.value = def.unit;
+            const isGrade = fitnessIsGradeTest(name);
+            if (def && unitSel && !isGrade) unitSel.value = def.unit;
+            // 区分種目（KWテスト・柔軟系）では測定値・単位の入力を隠し、区分セレクトを出す
+            const valueWrap = document.getElementById('physical-fitness-value-wrap');
+            const unitWrap = document.getElementById('physical-fitness-unit-wrap');
+            const gradeWrap = document.getElementById('physical-fitness-grade-wrap');
+            const gradeSel = document.getElementById('physical-fitness-grade');
+            if (valueWrap) valueWrap.classList.toggle('hidden', isGrade);
+            if (unitWrap) unitWrap.classList.toggle('hidden', isGrade);
+            if (gradeWrap) gradeWrap.classList.toggle('hidden', !isGrade);
+            if (isGrade && gradeSel) {
+                const std = FITNESS_SCORE_STANDARDS[name];
+                gradeSel.innerHTML = '<option value="">選択してください</option>' + std.options.map(o => `<option value="${physicalEscapeHtml(o)}">${physicalEscapeHtml(o)}</option>`).join('');
+            }
         }
 
         // 入力フォームの種目プルダウンを、表示中のカテゴリの種目だけで組み立てる
@@ -4515,24 +4676,38 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (!physicalPlayerName) { physicalShowError('physical-fitness-error', '先に選手を選択してください。'); return; }
             const date = document.getElementById('physical-fitness-date').value;
             const test = document.getElementById('physical-fitness-test').value;
-            const value = parseFloat(document.getElementById('physical-fitness-value').value);
-            const unitSel = document.getElementById('physical-fitness-unit');
             const def = fitnessTestDef(test);
-            const unit = (unitSel && unitSel.value) || (def ? def.unit : '');
             const memo = document.getElementById('physical-fitness-memo').value.trim();
             if (!date) { physicalShowError('physical-fitness-error', '日付を入力してください。'); return; }
             if (!test) { physicalShowError('physical-fitness-error', '測定種目を選択してください。'); return; }
-            if (isNaN(value)) { physicalShowError('physical-fitness-error', '測定値を正しく入力してください。'); return; }
+            let value = null;
+            let unit = '';
+            let grade = '';
+            if (fitnessIsGradeTest(test)) {
+                // 区分種目（KWテスト・柔軟系）は数値ではなく区分で記録する（grade に区分を保存）
+                const gradeSel = document.getElementById('physical-fitness-grade');
+                grade = gradeSel ? gradeSel.value : '';
+                if (!grade) { physicalShowError('physical-fitness-error', '区分を選択してください。'); return; }
+            } else {
+                value = parseFloat(document.getElementById('physical-fitness-value').value);
+                if (isNaN(value)) { physicalShowError('physical-fitness-error', '測定値を正しく入力してください。'); return; }
+                const unitSel = document.getElementById('physical-fitness-unit');
+                unit = (unitSel && unitSel.value) || (def ? def.unit : '');
+            }
             physicalShowError('physical-fitness-error', '');
             if (!Array.isArray(physicalData.fitness)) physicalData.fitness = [];
-            physicalData.fitness.push({
+            const newRecord = {
                 id: 'f_' + Date.now() + '_' + Math.floor(Math.random() * 1000000),
                 teamKey: physicalTeamKey, playerName: physicalPlayerName,
                 date: date, test: test, value: value, unit: unit, memo: memo
-            });
+            };
+            if (grade) newRecord.grade = grade;
+            physicalData.fitness.push(newRecord);
             savePhysicalData();
             physicalFitnessChartTest = test;
             document.getElementById('physical-fitness-value').value = '';
+            const gradeSelReset = document.getElementById('physical-fitness-grade');
+            if (gradeSelReset) gradeSelReset.value = '';
             document.getElementById('physical-fitness-memo').value = '';
             renderPhysicalScreen();
             showPhysicalSavedAndView();
