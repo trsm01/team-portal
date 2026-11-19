@@ -568,6 +568,62 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             #home-hub > div:hover, #home-scorebook-menu [onclick]:hover, #physical-category-grid > div:hover { transform: none; }
             button:active:not(:disabled), header button[class]:active:not(:disabled) { transform: none; }
         }
+
+        /* ============================================================
+           スマホ横スクロール防止（ページ全体は横に動かさない）
+           - 原因：ヘッダー（タイトル＋ボタン群）がスマホ幅に収まらず
+             ページ全体の横はみ出しになり、縦スクロール中も画面が
+             左右に動いてしまっていた。あわせて、flex / grid の子に
+             なった横スクロール表が最小幅に引っ張られて親を押し広げる
+             ケースも防ぐ。広い表は .overflow-x-auto の内側だけが
+             横スクロールし、ページ自体は横に動かない。
+           ============================================================ */
+        /* ページ自体の横はみ出しを止める。clip はスクロール領域を
+           作らないため sticky ヘッダーの追従を壊さない */
+        html, body { overflow-x: clip; }
+        @supports not (overflow: clip) {
+            html, body { overflow-x: hidden; }
+        }
+        body { max-width: 100%; }
+        img, svg, canvas, video { max-width: 100%; }
+
+        /* 横スクロール表は枠の内側だけでスクロールさせる：
+           ラッパー自身は親の幅を超えず、flex / grid の子でも
+           表の最小幅に引っ張られて親を押し広げない */
+        .overflow-x-auto, .overflow-auto { max-width: 100%; }
+        .grid > * { min-width: 0; }
+        .flex > .overflow-x-auto, .flex > .overflow-auto { min-width: 0; }
+
+        /* ヘッダー：タイトル側は縮める（入りきらない場合は末尾を省略し、
+           ボタンが画面外へ押し出されないようにする） */
+        header > div[class] > div:first-child { min-width: 0; }
+        header > div[class] > div:first-child > div:last-child { min-width: 0; }
+        header h1 { overflow: hidden; text-overflow: ellipsis; }
+
+        @media (max-width: 767px) {
+            /* ヘッダーは折り返し可・高さ可変にして、ボタンが増える
+               試合中でも全ボタンが画面内に収まるようにする */
+            header > div[class] {
+                flex-wrap: wrap; height: auto; min-height: 3.5rem;
+                padding-top: 6px; padding-bottom: 6px; row-gap: 6px;
+            }
+            header > div[class] > div:last-child,
+            #header-game-controls { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
+            /* 試合操作ボタン表示時はボタン群を2段目へ回し、
+               タイトルとボタンが横幅を取り合わないようにする */
+            header > div[class] > div:last-child:has(> #header-game-controls:not(.hidden)) { flex: 1 1 100%; }
+        }
+        @media (max-width: 640px) {
+            header > div[class] { padding-left: 10px; padding-right: 10px; }
+            header button[class] { padding-left: 8px; padding-right: 8px; }
+            header [class*="space-x-2"] > :not([hidden]) ~ :not([hidden]) { margin-left: 5px; }
+            header [class*="space-x-3"] > :not([hidden]) ~ :not([hidden]) { margin-left: 8px; }
+        }
+        @media (max-width: 480px) {
+            /* 狭幅ではアイコンタイルを畳み、タイトルとボタンの幅を確保する */
+            header > div[class] > div:first-child > div:first-child { display: none; }
+            header h1 { font-size: 13px; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
