@@ -974,6 +974,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <i data-lucide="eye" class="w-5 h-5"></i>保存した記録を見る（閲覧画面へ）
         </button>
         </div><!-- /physical-detail -->
+
+        <!-- 総合評価：カテゴリ別の平均点をレーダーチャートで表示する -->
+        <div id="physical-overall" class="hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-5">
+                <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                    <i data-lucide="chart-radar" class="w-5 h-5 text-orange-600"></i>総合評価
+                </h3>
+                <div id="physical-overall-summary"></div>
+                <div id="physical-overall-chart" class="w-full"></div>
+                <div id="physical-overall-categories"></div>
+                <p class="text-[11px] text-slate-400">各種目のベスト記録を基準値で100点満点に換算し、カテゴリごとに平均したものです。基準値が未設定の種目は採点されず、平均にも含まれません。</p>
+            </div>
+        </div>
     </div>
 
     <!-- ================= APP SCREEN 3: 選手成績（通算自動集計） ================= -->
@@ -3550,7 +3563,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // 「戻る」ボタンはスタックから1つ取り出してその状態を復元する。
         let navCurrentScreen = 'home';
         let navHomeSubView = 'hub'; // 'hub'（トップ選択） | 'scorebook-menu'
-        let navPhysicalSubView = 'hub'; // 'hub'（カテゴリ選択） | 'fitness'（カテゴリ画面）
+        let navPhysicalSubView = 'hub'; // 'hub'（カテゴリ選択） | 'fitness'（カテゴリ画面） | 'overall'（総合評価）
         let navPhysicalCategory = null; // 選択中のカテゴリ名（'__other__'＝その他の記録、null＝カテゴリ選択）
         let navPhysicalMode = 'view'; // 'view'（記録を見る画面） | 'input'（記録を入力する画面）
         const navHistoryStack = [];
@@ -3619,7 +3632,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     openScorebookHub();
                 }
                 if (prev.screen === 'physical') {
-                    if (prev.physicalSub === 'fitness' && prev.physicalCategory) {
+                    if (prev.physicalSub === 'overall') {
+                        openPhysicalOverall();
+                    } else if (prev.physicalSub === 'fitness' && prev.physicalCategory) {
                         openPhysicalCategory(prev.physicalCategory, prev.physicalMode);
                     } else {
                         showPhysicalHub();
@@ -3672,6 +3687,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 navPhysicalCategory = null;
                 navPhysicalMode = 'view';
                 physicalCategory = null;
+                physicalOverallView = false;
                 physicalMode = 'view';
                 initPhysicalScreen();
             } else if (screenName === 'scorebook') {
@@ -3740,13 +3756,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function syncPhysicalHubUI() {
             const hub = document.getElementById('physical-category-hub');
             const detail = document.getElementById('physical-detail');
-            const inHub = !physicalCategory;
+            const overall = document.getElementById('physical-overall');
+            const inOverall = !!physicalOverallView;
+            const inHub = !physicalCategory && !inOverall;
             if (hub) hub.classList.toggle('hidden', !inHub);
-            if (detail) detail.classList.toggle('hidden', inHub);
+            if (detail) detail.classList.toggle('hidden', inHub || inOverall);
+            if (overall) overall.classList.toggle('hidden', !inOverall);
             // 最上部の「体力測定」の横に、開いているカテゴリを括弧書きで示す（カテゴリ選択では何も出さない）
             const headingCat = document.getElementById('physical-heading-category');
             if (headingCat) {
-                headingCat.textContent = inHub ? '' : '（' + (physicalCategory === '__other__' ? 'その他の記録' : physicalCategory) + '）';
+                headingCat.textContent = inOverall ? '（総合評価）' : inHub ? '' : '（' + (physicalCategory === '__other__' ? 'その他の記録' : physicalCategory) + '）';
             }
         }
 
@@ -3759,6 +3778,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             navPhysicalCategory = null;
             navPhysicalMode = 'view';
             physicalCategory = null;
+            physicalOverallView = false;
             physicalMode = 'view';
             renderPhysicalScreen();
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -3778,12 +3798,30 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             navPhysicalCategory = category;
             navPhysicalMode = targetMode;
             physicalCategory = category;
+            physicalOverallView = false;
             physicalMode = targetMode;
             physicalFitnessCategoryFilter = category || '';
             populatePhysicalFitnessTestSelect();
             renderPhysicalScreen();
             if (typeof lucide !== 'undefined') lucide.createIcons();
             playViewIn(document.getElementById('physical-detail'));
+            scrollAppToTop();
+        }
+
+        // 総合評価ページを開く（カテゴリ別の平均点をレーダーチャートで表示する）
+        function openPhysicalOverall() {
+            if (!navRestoring && navCurrentScreen === 'physical' && navPhysicalSubView !== 'overall') {
+                pushNavHistory();
+            }
+            navPhysicalSubView = 'overall';
+            navPhysicalCategory = null;
+            navPhysicalMode = 'view';
+            physicalOverallView = true;
+            physicalCategory = null;
+            physicalMode = 'view';
+            renderPhysicalScreen();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            playViewIn(document.getElementById('physical-overall'));
             scrollAppToTop();
         }
 
@@ -3837,6 +3875,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         let physicalPlayerName = '';
         let physicalTab = 'fitness'; // 体力測定のみ
         let physicalCategory = null; // 表示中のカテゴリ（null＝カテゴリ選択、'__other__'＝その他の記録）
+        let physicalOverallView = false; // 総合評価ページを表示中かどうか
         let physicalMode = 'view'; // 'view'（記録を見る画面） | 'input'（記録を入力する画面）
         let physicalFitnessChartTest = '';
         let physicalFitnessCategoryFilter = ''; // 記録一覧のカテゴリ絞り込み（''=すべて、'__other__'=その他の記録）
@@ -3992,6 +4031,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function renderPhysicalScreen() {
             renderPhysicalMeta();
             syncPhysicalHubUI();
+            if (physicalOverallView) {
+                // 総合評価ページ：カテゴリ別平均点のレーダーチャートと内訳を表示する
+                renderPhysicalOverall();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                return;
+            }
             if (!physicalCategory) {
                 // カテゴリ選択：カテゴリごとのカードボタンを表示する
                 renderPhysicalCategoryHub();
@@ -4097,6 +4142,147 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             '__other__': { icon: 'folder-open', desc: 'カテゴリ外の種目（過去の記録）' }
         };
 
+        // ===== 総合評価の採点基準（大枠） =====
+        // 種目ごとの基準値は後からここへ設定する。設定した種目だけが採点対象になる。
+        // 形式: '種目名': { full: 100点になる測定値, zero: 0点になる測定値 }
+        //   大きいほど良い種目（better:'high'）は zero→full の間を直線補間で点数化し、
+        //   小さいほど良い種目（スプリント等、better:'low'）は full→zero の間を直線補間する。
+        //   範囲外の測定値は 0〜100 点に丸める。
+        // 例: '垂直跳び': { full: 75, zero: 40 }, '10m走': { full: 1.70, zero: 2.10 }
+        const FITNESS_SCORE_STANDARDS = {
+        };
+
+        // 測定値を基準値で 0〜100 点に換算する。基準値が未設定の種目は null（採点対象外）。
+        function fitnessScoreOf(testName, value) {
+            const std = FITNESS_SCORE_STANDARDS[testName];
+            if (!std || value == null || isNaN(value)) return null;
+            const full = Number(std.full);
+            const zero = Number(std.zero);
+            if (isNaN(full) || isNaN(zero) || full === zero) return null;
+            const def = fitnessTestDef(testName);
+            let ratio;
+            if (def && def.better === 'low') ratio = (zero - value) / (zero - full);
+            else ratio = (value - zero) / (full - zero);
+            if (ratio < 0) ratio = 0;
+            if (ratio > 1) ratio = 1;
+            return Math.round(ratio * 1000) / 10;
+        }
+
+        // カテゴリごとの評価を組み立てる：各種目のベスト記録と点数、採点済み種目の平均点。
+        function computePhysicalOverall() {
+            const bestByTest = {};
+            getPhysicalFitnessBests().forEach(r => { bestByTest[r.test] = r; });
+            return FITNESS_CATEGORIES.map(cat => {
+                const tests = FITNESS_TEST_DEFS.filter(d => d.category === cat).map(d => {
+                    const record = bestByTest[d.name] || null;
+                    return { def: d, record: record, score: record ? fitnessScoreOf(d.name, record.value) : null };
+                });
+                const scored = tests.filter(t => t.score != null);
+                const avg = scored.length ? Math.round(scored.reduce((s, t) => s + t.score, 0) / scored.length * 10) / 10 : null;
+                return { category: cat, tests: tests, avg: avg };
+            });
+        }
+
+        // 総合平均＝採点できたカテゴリの平均点の平均
+        function overallAverageOf(catResults) {
+            const avgs = catResults.filter(c => c.avg != null).map(c => c.avg);
+            if (!avgs.length) return null;
+            return Math.round(avgs.reduce((s, v) => s + v, 0) / avgs.length * 10) / 10;
+        }
+
+        function fmtScore(v) {
+            return v == null ? '―' : String(Math.round(v * 10) / 10);
+        }
+
+        // カテゴリ別平均点のレーダーチャート（SVG）。未採点のカテゴリは軸と「―」だけを表示する。
+        function buildPhysicalRadarChart(catResults) {
+            const W = 680, H = 520, CX = W / 2, CY = 258, R = 160;
+            const n = catResults.length;
+            const ptAt = (i, ratio) => {
+                const ang = -Math.PI / 2 + (Math.PI * 2 * i) / n;
+                return [CX + R * ratio * Math.cos(ang), CY + R * ratio * Math.sin(ang)];
+            };
+            let svg = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-auto max-w-[560px] mx-auto" role="img" aria-label="カテゴリ別平均点レーダーチャート">`;
+            [1, 0.75, 0.5, 0.25].forEach(ratio => {
+                const pts = catResults.map((c, i) => ptAt(i, ratio).map(v => v.toFixed(1)).join(',')).join(' ');
+                svg += `<polygon points="${pts}" fill="${ratio === 1 ? 'rgba(248,250,252,0.7)' : 'none'}" stroke="#e2e8f0" stroke-width="1"/>`;
+            });
+            [25, 50, 75, 100].forEach(v => {
+                const p = ptAt(0, v / 100);
+                svg += `<text x="${(p[0] + 6).toFixed(1)}" y="${(p[1] + 4).toFixed(1)}" font-size="10" fill="#94a3b8">${v}</text>`;
+            });
+            catResults.forEach((c, i) => {
+                const p = ptAt(i, 1);
+                svg += `<line x1="${CX}" y1="${CY}" x2="${p[0].toFixed(1)}" y2="${p[1].toFixed(1)}" stroke="#e2e8f0" stroke-width="1"/>`;
+            });
+            const scoredIdx = catResults.map((c, i) => c.avg != null ? i : -1).filter(i => i >= 0);
+            if (scoredIdx.length >= 3) {
+                const pts = scoredIdx.map(i => ptAt(i, catResults[i].avg / 100).map(v => v.toFixed(1)).join(',')).join(' ');
+                svg += `<polygon points="${pts}" fill="rgba(249,115,22,0.16)" stroke="#ea580c" stroke-width="2.5" stroke-linejoin="round"/>`;
+            } else if (scoredIdx.length === 2) {
+                const pts = scoredIdx.map(i => ptAt(i, catResults[i].avg / 100).map(v => v.toFixed(1)).join(',')).join(' ');
+                svg += `<polyline points="${pts}" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round"/>`;
+            }
+            scoredIdx.forEach(i => {
+                const p = ptAt(i, catResults[i].avg / 100);
+                svg += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="5" fill="#ea580c" stroke="#fff" stroke-width="1.5"><title>${physicalEscapeHtml(catResults[i].category)}：平均 ${fmtScore(catResults[i].avg)} 点</title></circle>`;
+            });
+            catResults.forEach((c, i) => {
+                const ang = -Math.PI / 2 + (Math.PI * 2 * i) / n;
+                const lx = CX + (R + 40) * Math.cos(ang);
+                const ly = CY + (R + 40) * Math.sin(ang);
+                const anchor = Math.cos(ang) > 0.35 ? 'start' : Math.cos(ang) < -0.35 ? 'end' : 'middle';
+                svg += `<text x="${lx.toFixed(1)}" y="${(ly - 2).toFixed(1)}" text-anchor="${anchor}" font-size="15" font-weight="800" fill="#1e293b">${physicalEscapeHtml(c.category)}</text>`;
+                svg += `<text x="${lx.toFixed(1)}" y="${(ly + 18).toFixed(1)}" text-anchor="${anchor}" font-size="14" font-weight="800" fill="${c.avg != null ? '#ea580c' : '#94a3b8'}">${c.avg != null ? fmtScore(c.avg) + ' 点' : '―'}</text>`;
+            });
+            svg += '</svg>';
+            return svg;
+        }
+
+        // 総合評価ページの描画：総合平均＋レーダーチャート＋カテゴリ別の内訳
+        function renderPhysicalOverall() {
+            const summaryEl = document.getElementById('physical-overall-summary');
+            const chartEl = document.getElementById('physical-overall-chart');
+            const catsEl = document.getElementById('physical-overall-categories');
+            if (!summaryEl || !chartEl || !catsEl) return;
+            const results = computePhysicalOverall();
+            const overallAvg = overallAverageOf(results);
+            const hasRecords = getPhysicalFitness().length > 0;
+            const scoredCats = results.filter(c => c.avg != null).length;
+
+            if (overallAvg != null) {
+                summaryEl.innerHTML = `
+                <div class="flex flex-wrap items-end gap-x-6 gap-y-2">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-500">総合平均</p>
+                        <p><span class="text-4xl font-extrabold text-orange-600">${fmtScore(overallAvg)}</span><span class="text-sm font-bold text-slate-500 ml-1">点 / 100点</span></p>
+                    </div>
+                    <p class="text-xs text-slate-500 pb-1.5">${scoredCats} / ${results.length} カテゴリを採点</p>
+                </div>`;
+            } else {
+                summaryEl.innerHTML = '<p class="text-[13px] text-slate-500 italic py-3 px-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">' + (hasRecords ? '基準値が未設定のため、まだ採点できません。' : 'まだ記録がありません。') + '</p>';
+            }
+
+            chartEl.innerHTML = hasRecords ? buildPhysicalRadarChart(results) : '';
+
+            const cardHtml = c => `
+            <div class="border border-slate-200 rounded-xl p-4">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <h4 class="font-extrabold text-slate-900 text-sm">${physicalEscapeHtml(c.category)}</h4>
+                    <span class="text-xs font-extrabold rounded-full px-2.5 py-1 border ${c.avg != null ? 'text-orange-700 bg-orange-50 border-orange-200' : 'text-slate-400 bg-slate-50 border-slate-200'}">平均 ${c.avg != null ? fmtScore(c.avg) + ' 点' : '―'}</span>
+                </div>
+                <div class="divide-y divide-slate-100">
+                    ${c.tests.map(t => `
+                    <div class="flex items-center gap-3 py-2">
+                        <span class="text-[13px] font-bold text-slate-700 flex-1 min-w-0 truncate">${physicalEscapeHtml(t.def.name)}</span>
+                        <span class="text-[13px] text-slate-500 whitespace-nowrap">${t.record ? t.record.value + ' ' + physicalEscapeHtml(t.record.unit || t.def.unit) : '記録なし'}</span>
+                        <span class="text-[13px] font-extrabold w-14 text-right whitespace-nowrap ${t.score != null ? 'text-slate-900' : 'text-slate-300'}">${t.score != null ? fmtScore(t.score) + ' 点' : '―'}</span>
+                    </div>`).join('')}
+                </div>
+            </div>`;
+            catsEl.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' + results.map(cardHtml).join('') + '</div>';
+        }
+
         function renderPhysicalCategoryHub() {
             const grid = document.getElementById('physical-category-grid');
             if (!grid) return;
@@ -4125,7 +4311,27 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                 </div>`;
             };
-            let html = FITNESS_CATEGORIES.map(cat => cardHtml(cat, cat)).join('');
+            // 総合評価カードは体組成より前に置く
+            const overallResults = computePhysicalOverall();
+            const overallAvg = overallAverageOf(overallResults);
+            const overallStat = overallAvg != null ? '総合平均 ' + fmtScore(overallAvg) + ' 点' : (records.length > 0 ? 'カテゴリ別の平均点を表示' : '記録なし');
+            const overallCard = `
+                <div onclick="openPhysicalOverall()" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border-2 border-slate-200 hover:border-orange-500 p-7 cursor-pointer transition flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-xl bg-orange-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                            <i data-lucide="chart-radar" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-orange-700 transition">総合評価</h3>
+                            <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">カテゴリ別の平均点をレーダーチャートで表示</p>
+                        </div>
+                    </div>
+                    <div class="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-orange-700">
+                        <span>${overallStat}</span>
+                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>`;
+            let html = overallCard + FITNESS_CATEGORIES.map(cat => cardHtml(cat, cat)).join('');
             // 過去の旧種目など、カテゴリに属さない記録がある場合のみ「その他の記録」カードを出す
             if (records.some(r => !fitnessCategoryOf(r.test))) html += cardHtml('__other__', 'その他の記録');
             grid.innerHTML = html;
@@ -11698,7 +11904,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             openOpponentTeams, openOpponentDetail, showOpponentList, renderOpponentList, renderOpponentDetail, renderOpponentPitcherDetail, exportOpponentStatsExcel, setOwnTeamKey,
             switchPlayerStatsBranch, switchBoxscoreBranch, refreshAggregatedStats,
             changePhysicalTeam, changePhysicalPlayer,
-            switchPhysicalTab, openPhysicalDetail, openPhysicalMode, showPhysicalHub, openPhysicalCategory, changePhysicalFitnessTest, changePhysicalFitnessChartTest,
+            switchPhysicalTab, openPhysicalDetail, openPhysicalMode, showPhysicalHub, openPhysicalCategory, openPhysicalOverall, changePhysicalFitnessTest, changePhysicalFitnessChartTest,
             addPhysicalFitness, deletePhysicalFitness,
             renderNewGameLineupRows, resetCount, resetWizard,
             resumeCurrentGameFromHome, saveAndRender, saveGameInfo,
