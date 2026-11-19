@@ -1198,17 +1198,36 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <i data-lucide="trophy" class="w-5 h-5 text-orange-600"></i><span id="physical-ranking-title">ランキング</span>
                     </h3>
                     <div id="physical-ranking-print-btn" class="hidden flex-wrap items-center gap-2">
-                        <button type="button" onclick="downloadPhysicalRankingPdf()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-extrabold transition shadow-sm" title="測定済みの選手だけのランキング表を、A4縦1枚に収まるPDFファイルでそのままダウンロード">
+                        <button type="button" onclick="downloadPhysicalRankingPdf()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-extrabold transition shadow-sm" title="下の「出力する範囲」で選んだ範囲のランキング表を、A4縦1枚いっぱいに配置したPDFファイルでそのままダウンロード">
                             <i data-lucide="file-text" class="w-4 h-4"></i>PDFでダウンロード
                         </button>
-                        <button type="button" onclick="downloadPhysicalRankingExcel()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#107C41] hover:bg-[#0B5C2E] text-white text-sm font-extrabold transition shadow-sm" title="測定済みの選手だけのランキング表を、A4縦1枚に収まる印刷設定付きのExcelファイルでダウンロード">
+                        <button type="button" onclick="downloadPhysicalRankingExcel()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#107C41] hover:bg-[#0B5C2E] text-white text-sm font-extrabold transition shadow-sm" title="下の「出力する範囲」で選んだ範囲のランキング表を、A4縦1枚に収まる印刷設定付きのExcelファイルでダウンロード">
                             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>Excelでダウンロード
                         </button>
                     </div>
                 </div>
+                <div id="physical-ranking-range" class="hidden flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <span class="text-xs font-extrabold text-slate-600 flex items-center gap-1.5"><i data-lucide="list-ordered" class="w-4 h-4 text-orange-600"></i>出力する範囲</span>
+                    <label class="flex items-center gap-1.5 text-sm font-bold text-slate-700 cursor-pointer">
+                        <input id="ranking-range-all" type="radio" name="ranking-output-range" value="all" checked onchange="setRankingOutputRange('all')" class="accent-orange-600 w-4 h-4">全員（測定済み全員）
+                    </label>
+                    <label class="flex items-center gap-1.5 text-sm font-bold text-slate-700 cursor-pointer">
+                        <input id="ranking-range-top" type="radio" name="ranking-output-range" value="top" onchange="setRankingOutputRange('top')" class="accent-orange-600 w-4 h-4">指定順位まで
+                    </label>
+                    <span class="flex items-center gap-1.5 text-sm font-bold text-slate-700">
+                        上位
+                        <input id="ranking-range-limit" type="number" min="1" max="999" step="1" value="10" onchange="setRankingOutputLimit(this.value)" onclick="setRankingOutputRange('top')" class="w-16 px-2 py-1 rounded-lg border border-slate-300 bg-white text-center font-extrabold text-slate-800">
+                        位まで
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <button type="button" onclick="setRankingOutputLimitQuick(10)" class="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:border-orange-400 hover:text-orange-700 text-slate-600 text-xs font-bold transition">上位10位</button>
+                        <button type="button" onclick="setRankingOutputLimitQuick(20)" class="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:border-orange-400 hover:text-orange-700 text-slate-600 text-xs font-bold transition">上位20位</button>
+                    </span>
+                    <span class="text-[11px] text-slate-400">PDF・Excelの両方に適用されます。同点で同じ順位の選手は、まとめて含みます。</span>
+                </div>
                 <div id="physical-ranking-summary"></div>
                 <div id="physical-ranking-sheet" class="ranking-sheet ranking-doc" data-density="1"></div>
-                <p class="text-[11px] text-slate-400">ランキング表はA4縦1枚の大きさで表示しています。「PDFでダウンロード」「Excelでダウンロード」のどちらかを押すと、測定済みの選手だけのランキング表をそのままファイルでダウンロードできます（別タブは開きません）。PDFはA4縦1枚に収まるレイアウトで作成され、ExcelファイルにはA4縦・1ページに収める印刷設定が付いているので、どちらでも測定済みの選手全員がA4縦1枚に収まります。各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、カテゴリ別はカテゴリごとの平均点、総合は全種目の採点済み平均（総合平均点）で順位付けしています。未記録・未採点の選手は画面では点数「―」で末尾に表示します（ダウンロードには含まれません）。</p>
+                <p class="text-[11px] text-slate-400">ランキング表はA4縦1枚の大きさで表示しています。「出力する範囲」で全員（測定済み全員）か指定順位までかを選んでから「PDFでダウンロード」「Excelでダウンロード」のどちらかを押すと、その範囲のランキング表をそのままファイルでダウンロードできます（別タブは開きません）。どちらの形式でも、出力する人数に合わせて行の高さと文字の大きさを自動調整し、A4縦1枚を縦いっぱいに使って表を配置するので、表の下に大きな余白は残りません（ExcelファイルにはA4縦・1ページに収める印刷設定も付いています）。各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、カテゴリ別はカテゴリごとの平均点、総合は全種目の採点済み平均（総合平均点）で順位付けしています。未記録・未採点の選手は画面では点数「―」で末尾に表示します（ダウンロードには含まれません）。</p>
                 <button type="button" onclick="openPhysicalRankingHub()" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-extrabold transition">
                     <i data-lucide="layout-grid" class="w-4 h-4"></i>ランキングのカテゴリ選択に戻る
                 </button>
@@ -5624,6 +5643,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 btn.classList.toggle('hidden', !hasTable);
                 btn.classList.toggle('flex', !!hasTable);
             }
+            const rangeBox = document.getElementById('physical-ranking-range');
+            if (rangeBox) {
+                rangeBox.classList.toggle('hidden', !hasTable);
+                rangeBox.classList.toggle('flex', !!hasTable);
+            }
         }
         function rankingSheetHead(title, summaryHtml) {
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || {};
@@ -5686,20 +5710,82 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const content = buildRankingPrintContent(sheet);
             area.innerHTML = content.html;
             area.setAttribute('data-density', rankingPrintDensity(content.rowCount));
+            // 印刷でもA4縦1枚を縦いっぱいに使う：測定済みの行が少ないときは、
+            // 印字可能高さ（297mm−上下余白20mm）から見出し・サマリー・注記の分を
+            // 差し引いた高さを行数で割り、行の高さと文字を広げて下に余白を残さない。
+            // 行が多いときは従来の密度調整のまま（1枚に収めることを優先する）。
+            if (content.rowCount > 0) {
+                const perRowMm = Math.floor(((277 - 36) / (content.rowCount + 1)) * 10) / 10;
+                if (perRowMm > 8.5) {
+                    const fontPx = Math.max(11.5, Math.min(19, perRowMm * 1.05));
+                    const st = document.createElement('style');
+                    st.textContent = '#ranking-print-area .ranking-table th, #ranking-print-area .ranking-table td { height: ' + perRowMm + 'mm; font-size: ' + fontPx + 'px; }'
+                        + '#ranking-print-area .ranking-table td.c-rank { font-size: ' + (fontPx + 2) + 'px; }'
+                        + '#ranking-print-area .ranking-table td.c-avg { font-size: ' + (fontPx + 2.5) + 'px; }'
+                        + '#ranking-print-area .ranking-table td.c-avg .pt { font-size: ' + Math.max(10, fontPx - 3) + 'px; }'
+                        + '#ranking-print-area .ranking-table tr.top1 td.c-rank { font-size: ' + (fontPx + 4) + 'px; }';
+                    area.appendChild(st);
+                }
+            }
             document.body.classList.add('printing-ranking');
             return true;
         }
         function cleanupRankingPrint() {
             document.body.classList.remove('printing-ranking');
         }
+        // ===== ランキング出力の範囲指定（全員／指定順位まで） =====
+        // ランキングページの「出力する範囲」で選んだ内容を保持し、PDF・Excelの
+        // 両ダウンロードに共通で適用する。保存データには影響しない画面上だけの状態。
+        let physicalRankingRangeMode = 'all'; // 'all'＝測定済み全員 / 'top'＝指定順位まで
+        let physicalRankingRangeLimit = 10;   // 'top' のときに何位まで出すか
+        function rankingRangeLimitValue() {
+            const n = parseInt(physicalRankingRangeLimit, 10);
+            return (isFinite(n) && n >= 1) ? Math.min(999, n) : 10;
+        }
+        function syncRankingRangeUI() {
+            const allR = document.getElementById('ranking-range-all');
+            const topR = document.getElementById('ranking-range-top');
+            const input = document.getElementById('ranking-range-limit');
+            if (allR) allR.checked = physicalRankingRangeMode !== 'top';
+            if (topR) topR.checked = physicalRankingRangeMode === 'top';
+            if (input && document.activeElement !== input) input.value = rankingRangeLimitValue();
+        }
+        function setRankingOutputRange(mode) {
+            physicalRankingRangeMode = mode === 'top' ? 'top' : 'all';
+            syncRankingRangeUI();
+        }
+        function setRankingOutputLimit(v) {
+            const n = parseInt(v, 10);
+            if (isFinite(n)) physicalRankingRangeLimit = Math.max(1, Math.min(999, n));
+            physicalRankingRangeMode = 'top';
+            syncRankingRangeUI();
+        }
+        function setRankingOutputLimitQuick(n) {
+            setRankingOutputLimit(n);
+            const input = document.getElementById('ranking-range-limit');
+            if (input) input.value = rankingRangeLimitValue();
+        }
+        // 出力対象の行を選ぶ：測定済み（採点あり）の選手だけを対象にし、
+        // 範囲指定が「指定順位まで」なら、その順位までの選手だけに絞る。
+        // 順位は同点同順位方式なので、境界順位と同点の選手はまとめて含まれる。
+        function rankingOutputSelection(allRows) {
+            const measured = allRows.filter(r => r.avg != null);
+            if (physicalRankingRangeMode === 'top') {
+                const lim = rankingRangeLimitValue();
+                return { rows: measured.filter(r => r.rank != null && r.rank <= lim), measuredCount: measured.length, limited: true, limit: lim };
+            }
+            return { rows: measured, measuredCount: measured.length, limited: false, limit: null };
+        }
         // ランキング表のExcelダウンロード。
         // 画面のボタンはこの関数を呼び、既存のSheetJSで .xlsx を生成してその場で直接
         // ダウンロードする（別タブは開かない）。
         // 掲載するのは測定済み（採点あり）の選手だけ。表は順位・背番号・氏名・平均点と、
         // カテゴリ別は各種目の「記録（点数）」、総合は各カテゴリの平均点を並べる。
-        // 印刷設定はA4縦・1ページに収める指定をファイルへ埋め込む（下記
-        // __xlsxAddA4FitToPage）。Excelで印刷すると測定済みの選手全員がA4縦1枚に収まる。
-        // 順位付け・採点基準・保存データは変えない。
+        // 出力範囲はランキングページの「出力する範囲」の指定（全員／指定順位まで）を
+        // rankingOutputSelection で適用する。印刷設定はA4縦・1ページに収める指定を
+        // ファイルへ埋め込み（下記 __xlsxAddA4FitToPage）、さらに行の高さをA4縦の
+        // 印字可能高さに合わせて配分するので、Excelで印刷すると出力した選手全員が
+        // A4縦1枚を縦いっぱいに使って収まる。順位付け・採点基準・保存データは変えない。
 
         // --- .xlsx（zip）の後加工：ワークシートXMLへ印刷設定を差し込む ---
         // 同梱のSheetJSは余白（!margins）しか書き出せず、紙サイズ・向き・「1ページに
@@ -5834,25 +5920,73 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             return out;
         }
-        async function __xlsxAddA4FitToPage(arrayBuffer) {
+        // styles.xml へ大きめのフォントと、それを参照するセル書式（cellXfs）を追加する。
+        // SheetJS（同梱のCE版）はセル書式を書き出せないため、印刷設定と同じく zip の
+        // 後加工で差し込む。追加した書式は縦中央＋折り返し有効で、高い行でも文字が
+        // 行の中央に来る。書式のインデックス { title, summary, head, data } を返す。
+        // 形式が想定と違う場合は null を返し、フォント拡大なしで続行する。
+        function __xlsxBuildFontStyles(stylesXml, spec) {
+            const fontsM = stylesXml.match(/<fonts count="(\d+)">/);
+            const xfsM = stylesXml.match(/<cellXfs count="(\d+)">/);
+            if (!fontsM || !xfsM || stylesXml.indexOf('</fonts>') < 0 || stylesXml.indexOf('</cellXfs>') < 0) return null;
+            const f0 = parseInt(fontsM[1], 10), x0 = parseInt(xfsM[1], 10);
+            const fontXml = (pt, bold) => '<font>' + (bold ? '<b/>' : '') + '<sz val="' + pt + '"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font>';
+            const xfXml = fid => '<xf numFmtId="0" fontId="' + fid + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>';
+            const out = stylesXml
+                .replace('<fonts count="' + f0 + '">', '<fonts count="' + (f0 + 4) + '">')
+                .replace('</fonts>', fontXml(spec.title, true) + fontXml(spec.summary, true) + fontXml(spec.head, true) + fontXml(spec.data, false) + '</fonts>')
+                .replace('<cellXfs count="' + x0 + '">', '<cellXfs count="' + (x0 + 4) + '">')
+                .replace('</cellXfs>', xfXml(f0) + xfXml(f0 + 1) + xfXml(f0 + 2) + xfXml(f0 + 3) + '</cellXfs>');
+            if (out === stylesXml) return null;
+            return { xml: out, idx: { title: x0, summary: x0 + 1, head: x0 + 2, data: x0 + 3 } };
+        }
+        // シートXMLの各行のセルへ s 属性（書式インデックス）を付ける。
+        // styleForRow(r) が行番号（1始まり）に対する書式インデックスを返す（nullなら付けない）。
+        // すでに s 属性のあるセルは二重付けを避けてそのままにする。
+        function __xlsxApplyRowStyles(sheetXml, styleForRow) {
+            return sheetXml.replace(/<row r="(\d+)"([^>]*)>([\s\S]*?)<\/row>/g, (m, r, attrs, inner) => {
+                const sIdx = styleForRow(parseInt(r, 10));
+                if (sIdx == null) return m;
+                const styled = inner.replace(/<c (?![^>]*\bs=")/g, '<c s="' + sIdx + '" ');
+                return '<row r="' + r + '"' + attrs + '>' + styled + '</row>';
+            });
+        }
+        // fontSpec が渡された場合は、行の高さに合わせて拡大したフォントも差し込む。
+        // fontSpec = { title, summary, head, data（pt）, rows（データ行数） }
+        // ランキング表の行構成（1始まり）：1=タイトル, 3=サマリー, 5=見出し, 6〜=データ行。
+        async function __xlsxAddA4FitToPage(arrayBuffer, fontSpec) {
             try {
                 const entries = __zipReadEntries(arrayBuffer);
                 if (!entries) return arrayBuffer;
                 const files = [];
-                let injected = false;
                 for (let i = 0; i < entries.length; i++) {
-                    const e = entries[i];
-                    const plain = await __zipEntryPlain(e);
-                    if (!injected && /^xl\/worksheets\/sheet\d+\.xml$/.test(e.name)) {
-                        const xml = new TextDecoder('utf-8').decode(plain);
-                        const mod = __xlsxInjectA4Setup(xml);
-                        if (mod !== xml) {
-                            files.push({ name: e.name, data: new TextEncoder().encode(mod) });
-                            injected = true;
-                            continue;
+                    files.push({ name: entries[i].name, data: await __zipEntryPlain(entries[i]) });
+                }
+                let styleIdx = null;
+                if (fontSpec) {
+                    const si = files.findIndex(f => f.name === 'xl/styles.xml');
+                    if (si >= 0) {
+                        const built = __xlsxBuildFontStyles(new TextDecoder('utf-8').decode(files[si].data), fontSpec);
+                        if (built) {
+                            styleIdx = built.idx;
+                            files[si] = { name: files[si].name, data: new TextEncoder().encode(built.xml) };
                         }
                     }
-                    files.push({ name: e.name, data: plain });
+                }
+                let injected = false;
+                for (let i = 0; i < files.length; i++) {
+                    if (!injected && /^xl\/worksheets\/sheet\d+\.xml$/.test(files[i].name)) {
+                        const xml = new TextDecoder('utf-8').decode(files[i].data);
+                        let mod = __xlsxInjectA4Setup(xml);
+                        if (mod !== xml) {
+                            if (styleIdx) {
+                                const dc = fontSpec.rows || 0;
+                                mod = __xlsxApplyRowStyles(mod, r => r === 1 ? styleIdx.title : r === 3 ? styleIdx.summary : r === 5 ? styleIdx.head : (r >= 6 && r < 6 + dc) ? styleIdx.data : null);
+                            }
+                            files[i] = { name: files[i].name, data: new TextEncoder().encode(mod) };
+                            injected = true;
+                        }
+                    }
                 }
                 if (!injected) return arrayBuffer;
                 return __zipBuildStored(files).buffer;
@@ -5869,13 +6003,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const isOverall = cat === PHYS_RANKING_OVERALL;
             if (!isOverall && FITNESS_CATEGORIES.indexOf(cat) < 0) { showToast('カテゴリが選ばれていません', 'warning'); return; }
             const allRows = isOverall ? physOverallRankingRows() : physCategoryRankingRows(cat);
-            const rows = allRows.filter(r => r.avg != null);
-            if (rows.length === 0) { showToast('ダウンロードできる測定済みの選手がいません。先に「記録入力」から記録を追加してください', 'warning'); return; }
+            const sel = rankingOutputSelection(allRows);
+            if (sel.measuredCount === 0) { showToast('ダウンロードできる測定済みの選手がいません。先に「記録入力」から記録を追加してください', 'warning'); return; }
+            const rows = sel.rows;
             const title = isOverall ? '総合ランキング' : cat + 'ランキング';
             const top = rows[0];
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || {};
             const teamName = roster.name ? String(roster.name) : '';
-            const summary = '1位：' + top.name + '（' + (isOverall ? '総合平均 ' : '平均 ') + fmtScore(top.avg) + ' 点） ― ' + rows.length + ' / ' + allRows.length + ' 名がランクイン'
+            const summary = '1位：' + top.name + '（' + (isOverall ? '総合平均 ' : '平均 ') + fmtScore(top.avg) + ' 点） ― ' + rows.length + ' / ' + sel.measuredCount + ' 名を出力'
+                + (sel.limited ? '（上位' + sel.limit + '位まで）' : '（測定済み全員）')
                 + (fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : '');
             let headers, widths;
             if (isOverall) {
@@ -5901,13 +6037,37 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             aoa.push(['※ ' + (isOverall
                 ? '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、全種目の採点済み平均（総合平均点）で順位付けしています。各カテゴリの欄はそのカテゴリの平均点です。'
                 : '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、このカテゴリの平均点で順位付けしています。各欄は「記録（点数）」です。')
-                + 'このファイルには測定済みの選手のみを掲載しています。印刷設定はA4縦・1ページに収める指定になっています。']);
+                + 'このファイルには測定済みの選手のみを掲載しています。' + (sel.limited ? '出力範囲は上位' + sel.limit + '位までです。' : '') + '印刷設定はA4縦・1ページに収める指定になっています。']);
             const fileBase = '体力測定_' + title;
+            // データ行の高さ：A4縦の印字可能高さ（約777pt＝297mm−上下余白0.45in×2）から
+            // 見出し等の固定行を差し引いた分を、見出し行＋データ行へ均等に配る。
+            // 行高に上限は設けない（Excelの上限409ptだけガード）ので、人数が少ない
+            // ときは行がその分高くなり、「行数×行高＋固定行 ≒ 777pt」になって
+            // fitToPage と合わせてA4縦1枚を縦いっぱいに使う（下に大きな余白を作らない）。
+            // 文字サイズも行の高さに合わせて拡大し（タイトルはさらに大きめ）、
+            // 拡大した文字が収まるようタイトル行・サマリー行の高さも連動させる。
+            // フォントは __xlsxAddA4FitToPage の後加工で styles.xml へ差し込む。
+            const __provRowH = Math.floor((777 - 101) / (rows.length + 1));
+            const excelFontPt = Math.max(11, Math.min(20, Math.round(__provRowH * 0.26)));
+            const excelTitleFontPt = Math.max(14, Math.min(28, Math.round(excelFontPt * 1.4)));
+            const __titleRowH = Math.max(24, Math.ceil(excelTitleFontPt * 1.35));
+            const __summaryRowH = Math.max(16, Math.ceil(excelFontPt * 1.35));
+            const __fixedTotal = __titleRowH + 15 + __summaryRowH + 8 + 8 + 30;
+            const excelDataRowH = Math.max(15, Math.min(409, Math.floor((777 - __fixedTotal) / (rows.length + 1))));
+            const excelFontSpec = { title: excelTitleFontPt, summary: excelFontPt, head: excelFontPt, data: excelFontPt, rows: rows.length };
             try {
                 if (window.XLSX && XLSX.utils && XLSX.utils.book_new) {
                     const wb = XLSX.utils.book_new();
                     const ws = XLSX.utils.aoa_to_sheet(aoa);
                     ws['!cols'] = widths.map(w => ({ wch: w }));
+                    // 行の高さをA4縦1枚いっぱいに配分する（固定行＋見出し行・データ行）
+                    const __fixedRowH = [__titleRowH, 15, __summaryRowH, 8];
+                    ws['!rows'] = aoa.map((_, ri) => {
+                        if (ri < 4) return { hpt: __fixedRowH[ri] };
+                        if (ri === aoa.length - 2) return { hpt: 8 };
+                        if (ri === aoa.length - 1) return { hpt: 30 };
+                        return { hpt: excelDataRowH };
+                    });
                     // 余白はSheetJSが書ける !margins で指定する
                     ws['!margins'] = { left: 0.35, right: 0.35, top: 0.45, bottom: 0.45, header: 0.25, footer: 0.25 };
                     // タイトル・日付・サマリー・注記の行は全列に結合して1行で見せる
@@ -5915,25 +6075,28 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     ws['!merges'] = [0, 1, 2, aoa.length - 1].map(r => ({ s: { r: r, c: 0 }, e: { r: r, c: lastCol } }));
                     XLSX.utils.book_append_sheet(wb, ws, __excelSheetName(title));
                     const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                    // A4縦・1ページに収める印刷設定（紙サイズ・向き・fitToPage）を差し込んでからダウンロードする
-                    const finalOut = await __xlsxAddA4FitToPage(out);
+                    // A4縦・1ページに収める印刷設定（紙サイズ・向き・fitToPage）と、
+                    // 行の高さに合わせた拡大フォントを差し込んでからダウンロードする
+                    const finalOut = await __xlsxAddA4FitToPage(out, excelFontSpec);
                     __excelDownloadBlob(new Blob([finalOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), fileBase + '_' + __excelDateStamp() + '.xlsx');
                 } else {
                     // SheetJSが使えない場合のフォールバック: Excelで開けるHTML形式（.xls）。
                     // 印刷設定（A4縦・1ページに収める）も可能な範囲で付ける。
                     const lastRow = aoa.length - 1;
                     const rowsHtml = aoa.map((row, ri) => {
-                        if (!row || row.length === 0) return '<tr><td></td></tr>';
+                        if (!row || row.length === 0) return '<tr style="height:8pt"><td></td></tr>';
                         if (ri <= 2 || ri === lastRow) {
-                            return '<tr><td colspan="' + headers.length + '"' + (ri === 0 ? ' style="font-weight:bold;font-size:15px;"' : '') + '>' + __excelEscapeHtml(row[0]) + '</td></tr>';
+                            const fh = ri === 0 ? __titleRowH : ri === 1 ? 15 : ri === 2 ? __summaryRowH : 30;
+                            const fs = ri === 0 ? ' style="font-weight:bold;font-size:' + excelTitleFontPt + 'pt;"' : ri === 2 ? ' style="font-weight:bold;font-size:' + excelFontPt + 'pt;"' : '';
+                            return '<tr style="height:' + fh + 'pt"><td colspan="' + headers.length + '"' + fs + '>' + __excelEscapeHtml(row[0]) + '</td></tr>';
                         }
                         const cells = row.map(v => {
                             const s = __excelEscapeHtml(v === null || v === undefined ? '' : v);
                             return ri === 4
-                                ? '<td style="font-weight:bold;background-color:#FFF7ED;border:1px solid #CBD5E1;text-align:center;">' + s + '</td>'
-                                : '<td style="border:1px solid #E2E8F0;">' + s + '</td>';
+                                ? '<td style="font-weight:bold;background-color:#FFF7ED;border:1px solid #CBD5E1;text-align:center;vertical-align:middle;font-size:' + excelFontPt + 'pt;">' + s + '</td>'
+                                : '<td style="border:1px solid #E2E8F0;vertical-align:middle;font-size:' + excelFontPt + 'pt;">' + s + '</td>';
                         }).join('');
-                        return '<tr>' + cells + '</tr>';
+                        return '<tr style="height:' + excelDataRowH + 'pt">' + cells + '</tr>';
                     }).join('');
                     const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">'
                         + '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>' + __excelEscapeHtml(__excelSheetName(title)) + '</x:Name>'
@@ -5943,7 +6106,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         + '<table border="0" cellpadding="4" cellspacing="0">' + rowsHtml + '</table></body></html>';
                     __excelDownloadBlob(new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8' }), fileBase + '_' + __excelDateStamp() + '.xls');
                 }
-                showToast('ランキングをExcelでダウンロードしました（測定済み ' + rows.length + ' 名・A4縦1枚の印刷設定付き）', 'success');
+                showToast('ランキングをExcelでダウンロードしました（' + (sel.limited ? '上位' + sel.limit + '位まで・' : '測定済み全員・') + rows.length + ' 名・A4縦1枚の印刷設定付き）', 'success');
             } catch (e) {
                 showToast('Excelのダウンロードに失敗しました。もう一度お試しください', 'warning');
             }
@@ -5955,8 +6118,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // （自己完結版の方針を維持する）。掲載するのは測定済み（採点あり）の選手だけ
         // （Excel版と同じ）。表は順位・背番号・氏名・平均点と、カテゴリ別は各種目の
         // 「記録（点数）」、総合は各カテゴリの平均点を並べ、画面のシートと同じ配色にする。
-        // 行数に応じて行の高さと文字サイズを詰めるため、測定済みの選手全員が必ず
-        // A4縦1枚に収まる。順位付け・採点基準・保存データは変えない。
+        // 出力範囲はランキングページの「出力する範囲」の指定（全員／指定順位まで）を
+        // rankingOutputSelection で適用する。使える縦幅を全行へ均等に配るため、
+        // 人数が多いときは行が詰まって全員が収まり、少ないときは行と文字が大きく
+        // なってA4縦1枚を縦いっぱいに使う（表の下に大きな余白を作らない）。
+        // 順位付け・採点基準・保存データは変えない。
         function __pdfFitText(ctx, text, maxWidth) {
             // 現在のフォントで測り、収まらなければ末尾を「…」で省略する
             if (ctx.measureText(text).width <= maxWidth) return text;
@@ -6001,14 +6167,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const isOverall = cat === PHYS_RANKING_OVERALL;
             if (!isOverall && FITNESS_CATEGORIES.indexOf(cat) < 0) { showToast('カテゴリが選ばれていません', 'warning'); return; }
             const allRows = isOverall ? physOverallRankingRows() : physCategoryRankingRows(cat);
-            const rows = allRows.filter(r => r.avg != null);
-            if (rows.length === 0) { showToast('ダウンロードできる測定済みの選手がいません。先に「記録入力」から記録を追加してください', 'warning'); return; }
+            const sel = rankingOutputSelection(allRows);
+            if (sel.measuredCount === 0) { showToast('ダウンロードできる測定済みの選手がいません。先に「記録入力」から記録を追加してください', 'warning'); return; }
+            const rows = sel.rows;
             const title = isOverall ? '総合ランキング' : cat + 'ランキング';
             const top = rows[0];
             const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || {};
             const teamName = roster.name ? String(roster.name) : '';
             const summaryMain = '1位：' + top.name + '（' + (isOverall ? '総合平均 ' : '平均 ') + fmtScore(top.avg) + ' 点）';
-            const summaryRest = ' ― ' + rows.length + ' / ' + allRows.length + ' 名がランクイン'
+            const summaryRest = ' ― ' + rows.length + ' / ' + sel.measuredCount + ' 名を出力'
+                + (sel.limited ? '（上位' + sel.limit + '位まで）' : '（測定済み全員）')
                 + (fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : '');
             // 表データ（Excel版と同じ並び）：順位・背番号・選手名・平均点＋データ列
             let headers, dataOf;
@@ -6026,7 +6194,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const note = '※ ' + (isOverall
                 ? '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、全種目の採点済み平均（総合平均点）で順位付けしています。各カテゴリの欄はそのカテゴリの平均点です。'
                 : '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、このカテゴリの平均点で順位付けしています。各欄は「記録（点数）」です。')
-                + 'このファイルには測定済みの選手のみを掲載しています。';
+                + 'このファイルには測定済みの選手のみを掲載しています。' + (sel.limited ? '出力範囲は上位' + sel.limit + '位までです。' : '');
             try {
                 const PW = 595.28, PH = 841.89, SCALE = 3;
                 const canvas = document.createElement('canvas');
@@ -6065,13 +6233,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ctx.fillStyle = '#334155';
                 ctx.fillText(__pdfFitText(ctx, summaryRest, CW - mainW), M + mainW, y + 5);
                 y += 20;
-                // --- 表の寸法（行数に応じて詰めてA4縦1枚に収める） ---
+                // --- 表の寸法（行数に応じて行の高さを配分し、A4縦1枚を縦いっぱいに使う） ---
+                // 使える縦幅を全行へ均等に配るため、人数が多いときは行が詰まり、
+                // 少ないときは行と文字が大きくなって、表の下に大きな余白が残らない。
                 const noteH = 32;
                 const tableBottom = PH - M - noteH;
                 const nRows = rows.length + 1; // 見出し行＋データ行
-                const rowH = Math.min(23, (tableBottom - y) / nRows);
-                const bodyFont = Math.max(6.8, Math.min(10.5, rowH * 0.44));
-                const headFont = Math.max(6.5, bodyFont - 0.5);
+                // 行の高さに上限は設けない：使える縦幅を全行へ均等に配り切るので、
+                // 3名以下のように人数が少ないときも表がページ下端まで届き、
+                // 表の下に余白が残らない。文字も行の高さに合わせて拡大する
+                // （データ列の文字は描画時に列幅へ収まるよう自動で縮小される）。
+                const rowH = (tableBottom - y) / nRows;
+                const bodyFont = Math.max(6.8, Math.min(30, rowH * 0.40));
+                const headFont = Math.max(6.5, Math.min(22, bodyFont - 1));
                 // 列幅：順位・背番号・平均点は固定幅、残りを選手名とデータ列で配分
                 const colRank = 32, colNo = 40, colAvg = isOverall ? 52 : 46;
                 const dataCount = headers.length - 4;
@@ -6109,14 +6283,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     let nx = colX[2] + 4;
                     const gc = GRADE_COLOR_META[normalizeGradeColor(r.player ? r.player.gradeColor : '')];
                     if (gc) {
+                        const dotR = Math.max(3.1, Math.min(8, rowH * 0.10));
                         ctx.beginPath();
-                        ctx.arc(nx + 3, cy, 3.1, 0, Math.PI * 2);
+                        ctx.arc(nx + dotR, cy, dotR, 0, Math.PI * 2);
                         ctx.fillStyle = gc.hex;
                         ctx.fill();
                         ctx.lineWidth = 0.6;
                         ctx.strokeStyle = 'rgba(15,23,42,.25)';
                         ctx.stroke();
-                        nx += 9.5;
+                        nx += dotR * 2 + 3.3;
                     }
                     ctx.font = '800 ' + bodyFont + 'px ' + FONT;
                     ctx.fillStyle = '#0f172a';
@@ -6187,14 +6362,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     line += note[i];
                 }
                 if (line) noteLines.push(line);
-                noteLines.slice(0, 3).forEach((ln, i) => ctx.fillText(ln, M, tableBottom + 12 + i * 10.5));
+                // 注記は表のすぐ下に置く（表がページを埋める場合は従来どおりの位置になる）
+                const noteY = y + rowH * nRows;
+                noteLines.slice(0, 3).forEach((ln, i) => ctx.fillText(ln, M, noteY + 12 + i * 10.5));
                 // --- PDF化してその場でダウンロード ---
                 const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
                 if (!blob) throw new Error('pdf canvas failed');
                 const jpegU8 = new Uint8Array(await blob.arrayBuffer());
                 const pdfU8 = __pdfBytesFromJpeg(jpegU8, canvas.width, canvas.height);
                 __excelDownloadBlob(new Blob([pdfU8.buffer], { type: 'application/pdf' }), '体力測定_' + title + '_' + __excelDateStamp() + '.pdf');
-                showToast('ランキングをPDFでダウンロードしました（測定済み ' + rows.length + ' 名・A4縦1枚）', 'success');
+                showToast('ランキングをPDFでダウンロードしました（' + (sel.limited ? '上位' + sel.limit + '位まで・' : '測定済み全員・') + rows.length + ' 名・A4縦1枚）', 'success');
             } catch (e) {
                 showToast('PDFのダウンロードに失敗しました。もう一度お試しください', 'warning');
             }
@@ -14580,6 +14757,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             switchPlayerStatsBranch, switchBoxscoreBranch, refreshAggregatedStats,
             changePhysicalTeam, changePhysicalPlayer,
             showPhysicalHub, openPhysicalOverall, openPhysicalPersonal, openPhysicalCompare, openPhysicalRankingHub, openPhysicalRanking, openPhysicalInput, downloadPhysicalRankingExcel, downloadPhysicalRankingPdf,
+            setRankingOutputRange, setRankingOutputLimit, setRankingOutputLimitQuick,
             togglePhysLine, changePhysPeriod, resetPhysPeriod, changePhysPersonalTest, switchPhysPersonalTab, changePhysPersonalCategory, togglePhysComparePlayer, changePhysCompareMetric,
             changePhysicalFitnessTest,
             addPhysicalFitness, addPhysicalFitnessBulk, clearPhysicalBulkForm, updatePhysicalBulkCount, renderPhysicalBulkForm, deletePhysicalFitness,
