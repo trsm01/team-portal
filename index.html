@@ -243,7 +243,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         .ranking-table tr.top1 td.c-rank { color: #ea580c; font-size: 15px; }
         .ranking-table tr.top2 td.c-rank, .ranking-table tr.top3 td.c-rank { color: #c2410c; }
         .ranking-table td.c-name { font-weight: 800; }
-        .ranking-table td.c-name .pno { color: #94a3b8; font-weight: 700; font-size: 10px; margin-right: 4px; }
         .ranking-table td.c-avg { font-weight: 800; font-size: 14px; }
         .ranking-table td.c-avg .pt { font-size: 10px; font-weight: 700; color: #64748b; margin-left: 1px; }
         .ranking-table td.c-test { text-align: center; color: #334155; }
@@ -1227,7 +1226,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
                 <div id="physical-ranking-summary"></div>
                 <div id="physical-ranking-sheet" class="ranking-sheet ranking-doc" data-density="1"></div>
-                <p class="text-[11px] text-slate-400">ランキング表はA4縦1枚の大きさで表示しています。「出力する範囲」で全員（測定済み全員）か指定順位までかを選んでから「PDFでダウンロード」「Excelでダウンロード」のどちらかを押すと、その範囲のランキング表をそのままファイルでダウンロードできます（別タブは開きません）。どちらの形式でも、出力する人数に合わせて行の高さと文字の大きさを自動調整し、A4縦1枚を縦いっぱいに使って表を配置するので、表の下に大きな余白は残りません（ExcelファイルにはA4縦・1ページに収める印刷設定も付いています）。各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、カテゴリ別はカテゴリごとの平均点、総合は全種目の採点済み平均（総合平均点）で順位付けしています。未記録・未採点の選手は画面では点数「―」で末尾に表示します（ダウンロードには含まれません）。</p>
                 <button type="button" onclick="openPhysicalRankingHub()" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-extrabold transition">
                     <i data-lucide="layout-grid" class="w-4 h-4"></i>ランキングのカテゴリ選択に戻る
                 </button>
@@ -5630,9 +5628,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         // ===== ランキング表シート（A4縦1枚）の共通部品 =====
-        function rankingSheetDateLabel() {
+        // 測定月のラベル：ランキングの対象となる自チームの体力測定記録のうち、
+        // 最新の記録日が属する月を「YYYY年M月の測定記録」と表す。
+        // 記録が無い場合は現在の年月で代替する（表自体は空状態になる）。
+        function rankingMeasurementMonthLabel() {
+            let latest = '';
+            if (physicalData && Array.isArray(physicalData.fitness)) {
+                physicalData.fitness.forEach(r => {
+                    if (r && r.teamKey === physicalTeamKey && r.date && String(r.date) > latest) latest = String(r.date);
+                });
+            }
+            if (latest.length >= 7) {
+                return latest.slice(0, 4) + '年' + parseInt(latest.slice(5, 7), 10) + '月の測定記録';
+            }
             const d = new Date();
-            return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日現在';
+            return d.getFullYear() + '年' + (d.getMonth() + 1) + '月の測定記録';
         }
         // 行数に応じて密度（1〜4）を決めてシートへ反映し、表があるときだけ印刷ボタンを出す
         function setupRankingSheet(sheetEl, rowCount, hasTable) {
@@ -5649,17 +5659,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 rangeBox.classList.toggle('flex', !!hasTable);
             }
         }
-        function rankingSheetHead(title, summaryHtml) {
-            const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || {};
-            const team = roster.name ? String(roster.name) : '';
+        // シート最上部は「種目（タイトル）」と「測定月」だけにし、その下に表を置く。
+        // サマリーや注記などの説明書きは置かない（簡素化）。
+        function rankingSheetHead(title) {
             return '<div class="ranking-doc-head">'
                 + '<p class="ranking-doc-title">体力測定 ' + physicalEscapeHtml(title) + '</p>'
-                + '<p class="ranking-doc-meta">' + (team ? physicalEscapeHtml(team) + '<br>' : '') + rankingSheetDateLabel() + '</p>'
-                + '</div>'
-                + (summaryHtml ? '<p class="ranking-doc-summary">' + summaryHtml + '</p>' : '');
+                + '<p class="ranking-doc-meta">' + rankingMeasurementMonthLabel() + '</p>'
+                + '</div>';
         }
+        // 氏名セル：背番号は表示しない。文字色はその選手の学年カラーにする
+        // （未設定の選手は従来の文字色のまま）。
         function rankingNameCell(r) {
-            return gradeColorDotHtml(r.player ? r.player.gradeColor : '') + (r.player.number ? '<span class="pno">No.' + physicalEscapeHtml(r.player.number) + '</span>' : '') + physicalEscapeHtml(r.name);
+            const key = normalizeGradeColor(r.player ? r.player.gradeColor : '');
+            const m = GRADE_COLOR_META[key];
+            const name = physicalEscapeHtml(r.name);
+            return m ? '<span style="color:' + m.hex + '">' + name + '</span>' : name;
         }
         function rankingRowClass(r) {
             if (r.avg == null) return ' class="unscored"';
@@ -5696,11 +5710,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const unscoredRows = clone.querySelectorAll('tr.unscored');
             for (let i = 0; i < unscoredRows.length; i++) unscoredRows[i].remove();
             const printedRows = clone.querySelectorAll('tbody tr').length;
-            // 注記の「未測定の選手は末尾に表示します」は画面表示向けの文言なので、印刷用に差し替える
-            const note = clone.querySelector('.ranking-doc-note');
-            if (note) {
-                note.textContent = note.textContent.replace('未記録・未採点の選手は点数「―」で末尾に表示します。', '印刷用には測定済みの選手のみを掲載しています。');
-            }
             return { html: clone.innerHTML, rowCount: printedRows };
         }
         function prepareRankingPrintArea() {
@@ -5711,11 +5720,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             area.innerHTML = content.html;
             area.setAttribute('data-density', rankingPrintDensity(content.rowCount));
             // 印刷でもA4縦1枚を縦いっぱいに使う：測定済みの行が少ないときは、
-            // 印字可能高さ（297mm−上下余白20mm）から見出し・サマリー・注記の分を
+            // 印字可能高さ（297mm−上下余白20mm）から見出しの分を
             // 差し引いた高さを行数で割り、行の高さと文字を広げて下に余白を残さない。
             // 行が多いときは従来の密度調整のまま（1枚に収めることを優先する）。
             if (content.rowCount > 0) {
-                const perRowMm = Math.floor(((277 - 36) / (content.rowCount + 1)) * 10) / 10;
+                const perRowMm = Math.floor(((277 - 26) / (content.rowCount + 1)) * 10) / 10;
                 if (perRowMm > 8.5) {
                     const fontPx = Math.max(11.5, Math.min(19, perRowMm * 1.05));
                     const st = document.createElement('style');
@@ -5779,7 +5788,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // ランキング表のExcelダウンロード。
         // 画面のボタンはこの関数を呼び、既存のSheetJSで .xlsx を生成してその場で直接
         // ダウンロードする（別タブは開かない）。
-        // 掲載するのは測定済み（採点あり）の選手だけ。表は順位・背番号・氏名・平均点と、
+        // 構成は簡素に：最上部に種目（タイトル）と測定月、その下に表だけを置く。
+        // サマリーや注記などの説明書き、背番号の列は入れない。氏名の文字色は学年カラー。
+        // 掲載するのは測定済み（採点あり）の選手だけ。表は順位・氏名・平均点と、
         // カテゴリ別は各種目の「記録（点数）」、総合は各カテゴリの平均点を並べる。
         // 出力範囲はランキングページの「出力する範囲」の指定（全員／指定順位まで）を
         // rankingOutputSelection で適用する。印刷設定はA4縦・1ページに収める指定を
@@ -5923,7 +5934,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // styles.xml へ大きめのフォントと、それを参照するセル書式（cellXfs）を追加する。
         // SheetJS（同梱のCE版）はセル書式を書き出せないため、印刷設定と同じく zip の
         // 後加工で差し込む。追加した書式は縦中央＋折り返し有効で、高い行でも文字が
-        // 行の中央に来る。書式のインデックス { title, summary, head, data } を返す。
+        // 行の中央に来る。あわせて氏名セル用の学年カラー（青・赤・緑）のフォントも
+        // 追加する。書式のインデックス { title, summary, head, data, blue, red, green } を返す。
         // 形式が想定と違う場合は null を返し、フォント拡大なしで続行する。
         function __xlsxBuildFontStyles(stylesXml, spec) {
             const fontsM = stylesXml.match(/<fonts count="(\d+)">/);
@@ -5931,29 +5943,42 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (!fontsM || !xfsM || stylesXml.indexOf('</fonts>') < 0 || stylesXml.indexOf('</cellXfs>') < 0) return null;
             const f0 = parseInt(fontsM[1], 10), x0 = parseInt(xfsM[1], 10);
             const fontXml = (pt, bold) => '<font>' + (bold ? '<b/>' : '') + '<sz val="' + pt + '"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font>';
+            const colorFontXml = (pt, rgb) => '<font><b/><sz val="' + pt + '"/><color rgb="' + rgb + '"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font>';
             const xfXml = fid => '<xf numFmtId="0" fontId="' + fid + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>';
             const out = stylesXml
-                .replace('<fonts count="' + f0 + '">', '<fonts count="' + (f0 + 4) + '">')
-                .replace('</fonts>', fontXml(spec.title, true) + fontXml(spec.summary, true) + fontXml(spec.head, true) + fontXml(spec.data, false) + '</fonts>')
-                .replace('<cellXfs count="' + x0 + '">', '<cellXfs count="' + (x0 + 4) + '">')
-                .replace('</cellXfs>', xfXml(f0) + xfXml(f0 + 1) + xfXml(f0 + 2) + xfXml(f0 + 3) + '</cellXfs>');
+                .replace('<fonts count="' + f0 + '">', '<fonts count="' + (f0 + 7) + '">')
+                .replace('</fonts>', fontXml(spec.title, true) + fontXml(spec.summary, true) + fontXml(spec.head, true) + fontXml(spec.data, false)
+                    + colorFontXml(spec.data, 'FF2563EB') + colorFontXml(spec.data, 'FFDC2626') + colorFontXml(spec.data, 'FF16A34A') + '</fonts>')
+                .replace('<cellXfs count="' + x0 + '">', '<cellXfs count="' + (x0 + 7) + '">')
+                .replace('</cellXfs>', xfXml(f0) + xfXml(f0 + 1) + xfXml(f0 + 2) + xfXml(f0 + 3) + xfXml(f0 + 4) + xfXml(f0 + 5) + xfXml(f0 + 6) + '</cellXfs>');
             if (out === stylesXml) return null;
-            return { xml: out, idx: { title: x0, summary: x0 + 1, head: x0 + 2, data: x0 + 3 } };
+            return { xml: out, idx: { title: x0, summary: x0 + 1, head: x0 + 2, data: x0 + 3, blue: x0 + 4, red: x0 + 5, green: x0 + 6 } };
         }
         // シートXMLの各行のセルへ s 属性（書式インデックス）を付ける。
         // styleForRow(r) が行番号（1始まり）に対する書式インデックスを返す（nullなら付けない）。
+        // nameStyleForRow(r) が渡された場合、その行の氏名セル（B列）だけ書式を差し替える
+        // （学年カラーのフォントを当てるため）。
         // すでに s 属性のあるセルは二重付けを避けてそのままにする。
-        function __xlsxApplyRowStyles(sheetXml, styleForRow) {
+        function __xlsxApplyRowStyles(sheetXml, styleForRow, nameStyleForRow) {
             return sheetXml.replace(/<row r="(\d+)"([^>]*)>([\s\S]*?)<\/row>/g, (m, r, attrs, inner) => {
-                const sIdx = styleForRow(parseInt(r, 10));
+                const rn = parseInt(r, 10);
+                const sIdx = styleForRow(rn);
                 if (sIdx == null) return m;
-                const styled = inner.replace(/<c (?![^>]*\bs=")/g, '<c s="' + sIdx + '" ');
+                let styled = inner.replace(/<c (?![^>]*\bs=")/g, '<c s="' + sIdx + '" ');
+                if (nameStyleForRow) {
+                    const nIdx = nameStyleForRow(rn);
+                    if (nIdx != null) {
+                        styled = styled
+                            .replace(new RegExp('<c s="\\d+" r="B' + rn + '"'), '<c s="' + nIdx + '" r="B' + rn + '"')
+                            .replace(new RegExp('<c r="B' + rn + '"'), '<c s="' + nIdx + '" r="B' + rn + '"');
+                    }
+                }
                 return '<row r="' + r + '"' + attrs + '>' + styled + '</row>';
             });
         }
         // fontSpec が渡された場合は、行の高さに合わせて拡大したフォントも差し込む。
-        // fontSpec = { title, summary, head, data（pt）, rows（データ行数） }
-        // ランキング表の行構成（1始まり）：1=タイトル, 3=サマリー, 5=見出し, 6〜=データ行。
+        // fontSpec = { title, summary, head, data（pt）, rows（データ行数）, nameColors（行番号→学年カラー） }
+        // ランキング表の行構成（1始まり）：1=タイトル, 2=測定月, 4=見出し, 5〜=データ行。
         async function __xlsxAddA4FitToPage(arrayBuffer, fontSpec) {
             try {
                 const entries = __zipReadEntries(arrayBuffer);
@@ -5981,7 +6006,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         if (mod !== xml) {
                             if (styleIdx) {
                                 const dc = fontSpec.rows || 0;
-                                mod = __xlsxApplyRowStyles(mod, r => r === 1 ? styleIdx.title : r === 3 ? styleIdx.summary : r === 5 ? styleIdx.head : (r >= 6 && r < 6 + dc) ? styleIdx.data : null);
+                                const nameColors = fontSpec.nameColors || {};
+                                mod = __xlsxApplyRowStyles(mod,
+                                    r => r === 1 ? styleIdx.title : r === 2 ? styleIdx.summary : r === 4 ? styleIdx.head : (r >= 5 && r < 5 + dc) ? styleIdx.data : null,
+                                    r => nameColors[r] ? styleIdx[nameColors[r]] : null);
                             }
                             files[i] = { name: files[i].name, data: new TextEncoder().encode(mod) };
                             injected = true;
@@ -6007,72 +6035,64 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (sel.measuredCount === 0) { showToast('ダウンロードできる測定済みの選手がいません。先に「記録入力」から記録を追加してください', 'warning'); return; }
             const rows = sel.rows;
             const title = isOverall ? '総合ランキング' : cat + 'ランキング';
-            const top = rows[0];
-            const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || {};
-            const teamName = roster.name ? String(roster.name) : '';
-            const summary = '1位：' + top.name + '（' + (isOverall ? '総合平均 ' : '平均 ') + fmtScore(top.avg) + ' 点） ― ' + rows.length + ' / ' + sel.measuredCount + ' 名を出力'
-                + (sel.limited ? '（上位' + sel.limit + '位まで）' : '（測定済み全員）')
-                + (fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : '');
             let headers, widths;
             if (isOverall) {
-                headers = ['順位', '背番号', '選手名', '総合平均点'].concat(FITNESS_CATEGORIES);
-                widths = [7, 9, 20, 12].concat(FITNESS_CATEGORIES.map(() => 11));
+                headers = ['順位', '選手名', '総合平均点'].concat(FITNESS_CATEGORIES);
+                widths = [7, 22, 12].concat(FITNESS_CATEGORIES.map(() => 11));
             } else {
                 const tests = (allRows[0] && allRows[0].tests) || [];
-                headers = ['順位', '背番号', '選手名', '平均点'].concat(tests.map(t => t.def.name));
-                widths = [7, 9, 20, 10].concat(tests.map(() => 19));
+                headers = ['順位', '選手名', '平均点'].concat(tests.map(t => t.def.name));
+                widths = [7, 22, 10].concat(tests.map(() => 19));
             }
             const aoa = [];
             aoa.push(['体力測定 ' + title]);
-            aoa.push([(teamName ? teamName + ' ／ ' : '') + rankingSheetDateLabel()]);
-            aoa.push([summary]);
+            aoa.push([rankingMeasurementMonthLabel()]);
             aoa.push([]);
             aoa.push(headers);
             rows.forEach(r => {
-                const base = [r.rank + '位', (r.player && r.player.number) ? String(r.player.number) : '', r.name, fmtScore(r.avg) + '点'];
+                const base = [r.rank + '位', r.name, fmtScore(r.avg) + '点'];
                 if (isOverall) aoa.push(base.concat(r.catAvgs.map(c => c.avg != null ? fmtScore(c.avg) + '点' : '―')));
                 else aoa.push(base.concat((r.tests || []).map(rankingExcelTestCell)));
             });
-            aoa.push([]);
-            aoa.push(['※ ' + (isOverall
-                ? '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、全種目の採点済み平均（総合平均点）で順位付けしています。各カテゴリの欄はそのカテゴリの平均点です。'
-                : '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、このカテゴリの平均点で順位付けしています。各欄は「記録（点数）」です。')
-                + 'このファイルには測定済みの選手のみを掲載しています。' + (sel.limited ? '出力範囲は上位' + sel.limit + '位までです。' : '') + '印刷設定はA4縦・1ページに収める指定になっています。']);
             const fileBase = '体力測定_' + title;
             // データ行の高さ：A4縦の印字可能高さ（約777pt＝297mm−上下余白0.45in×2）から
-            // 見出し等の固定行を差し引いた分を、見出し行＋データ行へ均等に配る。
+            // タイトル・測定月などの固定行を差し引いた分を、見出し行＋データ行へ均等に配る。
             // 行高に上限は設けない（Excelの上限409ptだけガード）ので、人数が少ない
             // ときは行がその分高くなり、「行数×行高＋固定行 ≒ 777pt」になって
             // fitToPage と合わせてA4縦1枚を縦いっぱいに使う（下に大きな余白を作らない）。
             // 文字サイズも行の高さに合わせて拡大し（タイトルはさらに大きめ）、
-            // 拡大した文字が収まるようタイトル行・サマリー行の高さも連動させる。
+            // 拡大した文字が収まるようタイトル行・測定月行の高さも連動させる。
             // フォントは __xlsxAddA4FitToPage の後加工で styles.xml へ差し込む。
-            const __provRowH = Math.floor((777 - 101) / (rows.length + 1));
+            const __provRowH = Math.floor((777 - 47) / (rows.length + 1));
             const excelFontPt = Math.max(11, Math.min(20, Math.round(__provRowH * 0.26)));
             const excelTitleFontPt = Math.max(14, Math.min(28, Math.round(excelFontPt * 1.4)));
             const __titleRowH = Math.max(24, Math.ceil(excelTitleFontPt * 1.35));
-            const __summaryRowH = Math.max(16, Math.ceil(excelFontPt * 1.35));
-            const __fixedTotal = __titleRowH + 15 + __summaryRowH + 8 + 8 + 30;
+            const __monthRowH = Math.max(15, Math.ceil(excelFontPt * 1.35));
+            const __fixedTotal = __titleRowH + __monthRowH + 8;
             const excelDataRowH = Math.max(15, Math.min(409, Math.floor((777 - __fixedTotal) / (rows.length + 1))));
-            const excelFontSpec = { title: excelTitleFontPt, summary: excelFontPt, head: excelFontPt, data: excelFontPt, rows: rows.length };
+            // 氏名セルの学年カラー（シート行番号は1始まり：データは5行目から）
+            const excelNameColors = {};
+            rows.forEach((r, i) => {
+                const k = normalizeGradeColor(r.player ? r.player.gradeColor : '');
+                if (k) excelNameColors[5 + i] = k;
+            });
+            const excelFontSpec = { title: excelTitleFontPt, summary: excelFontPt, head: excelFontPt, data: excelFontPt, rows: rows.length, nameColors: excelNameColors };
             try {
                 if (window.XLSX && XLSX.utils && XLSX.utils.book_new) {
                     const wb = XLSX.utils.book_new();
                     const ws = XLSX.utils.aoa_to_sheet(aoa);
                     ws['!cols'] = widths.map(w => ({ wch: w }));
                     // 行の高さをA4縦1枚いっぱいに配分する（固定行＋見出し行・データ行）
-                    const __fixedRowH = [__titleRowH, 15, __summaryRowH, 8];
+                    const __fixedRowH = [__titleRowH, __monthRowH, 8];
                     ws['!rows'] = aoa.map((_, ri) => {
-                        if (ri < 4) return { hpt: __fixedRowH[ri] };
-                        if (ri === aoa.length - 2) return { hpt: 8 };
-                        if (ri === aoa.length - 1) return { hpt: 30 };
+                        if (ri < 3) return { hpt: __fixedRowH[ri] };
                         return { hpt: excelDataRowH };
                     });
                     // 余白はSheetJSが書ける !margins で指定する
                     ws['!margins'] = { left: 0.35, right: 0.35, top: 0.45, bottom: 0.45, header: 0.25, footer: 0.25 };
-                    // タイトル・日付・サマリー・注記の行は全列に結合して1行で見せる
+                    // タイトル・測定月の行は全列に結合して1行で見せる
                     const lastCol = headers.length - 1;
-                    ws['!merges'] = [0, 1, 2, aoa.length - 1].map(r => ({ s: { r: r, c: 0 }, e: { r: r, c: lastCol } }));
+                    ws['!merges'] = [0, 1].map(r => ({ s: { r: r, c: 0 }, e: { r: r, c: lastCol } }));
                     XLSX.utils.book_append_sheet(wb, ws, __excelSheetName(title));
                     const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
                     // A4縦・1ページに収める印刷設定（紙サイズ・向き・fitToPage）と、
@@ -6082,19 +6102,23 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 } else {
                     // SheetJSが使えない場合のフォールバック: Excelで開けるHTML形式（.xls）。
                     // 印刷設定（A4縦・1ページに収める）も可能な範囲で付ける。
-                    const lastRow = aoa.length - 1;
                     const rowsHtml = aoa.map((row, ri) => {
                         if (!row || row.length === 0) return '<tr style="height:8pt"><td></td></tr>';
-                        if (ri <= 2 || ri === lastRow) {
-                            const fh = ri === 0 ? __titleRowH : ri === 1 ? 15 : ri === 2 ? __summaryRowH : 30;
-                            const fs = ri === 0 ? ' style="font-weight:bold;font-size:' + excelTitleFontPt + 'pt;"' : ri === 2 ? ' style="font-weight:bold;font-size:' + excelFontPt + 'pt;"' : '';
+                        if (ri <= 1) {
+                            const fh = ri === 0 ? __titleRowH : __monthRowH;
+                            const fs = ' style="font-weight:bold;font-size:' + (ri === 0 ? excelTitleFontPt : excelFontPt) + 'pt;"';
                             return '<tr style="height:' + fh + 'pt"><td colspan="' + headers.length + '"' + fs + '>' + __excelEscapeHtml(row[0]) + '</td></tr>';
                         }
-                        const cells = row.map(v => {
+                        const dataRow = rows[ri - 4];
+                        const cells = row.map((v, ci) => {
                             const s = __excelEscapeHtml(v === null || v === undefined ? '' : v);
-                            return ri === 4
-                                ? '<td style="font-weight:bold;background-color:#FFF7ED;border:1px solid #CBD5E1;text-align:center;vertical-align:middle;font-size:' + excelFontPt + 'pt;">' + s + '</td>'
-                                : '<td style="border:1px solid #E2E8F0;vertical-align:middle;font-size:' + excelFontPt + 'pt;">' + s + '</td>';
+                            if (ri === 3) return '<td style="font-weight:bold;background-color:#FFF7ED;border:1px solid #CBD5E1;text-align:center;vertical-align:middle;font-size:' + excelFontPt + 'pt;">' + s + '</td>';
+                            let st = 'border:1px solid #E2E8F0;vertical-align:middle;font-size:' + excelFontPt + 'pt;';
+                            if (ci === 1 && dataRow) {
+                                const gm = GRADE_COLOR_META[normalizeGradeColor(dataRow.player ? dataRow.player.gradeColor : '')];
+                                if (gm) st += 'color:' + gm.hex + ';font-weight:bold;';
+                            }
+                            return '<td style="' + st + '">' + s + '</td>';
                         }).join('');
                         return '<tr style="height:' + excelDataRowH + 'pt">' + cells + '</tr>';
                     }).join('');
@@ -6116,8 +6140,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // A4縦1ページのPDFファイルとしてその場で直接ダウンロードする（別タブは開かない）。
         // 外部ライブラリ（jsPDF等）は読み込まず、PDFの組み立てもページ内で完結させる
         // （自己完結版の方針を維持する）。掲載するのは測定済み（採点あり）の選手だけ
-        // （Excel版と同じ）。表は順位・背番号・氏名・平均点と、カテゴリ別は各種目の
-        // 「記録（点数）」、総合は各カテゴリの平均点を並べ、画面のシートと同じ配色にする。
+        // （Excel版と同じ）。構成は簡素に：最上部に種目（タイトル）と測定月、その下に
+        // 表だけを置き、サマリーや注記などの説明書きと背番号の列は入れない。
+        // 表は順位・氏名・平均点と、カテゴリ別は各種目の「記録（点数）」、総合は
+        // 各カテゴリの平均点を並べ、画面のシートと同じ配色にする。氏名の文字色は学年カラー。
         // 出力範囲はランキングページの「出力する範囲」の指定（全員／指定順位まで）を
         // rankingOutputSelection で適用する。使える縦幅を全行へ均等に配るため、
         // 人数が多いときは行が詰まって全員が収まり、少ないときは行と文字が大きく
@@ -6171,30 +6197,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (sel.measuredCount === 0) { showToast('ダウンロードできる測定済みの選手がいません。先に「記録入力」から記録を追加してください', 'warning'); return; }
             const rows = sel.rows;
             const title = isOverall ? '総合ランキング' : cat + 'ランキング';
-            const top = rows[0];
-            const roster = (globalTeamRosters && globalTeamRosters[physicalTeamKey]) || {};
-            const teamName = roster.name ? String(roster.name) : '';
-            const summaryMain = '1位：' + top.name + '（' + (isOverall ? '総合平均 ' : '平均 ') + fmtScore(top.avg) + ' 点）';
-            const summaryRest = ' ― ' + rows.length + ' / ' + sel.measuredCount + ' 名を出力'
-                + (sel.limited ? '（上位' + sel.limit + '位まで）' : '（測定済み全員）')
-                + (fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : '');
-            // 表データ（Excel版と同じ並び）：順位・背番号・選手名・平均点＋データ列
+            // 表データ（Excel版と同じ並び）：順位・選手名・平均点＋データ列
             let headers, dataOf;
             if (isOverall) {
-                headers = ['順位', '背番号', '選手名', '総合平均点'].concat(FITNESS_CATEGORIES);
+                headers = ['順位', '選手名', '総合平均点'].concat(FITNESS_CATEGORIES);
                 dataOf = r => r.catAvgs.map(c => ({ main: c.avg != null ? fmtScore(c.avg) + '点' : '―', score: null }));
             } else {
                 const tests0 = (allRows[0] && allRows[0].tests) || [];
-                headers = ['順位', '背番号', '選手名', '平均点'].concat(tests0.map(t => t.def.name));
+                headers = ['順位', '選手名', '平均点'].concat(tests0.map(t => t.def.name));
                 dataOf = r => (r.tests || []).map(t => {
                     if (!t.record) return { main: '―', score: null };
                     return { main: fitnessRecordLabel(t.record, t.def), score: t.score != null ? '（' + fmtScore(t.score) + '点）' : '（―）' };
                 });
             }
-            const note = '※ ' + (isOverall
-                ? '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、全種目の採点済み平均（総合平均点）で順位付けしています。各カテゴリの欄はそのカテゴリの平均点です。'
-                : '各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、このカテゴリの平均点で順位付けしています。各欄は「記録（点数）」です。')
-                + 'このファイルには測定済みの選手のみを掲載しています。' + (sel.limited ? '出力範囲は上位' + sel.limit + '位までです。' : '');
             try {
                 const PW = 595.28, PH = 841.89, SCALE = 3;
                 const canvas = document.createElement('canvas');
@@ -6209,35 +6224,25 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, PW, PH);
                 ctx.textBaseline = 'middle';
-                // --- 見出し ---
+                // --- 見出し（種目タイトルと測定月だけ） ---
                 let y = M + 4;
                 ctx.fillStyle = '#0f172a';
                 ctx.font = '800 19px ' + FONT;
                 ctx.textAlign = 'left';
                 ctx.fillText('体力測定 ' + title, M, y + 10);
-                ctx.font = '700 8.5px ' + FONT;
+                ctx.font = '700 10px ' + FONT;
                 ctx.fillStyle = '#64748b';
                 ctx.textAlign = 'right';
-                if (teamName) ctx.fillText(teamName, PW - M, y + 3);
-                ctx.fillText(rankingSheetDateLabel(), PW - M, y + 15);
+                ctx.fillText(rankingMeasurementMonthLabel(), PW - M, y + 10);
                 ctx.textAlign = 'left';
                 y += 26;
                 ctx.fillStyle = '#ea580c';
                 ctx.fillRect(M, y, CW, 2.4);
                 y += 12;
-                // --- サマリー（1位の部分はオレンジ太字） ---
-                ctx.font = '700 10.5px ' + FONT;
-                ctx.fillStyle = '#c2410c';
-                ctx.fillText(summaryMain, M, y + 5);
-                const mainW = ctx.measureText(summaryMain).width;
-                ctx.fillStyle = '#334155';
-                ctx.fillText(__pdfFitText(ctx, summaryRest, CW - mainW), M + mainW, y + 5);
-                y += 20;
                 // --- 表の寸法（行数に応じて行の高さを配分し、A4縦1枚を縦いっぱいに使う） ---
                 // 使える縦幅を全行へ均等に配るため、人数が多いときは行が詰まり、
                 // 少ないときは行と文字が大きくなって、表の下に大きな余白が残らない。
-                const noteH = 32;
-                const tableBottom = PH - M - noteH;
+                const tableBottom = PH - M;
                 const nRows = rows.length + 1; // 見出し行＋データ行
                 // 行の高さに上限は設けない：使える縦幅を全行へ均等に配り切るので、
                 // 3名以下のように人数が少ないときも表がページ下端まで届き、
@@ -6246,13 +6251,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const rowH = (tableBottom - y) / nRows;
                 const bodyFont = Math.max(6.8, Math.min(30, rowH * 0.40));
                 const headFont = Math.max(6.5, Math.min(22, bodyFont - 1));
-                // 列幅：順位・背番号・平均点は固定幅、残りを選手名とデータ列で配分
-                const colRank = 32, colNo = 40, colAvg = isOverall ? 52 : 46;
-                const dataCount = headers.length - 4;
+                // 列幅：順位・平均点は固定幅、残りを選手名とデータ列で配分
+                const colRank = 32, colAvg = isOverall ? 52 : 46;
+                const dataCount = headers.length - 3;
                 const nameWeight = 1.05, dataWeight = isOverall ? 0.62 : 1.2;
-                const restW = CW - colRank - colNo - colAvg;
+                const restW = CW - colRank - colAvg;
                 const unit = restW / (nameWeight + dataWeight * Math.max(1, dataCount));
-                const colW = [colRank, colNo, unit * nameWeight, colAvg];
+                const colW = [colRank, unit * nameWeight, colAvg];
                 for (let i = 0; i < dataCount; i++) colW.push(unit * dataWeight);
                 const colX = [M];
                 for (let i = 0; i < colW.length; i++) colX.push(colX[i] + colW[i]);
@@ -6275,37 +6280,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     ctx.fillStyle = r.rank === 1 ? '#ea580c' : (r.rank <= 3 ? '#c2410c' : '#475569');
                     ctx.textAlign = 'center';
                     ctx.fillText(String(r.rank), colX[0] + colW[0] / 2, cy);
-                    // 背番号
-                    ctx.font = '700 ' + bodyFont + 'px ' + FONT;
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.fillText(r.player && r.player.number ? String(r.player.number) : '', colX[1] + colW[1] / 2, cy);
-                    // 選手名（学年カラーの色丸＋氏名）
-                    let nx = colX[2] + 4;
+                    // 選手名（文字色は学年カラー。未設定なら通常色）
                     const gc = GRADE_COLOR_META[normalizeGradeColor(r.player ? r.player.gradeColor : '')];
-                    if (gc) {
-                        const dotR = Math.max(3.1, Math.min(8, rowH * 0.10));
-                        ctx.beginPath();
-                        ctx.arc(nx + dotR, cy, dotR, 0, Math.PI * 2);
-                        ctx.fillStyle = gc.hex;
-                        ctx.fill();
-                        ctx.lineWidth = 0.6;
-                        ctx.strokeStyle = 'rgba(15,23,42,.25)';
-                        ctx.stroke();
-                        nx += dotR * 2 + 3.3;
-                    }
                     ctx.font = '800 ' + bodyFont + 'px ' + FONT;
-                    ctx.fillStyle = '#0f172a';
+                    ctx.fillStyle = gc ? gc.hex : '#0f172a';
                     ctx.textAlign = 'left';
-                    ctx.fillText(__pdfFitText(ctx, r.name, colX[2] + colW[2] - (nx - colX[2]) - 3), nx, cy);
+                    ctx.fillText(__pdfFitText(ctx, r.name, colW[1] - 7), colX[1] + 4, cy);
                     // 平均点
                     ctx.font = '800 ' + (bodyFont + 2) + 'px ' + FONT;
                     ctx.fillStyle = '#0f172a';
                     ctx.textAlign = 'center';
-                    ctx.fillText(fmtScore(r.avg) + '点', colX[3] + colW[3] / 2, cy);
+                    ctx.fillText(fmtScore(r.avg) + '点', colX[2] + colW[2] / 2, cy);
                     // データ列
                     const cells = dataOf(r);
                     cells.forEach((c, i) => {
-                        const cx = colX[4 + i], w = colW[4 + i];
+                        const cx = colX[3 + i], w = colW[3 + i];
                         ctx.textAlign = 'left';
                         if (!c.score) {
                             ctx.font = '400 ' + bodyFont + 'px ' + FONT;
@@ -6352,19 +6341,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 colX.forEach(x => {
                     ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + rowH * nRows); ctx.stroke();
                 });
-                // --- 注記（本文幅で折り返し） ---
-                ctx.font = '400 8px ' + FONT;
-                ctx.fillStyle = '#64748b';
-                const noteLines = [];
-                let line = '';
-                for (let i = 0; i < note.length; i++) {
-                    if (line && ctx.measureText(line + note[i]).width > CW) { noteLines.push(line); line = ''; }
-                    line += note[i];
-                }
-                if (line) noteLines.push(line);
-                // 注記は表のすぐ下に置く（表がページを埋める場合は従来どおりの位置になる）
-                const noteY = y + rowH * nRows;
-                noteLines.slice(0, 3).forEach((ln, i) => ctx.fillText(ln, M, noteY + 12 + i * 10.5));
                 // --- PDF化してその場でダウンロード ---
                 const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
                 if (!blob) throw new Error('pdf canvas failed');
@@ -6421,26 +6397,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 setupRankingSheet(sheetEl, 0, false);
                 return;
             }
-            const top = scored[0];
-            summaryEl.innerHTML = `
-                <div class="flex flex-wrap items-end gap-x-6 gap-y-2">
-                    <div>
-                        <p class="text-[11px] font-bold text-slate-500">1位</p>
-                        <p class="text-xl font-extrabold text-slate-900">${physicalEscapeHtml(top.name)}<span class="text-sm font-bold text-slate-500 ml-2">平均 ${fmtScore(top.avg)} 点</span></p>
-                    </div>
-                    <p class="text-xs text-slate-500 pb-1">${scored.length} / ${rows.length} 名がランクイン${fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : ''}</p>
-                </div>`;
+            summaryEl.innerHTML = '';
             const tests = rows[0].tests || [];
             const testColW = tests.length ? Math.max(10, Math.floor(57 / tests.length)) : 0;
-            const summaryHtml = '1位：<strong>' + physicalEscapeHtml(top.name) + '</strong>（平均 ' + fmtScore(top.avg) + ' 点） ― ' + scored.length + ' / ' + rows.length + ' 名がランクイン'
-                + (fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : '');
             const rowHtml = r => '<tr' + rankingRowClass(r) + '>'
                 + '<td class="c-rank">' + (r.rank != null ? r.rank + '位' : '―') + '</td>'
                 + '<td class="c-name">' + rankingNameCell(r) + '</td>'
                 + rankingAvgCell(r)
                 + r.tests.map(rankingTestCell).join('')
                 + '</tr>';
-            sheetEl.innerHTML = rankingSheetHead(cat + 'ランキング', summaryHtml)
+            sheetEl.innerHTML = rankingSheetHead(cat + 'ランキング')
                 + '<table class="ranking-table"><colgroup>'
                 + '<col style="width:8%"><col style="width:24%"><col style="width:11%">'
                 + tests.map(() => '<col style="width:' + testColW + '%">').join('')
@@ -6448,8 +6414,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 + tests.map(t => '<th>' + physicalEscapeHtml(t.def.name) + '</th>').join('')
                 + '</tr></thead><tbody>'
                 + rows.map(rowHtml).join('')
-                + '</tbody></table>'
-                + '<p class="ranking-doc-note">各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、このカテゴリの平均点で順位付けしています。未記録・未採点の選手は点数「―」で末尾に表示します。</p>';
+                + '</tbody></table>';
             setupRankingSheet(sheetEl, rows.length, true);
         }
 
@@ -6475,17 +6440,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 setupRankingSheet(sheetEl, 0, false);
                 return;
             }
-            const top = scored[0];
-            summaryEl.innerHTML = `
-                <div class="flex flex-wrap items-end gap-x-6 gap-y-2">
-                    <div>
-                        <p class="text-[11px] font-bold text-slate-500">1位</p>
-                        <p class="text-xl font-extrabold text-slate-900">${physicalEscapeHtml(top.name)}<span class="text-sm font-bold text-slate-500 ml-2">総合平均 ${fmtScore(top.avg)} 点</span></p>
-                    </div>
-                    <p class="text-xs text-slate-500 pb-1">${scored.length} / ${rows.length} 名がランクイン${fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : ''}</p>
-                </div>`;
-            const summaryHtml = '1位：<strong>' + physicalEscapeHtml(top.name) + '</strong>（総合平均 ' + fmtScore(top.avg) + ' 点） ― ' + scored.length + ' / ' + rows.length + ' 名がランクイン'
-                + (fitnessLineLabel(top.avg) ? '（1位は' + fitnessLineLabel(top.avg) + '相当）' : '');
+            summaryEl.innerHTML = '';
             const catCell = c => '<td class="c-test">' + (c.avg != null ? '<span class="score">' + fmtScore(c.avg) + '点</span>' : '―') + '</td>';
             const rowHtml = r => '<tr' + rankingRowClass(r) + '>'
                 + '<td class="c-rank">' + (r.rank != null ? r.rank + '位' : '―') + '</td>'
@@ -6493,7 +6448,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 + rankingAvgCell(r)
                 + r.catAvgs.map(catCell).join('')
                 + '</tr>';
-            sheetEl.innerHTML = rankingSheetHead('総合ランキング', summaryHtml)
+            sheetEl.innerHTML = rankingSheetHead('総合ランキング')
                 + '<table class="ranking-table"><colgroup>'
                 + '<col style="width:7%"><col style="width:20%"><col style="width:13%">'
                 + FITNESS_CATEGORIES.map(() => '<col style="width:10%">').join('')
@@ -6501,8 +6456,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 + FITNESS_CATEGORIES.map(c => '<th>' + physicalEscapeHtml(c) + '</th>').join('')
                 + '</tr></thead><tbody>'
                 + rows.map(rowHtml).join('')
-                + '</tbody></table>'
-                + '<p class="ranking-doc-note">各種目のベスト記録を、150キロライン＝6点〜115キロライン＝1点の基準で換算し、全種目の採点済み平均（総合平均点）で順位付けしています。各カテゴリの欄はそのカテゴリの平均点です。未記録・未採点の選手は点数「―」で末尾に表示します。</p>';
+                + '</tbody></table>';
             setupRankingSheet(sheetEl, rows.length, true);
         }
 
