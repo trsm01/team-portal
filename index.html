@@ -1078,10 +1078,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1140px]">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1060px]">
                     <thead>
                         <tr class="bg-slate-900 text-slate-200 font-semibold">
-                            <th class="py-2.5 px-3 text-center w-14">背番号</th>
                             <th class="py-2.5 px-3">選手名</th>
                             <th class="py-2.5 px-3 text-center w-28">投 (投球)</th>
                             <th class="py-2.5 px-3 text-center w-28">打 (打席)</th>
@@ -1113,10 +1112,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <p id="roster-import-summary" class="text-[13px] text-slate-600 mt-1 leading-relaxed"></p>
                 </div>
                 <div class="border border-slate-200 rounded-lg overflow-auto max-h-64">
-                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[780px]">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[700px]">
                         <thead>
                             <tr class="bg-slate-900 text-slate-200 font-semibold">
-                                <th class="py-2 px-3 text-center w-16">背番号</th>
                                 <th class="py-2 px-3">選手名</th>
                                 <th class="py-2 px-3 text-center w-16">投</th>
                                 <th class="py-2 px-3 text-center w-16">打</th>
@@ -3875,6 +3873,63 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const sel = document.getElementById(selId);
             const custom = document.getElementById(customId);
             if (custom) custom.classList.toggle('hidden', !sel || sel.value !== '__other__');
+            // 新規試合のスタメン選択では、公式戦のときだけ背番号プルダウンを出す
+            if (selId === 'setup-tournament') updateSetupUniformNumberVisibility();
+        }
+
+        // ================= 背番号（試合ごとに選択） =================
+        // 背番号は選手登録では持たず、試合のスタメン選択時に、その試合の
+        // 大会が練習試合以外の公式戦の場合だけプルダウン（1〜25）で選ぶ。
+        // 選んだ背番号は試合データ（gameState の選手）に保存され、
+        // ボックススコア等の表示はそちらを使う。
+        function isSetupTournamentOfficial() {
+            const sel = document.getElementById('setup-tournament');
+            return !!sel && sel.value !== '練習試合';
+        }
+
+        function updateSetupUniformNumberVisibility() {
+            const show = isSetupTournamentOfficial();
+            document.querySelectorAll('#modal-new-game-setup .setup-uniform-num').forEach(el => {
+                el.classList.toggle('hidden', !show);
+            });
+        }
+
+        // 背番号プルダウン（未選択＋1〜25）の選択肢HTML
+        function uniformNumberOptionsHtml(selected) {
+            let html = '<option value="">背番号</option>';
+            for (let n = 1; n <= 25; n++) {
+                html += `<option value="${n}"${String(selected) === String(n) ? ' selected' : ''}>${n}</option>`;
+            }
+            return html;
+        }
+
+        // 既存データに背番号（1〜25）があれば初期選択に使う。それ以外は未選択
+        function uniformNumberDefault(value) {
+            const n = parseInt(value, 10);
+            return (!isNaN(n) && n >= 1 && n <= 25 && String(n) === String(value).trim()) ? String(n) : '';
+        }
+
+        // スタメン選択で選手を選び直したら、その行の背番号プルダウンの
+        // 初期値を、選んだ選手の既存データの背番号に合わせる
+        function onSetupMyPlayerChange(idx) {
+            const playerSel = document.getElementById(`setup-my-player-${idx}`);
+            const numSel = document.getElementById(`setup-my-num-${idx}`);
+            if (!playerSel || !numSel) return;
+            const rosterSel = document.getElementById('setup-my-team-roster');
+            const roster = rosterSel ? globalTeamRosters[rosterSel.value] : null;
+            const p = roster ? roster.players.find(x => x.id === playerSel.value) : null;
+            numSel.value = p ? uniformNumberDefault(p.number) : '';
+        }
+
+        // DH使用時の投手欄で投手を選び直した場合も同様に合わせる
+        function onSetupMyPitcherChange() {
+            const playerSel = document.getElementById('setup-my-pitcher-player');
+            const numSel = document.getElementById('setup-my-pitcher-num');
+            if (!playerSel || !numSel) return;
+            const rosterSel = document.getElementById('setup-my-team-roster');
+            const roster = rosterSel ? globalTeamRosters[rosterSel.value] : null;
+            const p = roster ? roster.players.find(x => x.id === playerSel.value) : null;
+            numSel.value = p ? uniformNumberDefault(p.number) : '';
         }
 
         // プルダウンの選択から、保存する大会名文字列を組み立てる
@@ -7296,12 +7351,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const oppTwoWay = oppDHVal === '2';
 
             // 再描画（DH切り替え・チーム切替）前に、入力済みの値を保持する
-            const snap = { myPlayer: [], myPos: [], oppPos: [], oppNum: [], oppName: [], myPitcher: '', oppPitcherNum: '', oppPitcherName: '' };
+            const snap = { myPlayer: [], myPos: [], myNum: [], oppPos: [], oppNum: [], oppName: [], myPitcher: '', myPitcherNum: '', oppPitcherNum: '', oppPitcherName: '' };
             for (let i = 0; i < 9; i++) {
                 const mp = document.getElementById(`setup-my-player-${i}`);
                 if (mp) snap.myPlayer[i] = mp.value;
                 const mpos = document.getElementById(`setup-my-pos-${i}`);
                 if (mpos) snap.myPos[i] = mpos.value;
+                const mnum = document.getElementById(`setup-my-num-${i}`);
+                if (mnum) snap.myNum[i] = mnum.value;
                 const opos = document.getElementById(`setup-opp-pos-${i}`);
                 if (opos) snap.oppPos[i] = opos.value;
                 const onum = document.getElementById(`setup-opp-num-${i}`);
@@ -7311,6 +7368,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             const snapMyPitcherEl = document.getElementById('setup-my-pitcher-player');
             if (snapMyPitcherEl) snap.myPitcher = snapMyPitcherEl.value;
+            const snapMyPitcherNumEl = document.getElementById('setup-my-pitcher-num');
+            if (snapMyPitcherNumEl) snap.myPitcherNum = snapMyPitcherNumEl.value;
             const snapOppPNum = document.getElementById('setup-opp-pitcher-num');
             if (snapOppPNum) snap.oppPitcherNum = snapOppPNum.value;
             const snapOppPName = document.getElementById('setup-opp-pitcher-name');
@@ -7350,18 +7409,23 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (hasSnapMy && snap.myPos[i]) defaultPos = snap.myPos[i];
                 const selectedPlayer = myRoster.players.find(p => p.id === selectedPlayerId) || defaultPlayer;
                 const playerOptions = myRoster.players.map(p =>
-                    `<option value="${p.id}" ${selectedPlayer && p.id === selectedPlayer.id ? 'selected' : ''}>#${p.number} ${p.name} (${p.grade || ''}/${p.bats || ''}打)${cohortLabel(p.cohort) ? ' ' + cohortLabel(p.cohort) : ''}${gradeColorLabel(p.gradeColor) ? ' ' + gradeColorLabel(p.gradeColor) : ''}</option>`
+                    `<option value="${p.id}" ${selectedPlayer && p.id === selectedPlayer.id ? 'selected' : ''}>${p.name} (${p.grade || ''}/${p.bats || ''}打)${cohortLabel(p.cohort) ? ' ' + cohortLabel(p.cohort) : ''}${gradeColorLabel(p.gradeColor) ? ' ' + gradeColorLabel(p.gradeColor) : ''}</option>`
                 ).join('');
                 const posOptions = positions.map(pos =>
                     `<option value="${pos}" ${pos === defaultPos ? 'selected' : ''}>${pos}</option>`
                 ).join('');
+                // 背番号プルダウン（公式戦のみ表示。練習試合では出さない）
+                const showNum = isSetupTournamentOfficial();
+                let selectedNum = selectedPlayer ? uniformNumberDefault(selectedPlayer.number) : '';
+                if (hasSnapMy && snap.myNum[i] !== undefined) selectedNum = snap.myNum[i];
 
                 const row = document.createElement('div');
                 row.className = 'flex items-center gap-1.5 text-xs';
                 row.innerHTML = `
                     <span class="w-6 text-center font-extrabold text-indigo-900">${i + 1}番</span>
                     <select id="setup-my-pos-${i}" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptions}</select>
-                    <select id="setup-my-player-${i}" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${playerOptions}</select>
+                    <select id="setup-my-player-${i}" onchange="onSetupMyPlayerChange(${i})" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${playerOptions}</select>
+                    <select id="setup-my-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNum ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedNum)}</select>
                 `;
                 myContainer.appendChild(row);
             }
@@ -7380,13 +7444,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     let selectedPitcherId = pitcherDefault ? pitcherDefault.id : '';
                     if (snap.myPitcher && myRoster.players.some(p => p.id === snap.myPitcher)) selectedPitcherId = snap.myPitcher;
                     const pitcherOptions = myRoster.players.map(p =>
-                        `<option value="${p.id}" ${p.id === selectedPitcherId ? 'selected' : ''}>#${p.number} ${p.name} (${p.grade || ''}/${p.bats || ''}打)${cohortLabel(p.cohort) ? ' ' + cohortLabel(p.cohort) : ''}${gradeColorLabel(p.gradeColor) ? ' ' + gradeColorLabel(p.gradeColor) : ''}</option>`
+                        `<option value="${p.id}" ${p.id === selectedPitcherId ? 'selected' : ''}>${p.name} (${p.grade || ''}/${p.bats || ''}打)${cohortLabel(p.cohort) ? ' ' + cohortLabel(p.cohort) : ''}${gradeColorLabel(p.gradeColor) ? ' ' + gradeColorLabel(p.gradeColor) : ''}</option>`
                     ).join('');
+                    // 背番号プルダウン（公式戦のみ表示。練習試合では出さない）
+                    const showNumP = isSetupTournamentOfficial();
+                    const selectedPitcher = myRoster.players.find(p => p.id === selectedPitcherId);
+                    let selectedPitcherNum = selectedPitcher ? uniformNumberDefault(selectedPitcher.number) : '';
+                    if (snap.myPitcherNum) selectedPitcherNum = snap.myPitcherNum;
                     myPitcherArea.innerHTML = `
                         <div class="flex items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
                             <span class="shrink-0 text-center font-extrabold text-amber-900 leading-tight">10人目<br><span class="text-[9px] font-bold">打順なし</span></span>
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
-                            <select id="setup-my-pitcher-player" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${pitcherOptions}</select>
+                            <select id="setup-my-pitcher-player" onchange="onSetupMyPitcherChange()" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${pitcherOptions}</select>
+                            <select id="setup-my-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${showNumP ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedPitcherNum)}</select>
                         </div>
                         <p class="text-[10px] text-amber-800 font-bold mt-1">DH使用のため打順に入りません。打順に指名打者（指）を1人入れてください。</p>
                     `;
@@ -7461,6 +7531,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const oppTwoWay = oppDHVal === '2';
             const setupRuleModeEl = document.getElementById('setup-rule-mode');
             const setupRuleMode = setupRuleModeEl && setupRuleModeEl.value === 'relaxed' ? 'relaxed' : 'strict';
+            // 背番号プルダウンは公式戦（練習試合以外）のときだけ有効。選んだ背番号を試合データに保存する
+            const officialSetup = isSetupTournamentOfficial();
 
             // DH使用時の入力チェック（自チーム）：打順に「指」が1人いること、
             // 投手欄の選手が打順と重複していないこと、打順に投手が入っていないこと
@@ -7527,11 +7599,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const pos = document.getElementById(`setup-my-pos-${i}`).value;
                 const masterP = myRoster.players.find(p => p.id === selectedId) || myRoster.players[0];
                 if (masterP) selectedMasterIds.add(masterP.id);
+                const numSelEl = document.getElementById(`setup-my-num-${i}`);
+                const chosenNum = officialSetup && numSelEl ? numSelEl.value : '';
                 myPlayers.push({
                     id: `${mySide}_p_${i + 1}_${Date.now()}`,
                     order: i + 1,
                     pos: pos,
-                    number: masterP ? masterP.number : String(i + 1),
+                    number: chosenNum || (masterP ? masterP.number : String(i + 1)),
                     name: masterP ? masterP.name : `選手${i + 1}`,
                     cohort: masterP && masterP.cohort != null ? masterP.cohort : '',
                     gradeColor: masterP ? normalizeGradeColor(masterP.gradeColor) : '',
@@ -7541,11 +7615,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             if (myDH && myPitcherMaster) {
                 selectedMasterIds.add(myPitcherMaster.id);
+                const pitcherNumSelEl = document.getElementById('setup-my-pitcher-num');
+                const chosenPitcherNum = officialSetup && pitcherNumSelEl ? pitcherNumSelEl.value : '';
                 myPlayers.push({
                     id: `${mySide}_p_10_${Date.now()}`,
                     order: 10,
                     pos: '投',
-                    number: myPitcherMaster.number || '',
+                    number: chosenPitcherNum || myPitcherMaster.number || '',
                     name: myPitcherMaster.name,
                     cohort: myPitcherMaster.cohort != null ? myPitcherMaster.cohort : '',
                     gradeColor: normalizeGradeColor(myPitcherMaster.gradeColor),
@@ -7761,7 +7837,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (!settingsShowAllYears && !isPlayerInSelectedYear(p)) return;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="py-2 px-3 text-center"><input type="text" value="${p.number}" onchange="updateMasterPlayer(${idx}, 'number', this.value)" class="w-14 text-center border border-slate-200 rounded py-1 font-mono text-xs"></td>
                     <td class="py-2 px-3"><span class="flex items-center">${gradeColorDotHtml(p.gradeColor)}<input type="text" value="${p.name}" onchange="updateMasterPlayer(${idx}, 'name', this.value)" class="flex-1 min-w-0 border border-slate-200 rounded px-2 py-1 font-bold text-xs"></span></td>
                     <td class="py-2 px-3 text-center">
                         <select onchange="updateMasterPlayer(${idx}, 'throws', this.value)" class="border border-slate-200 rounded px-2 py-1 text-xs">
@@ -7918,7 +7993,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 id: `${currentSettingsTeam}_p_${Date.now()}`,
                 order: newOrder <= 9 ? newOrder : 0,
                 pos: newOrder === 1 ? '投' : (newOrder === 2 ? '捕' : '外'),
-                number: String(newOrder + 10),
+                // 背番号は選手登録では持たない（試合ごとにスタメン選択時に選ぶ）。項目自体は互換のため残す
+                number: '',
                 name: `新規選手${newOrder}`,
                 throws: '右',
                 bats: '右',
@@ -8034,6 +8110,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
         // シートの2次元配列 → 選手リスト。見出し行があれば列を自動判別し、
         // 無ければ「背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー・入学年度」の順とみなす。
+        // 背番号は選手登録では扱わないため、列があっても読み飛ばす（列位置の判別と
+        // 重複チェックのためにだけ内部で読み、登録データには保存しない）。
         function __parseRosterAoa(aoa) {
             const aliases = {
                 number: ['背番号', '番号', '背番', '選手番号', 'No'],
@@ -8096,7 +8174,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (!nameRaw) { skipped.push((r + 1) + '行目：選手名が空のため読み込めませんでした'); continue; }
                 const number = __rosterNormNumber(get(colMap.number));
                 const key = nameRaw + '|' + number;
-                if (seen[key]) { skipped.push((r + 1) + '行目：' + nameRaw + '（同じ選手名・背番号がファイル内で重複）'); continue; }
+                if (seen[key]) { skipped.push((r + 1) + '行目：' + nameRaw + '（同じ選手名がファイル内で重複）'); continue; }
                 seen[key] = true;
                 const heightRaw = String(get(colMap.height) === null || get(colMap.height) === undefined ? '' : get(colMap.height)).trim();
                 const height = __rosterNormHeight(get(colMap.height));
@@ -8133,7 +8211,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         showToast(changed ? ('チーム名を「' + parsed.teamName + '」に登録しました（スコアブック・体力測定にも反映されます）') : 'チーム名は現在の登録と同じでした', 'success');
                         return;
                     }
-                    showToast('選手データを読み取れませんでした。「背番号・選手名・投・打・学年」の列があるか確認してください。迷ったら「ひな型Excelをダウンロード」のひな型をお使いください', 'warning');
+                    showToast('選手データを読み取れませんでした。「選手名・投・打・学年」の列があるか確認してください。迷ったら「ひな型Excelをダウンロード」のひな型をお使いください', 'warning');
                     return;
                 }
                 __showRosterImportModal(parsed, file.name);
@@ -8174,7 +8252,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             document.getElementById('roster-import-summary').textContent = '「' + fileName + '」から ' + parsed.players.length + ' 名の選手を読み取りました。内容を確認して、登録方法を選んでください。' +
                 (parsed.teamName ? (' ファイルにチーム名「' + parsed.teamName + '」が含まれているため、チーム名も一緒に登録されます。') : '');
             document.getElementById('roster-import-preview-tbody').innerHTML = parsed.players.map(p => '<tr>' +
-                '<td class="py-1.5 px-3 text-center font-mono">' + __excelEscapeHtml(p.number || '-') + '</td>' +
                 '<td class="py-1.5 px-3 font-bold">' + __excelEscapeHtml(p.name) + '</td>' +
                 '<td class="py-1.5 px-3 text-center">' + p.throws + '投</td>' +
                 '<td class="py-1.5 px-3 text-center">' + p.bats + '打</td>' +
@@ -8209,7 +8286,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     id: currentSettingsTeam + '_p_' + stamp + '_' + i,
                     order: i < 9 ? i + 1 : 0,
                     pos: p.pos || defaultPos(i),
-                    number: p.number,
+                    // 背番号は選手登録では持たない（ファイルに列があっても保存しない）
+                    number: '',
                     name: p.name,
                     throws: p.throws,
                     bats: p.bats,
@@ -8236,7 +8314,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     id: currentSettingsTeam + '_p_' + stamp + '_' + i,
                     order: 0,
                     pos: p.pos || '外',
-                    number: p.number,
+                    // 背番号は選手登録では持たない（ファイルに列があっても保存しない）
+                    number: '',
                     name: p.name,
                     throws: p.throws,
                     bats: p.bats,
@@ -8260,7 +8339,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // 空のひな型Excelをダウンロードする。ひな型のまま入力して
         // 「Excelで読み込み」から読み込めば、チーム名＋選手をまとめて登録できる。
         // 1枚目「選手登録ひな型」が読み込み対象シート（読み込みは先頭シートのみ読むため、
-        // 入力方法シートは2枚目に置く）。記入例の行は背番号を「※例」から始めることで
+        // 入力方法シートは2枚目に置く）。記入例の行は選手名を「※例」から始めることで
         // 読み込み時に自動で除外される（__parseRosterAoa の注記行スキップを利用）。
         function downloadRosterBlankTemplate() {
             const tData = globalTeamRosters[currentSettingsTeam];
@@ -8268,15 +8347,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ['選手登録ひな型（チーム名・選手一括登録用）'],
                 ['チーム名', tData.name, '※ チーム名を登録・変更したい場合は、この行のチーム名（B列）を書き換えてください。読み込むとチーム名も一緒に登録されます。この行と見出し行は消さないでください'],
                 [],
-                ['背番号', '選手名', '投', '打', '学年', '守備位置', '身長', '何期生', '学年カラー', '入学年度'],
-                ['※例1', '山田 太郎', '右投', '右打', '3年', '投', 175, 71, '青', 2024],
-                ['※例2', '佐藤 次郎', '左投', '左打', '2年', '捕', 168, 72, '赤', 2025],
-                ['※例3', '鈴木 三郎', '右投', '両打', '1年', '外', 180, 73, '緑', 2026]
+                ['選手名', '投', '打', '学年', '守備位置', '身長', '何期生', '学年カラー', '入学年度'],
+                ['※例1 山田 太郎', '右投', '右打', '3年', '投', 175, 71, '青', 2024],
+                ['※例2 佐藤 次郎', '左投', '左打', '2年', '捕', 168, 72, '赤', 2025],
+                ['※例3 鈴木 三郎', '右投', '両打', '1年', '外', 180, 73, '緑', 2026]
             ];
-            for (let i = 0; i < 25; i++) sheet1.push(['', '', '', '', '', '', '', '', '', '']);
+            for (let i = 0; i < 25; i++) sheet1.push(['', '', '', '', '', '', '', '', '']);
             sheet1.push([]);
-            sheet1.push(['※ 記入例の行（背番号が「※例」から始まる行）は読み込まれません。例を参考に、空の行へ実際の選手を1行に1名ずつ入力してください。例の行は消しても構いません。']);
-            sheet1.push(['※ 投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。背番号は空欄でも登録できますが、選手名は必須です。身長はcm単位の数値（例：175）で入力してください。空欄でも登録できます。何期生は数字（例：72）で入力してください（「72期生」という表記でも判別します）。学年カラーは 青・赤・緑 のいずれかで入力してください。どちらも空欄でも登録できます。入学年度は西暦（例：2025）で入力してください。ログイン時に選んだ年度 − 入学年度 ＋ 1 がその年度の学年になり、1〜3年生の選手が表示対象になります（空欄でも登録できます）。']);
+            sheet1.push(['※ 記入例の行（選手名が「※例」から始まる行）は読み込まれません。例を参考に、空の行へ実際の選手を1行に1名ずつ入力してください。例の行は消しても構いません。']);
+            sheet1.push(['※ 投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。選手名は必須です。身長はcm単位の数値（例：175）で入力してください。空欄でも登録できます。何期生は数字（例：72）で入力してください（「72期生」という表記でも判別します）。学年カラーは 青・赤・緑 のいずれかで入力してください。どちらも空欄でも登録できます。入学年度は西暦（例：2025）で入力してください。ログイン時に選んだ年度 − 入学年度 ＋ 1 がその年度の学年になり、1〜3年生の選手が表示対象になります（空欄でも登録できます）。']);
             sheet1.push(['※ 入力が終わったらファイルを保存し、チーム設定画面で読み込み先のチームが選択されていることを確認してから「Excelで読み込み」でこのファイルを選んでください。「全員入れ替え」で登録すると先頭9名がスタメン（打順1〜9番）になります。詳しくは2枚目の「入力方法」シートをご覧ください。']);
             const sheet2 = [
                 ['ひな型の入力方法・記入例'],
@@ -8286,10 +8365,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 [],
                 ['手順1', 'チーム設定画面で、登録したいチーム（チームA／チームB）をプルダウンで選んでから「ひな型Excelをダウンロード」を押してください。ひな型は選んだチーム用です。もう一方のチーム分は、チームを切り替えて同じ手順を繰り返してください。'],
                 ['手順2', 'ひな型の1枚目「選手登録ひな型」シートを開き、2行目のチーム名を確認します（変更する場合はB列を書き換えます）。'],
-                ['手順3', '見出し行（背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー・入学年度）の下の空の行に、1行に1選手ずつ入力します。記入例の行は読み込まれないので、参考用に残しても消しても構いません。見出し行とチーム名の行は消さず、列の並びも変えないでください。'],
+                ['手順3', '見出し行（選手名・投・打・学年・守備位置・身長・何期生・学年カラー・入学年度）の下の空の行に、1行に1選手ずつ入力します。記入例の行は読み込まれないので、参考用に残しても消しても構いません。見出し行とチーム名の行は消さず、列の並びも変えないでください。'],
                 ['手順4', 'ファイルを保存し、チーム設定画面の「Excelで読み込み」からこのファイルを選ぶと、確認画面で読み込んだ内容をチェックしてから登録できます。'],
-                ['背番号', '半角数字で入力します（例：1、18）。空欄でも登録できます。'],
-                ['選手名', '必須です。空欄の行は読み込めません。同じ選手名・背番号の組み合わせがファイル内に重複していると、その行は読み込めません。'],
+                ['選手名', '必須です。空欄の行は読み込めません。同じ選手名がファイル内に重複していると、その行は読み込めません。'],
                 ['投', '右投／左投／両投 のいずれかで入力します（右・左・両 の1文字でも判別します）。'],
                 ['打', '右打／左打／両打 のいずれかで入力します（右・左・両 の1文字でも判別します）。'],
                 ['学年', '3年／2年／1年／他 のいずれかで入力します（3・2・1 の数字だけでも判別します）。'],
@@ -8316,14 +8394,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ['選手登録シート（' + tData.name + '）'],
                 ['出力日時: ' + __excelNowText()],
                 [],
-                ['背番号', '選手名', '投', '打', '学年', '守備位置', '身長', '何期生', '学年カラー', '入学年度']
+                ['選手名', '投', '打', '学年', '守備位置', '身長', '何期生', '学年カラー', '入学年度']
             ];
             tData.players.forEach(p => {
-                aoa.push([p.number, p.name, p.throws + '投', p.bats + '打', (p.grade === 'other' ? '他' : p.grade), p.pos || '', (p.height != null && p.height !== '' ? p.height : ''), (p.cohort != null && p.cohort !== '' ? p.cohort : ''), gradeColorLabel(p.gradeColor), (p.entryYear != null && p.entryYear !== '' ? p.entryYear : '')]);
+                aoa.push([p.name, p.throws + '投', p.bats + '打', (p.grade === 'other' ? '他' : p.grade), p.pos || '', (p.height != null && p.height !== '' ? p.height : ''), (p.cohort != null && p.cohort !== '' ? p.cohort : ''), gradeColorLabel(p.gradeColor), (p.entryYear != null && p.entryYear !== '' ? p.entryYear : '')]);
             });
             aoa.push([]);
             aoa.push(['※ このファイルを編集して、チーム設定画面の「Excelで読み込み」から読み込むと、選手を一括で登録できます。']);
-            aoa.push(['※ 見出し行（背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー・入学年度）は残したまま、選手の行を追加・編集・削除してください。投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。身長はcm単位の数値で入力してください（空欄でも登録できます）。何期生は数字（例：72）で、学年カラーは 青・赤・緑 のいずれかで入力してください（どちらも空欄でも登録できます）。入学年度は西暦（例：2025）で入力してください（空欄でも登録できます）。']);
+            aoa.push(['※ 見出し行（選手名・投・打・学年・守備位置・身長・何期生・学年カラー・入学年度）は残したまま、選手の行を追加・編集・削除してください。投は 右投／左投／両投、打は 右打／左打／両打、学年は 3年／2年／1年／他 のいずれかで入力してください。守備位置は 投・捕・一・二・三・遊・左・中・右・内・外 の1文字で入力します（空欄でも登録できます）。身長はcm単位の数値で入力してください（空欄でも登録できます）。何期生は数字（例：72）で、学年カラーは 青・赤・緑 のいずれかで入力してください（どちらも空欄でも登録できます）。入学年度は西暦（例：2025）で入力してください（空欄でも登録できます）。']);
             __downloadExcelWorkbook([{ name: '選手登録', aoa: aoa }], '選手登録_' + tData.name);
             showToast('現在の登録内容をExcelファイルでダウンロードしました', 'success');
         }
@@ -15466,6 +15544,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             changePhysicalFitnessMonth, syncPhysicalMonthFromDate,
             openDemoInsertModal, openDemoRemoveModal, insertDemoData, removeDemoData, updateDemoDataStatus,
             renderNewGameLineupRows, resetCount, resetWizard,
+            onTournamentSelectChange, onSetupMyPlayerChange, onSetupMyPitcherChange,
             resumeCurrentGameFromHome, saveAndRender, saveGameInfo,
             saveTeamNameSettings, selectKDetail, selectKDetailCause, selectKBatterTarget,
             confirmKDetail, backToStrikeoutType, selectOffensePinchRunnerTarget,
