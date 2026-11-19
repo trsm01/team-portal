@@ -1073,9 +1073,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
             </div>
             <input type="file" id="roster-excel-file" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleRosterExcelFile(this)">
-            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">Excel登録は「ひな型Excel」の利用がおすすめです。列：背番号・選手名・投・打・学年・守備位置・身長・何期生・学年カラー・入学年度。何期生は数字（例：72）、学年カラーは青・赤・緑のいずれかで入力します（どちらも空欄可）。入学年度は西暦（例：2025）で入力します。選択中の年度 − 入学年度 ＋ 1 がその年度の学年になり、1〜3年生の選手が表示対象になります（空欄でも登録できます）。</p>
             <div class="flex flex-wrap items-center gap-2">
-                <span id="settings-year-filter-info" class="text-xs font-bold text-slate-600"></span>
                 <button id="settings-year-filter-btn" onclick="toggleSettingsShowAllYears()" class="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded-lg text-xs font-bold transition">対象外の選手も表示</button>
             </div>
 
@@ -1197,7 +1195,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div id="physical-personal" class="hidden space-y-6">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-5">
                 <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
-                    <i data-lucide="trending-up" class="w-5 h-5 text-orange-600"></i>個人記録の確認
+                    <i data-lucide="trending-up" class="w-5 h-5 text-orange-600"></i>個人記録の推移
                 </h3>
                 <div class="flex flex-wrap items-end gap-x-5 gap-y-3">
                     <div class="flex items-end gap-2">
@@ -1301,7 +1299,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div id="physical-compare" class="hidden space-y-6">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-5">
                 <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
-                    <i data-lucide="users" class="w-5 h-5 text-orange-600"></i>個人記録の比較
+                    <i data-lucide="users" class="w-5 h-5 text-orange-600"></i>記録の個人間比較
                 </h3>
                 <div>
                     <p class="text-[11px] font-bold text-slate-500 mb-1.5">比較する選手</p>
@@ -3054,7 +3052,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <li>試合データ：デモの試合4試合を蓄積アーカイブに追加（打者成績・投手成績が表示されます）</li>
                     <li>体力測定：6カテゴリ・17種目×3か月分の記録を追加</li>
                 </ul>
-                <p class="text-xs text-slate-500">今ある本物の記録は上書き・削除しません。デモデータは後から「デモデータを消す」でデモ分だけ削除できます。体力測定の総合評価と個人記録の確認は選択中の選手だけを表示する画面のため、投入後はデモ選手1を選択した状態で表示されます。</p>
+                <p class="text-xs text-slate-500">今ある本物の記録は上書き・削除しません。デモデータは後から「デモデータを消す」でデモ分だけ削除できます。体力測定の総合評価と個人記録の推移は選択中の選手だけを表示する画面のため、投入後はデモ選手1を選択した状態で表示されます。</p>
             </div>
             <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end space-x-2">
                 <button onclick="closeModal('modal-demo-insert')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
@@ -4346,7 +4344,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             // 最上部の「体力測定」の横に、開いている画面を括弧書きで示す（メニュー選択では何も出さない）
             const headingCat = document.getElementById('physical-heading-category');
             if (headingCat) {
-                headingCat.textContent = inOverall ? '（総合評価）' : inPersonal ? '（個人記録の確認）' : inCompare ? '（個人記録の比較）' : inRankingHub ? '（各カテゴリーランキング）' : inRanking ? '（' + (physicalRankingCategory || '') + 'ランキング）' : inInput ? '（記録入力）' : '';
+                headingCat.textContent = inOverall ? '（総合評価）' : inPersonal ? '（個人記録の推移）' : inCompare ? '（記録の個人間比較）' : inRankingHub ? '（各カテゴリーランキング）' : inRanking ? '（' + (physicalRankingCategory || '') + 'ランキング）' : inInput ? '（記録入力）' : '';
             }
         }
 
@@ -5647,7 +5645,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <i data-lucide="trending-up" class="w-7 h-7"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-orange-700 transition">個人記録の確認</h3>
+                            <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-orange-700 transition">個人記録の推移</h3>
                             <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">カテゴリー平均と各種目の推移をタブで確認</p>
                         </div>
                     </div>
@@ -5664,7 +5662,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <i data-lucide="users" class="w-7 h-7"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-orange-700 transition">個人記録の比較</h3>
+                            <h3 class="text-xl font-extrabold text-slate-900 group-hover:text-orange-700 transition">記録の個人間比較</h3>
                             <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">複数選手の推移を色分けして重ね、目標ラインと比べて確認</p>
                         </div>
                     </div>
@@ -7639,15 +7637,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 summaryEl.textContent = `自チーム ${t.name}：${(t.players || []).length}名登録`;
             }
 
-            // 年度フィルタ情報：選択中の年度の対象人数と、対象外も表示する切替ボタン
-            const yearInfoEl = document.getElementById('settings-year-filter-info');
+            // 年度フィルタ：対象外も表示する切替ボタン
             const yearBtnEl = document.getElementById('settings-year-filter-btn');
-            const inYearCount = (tData.players || []).filter(p => isPlayerInSelectedYear(p)).length;
-            if (yearInfoEl) {
-                yearInfoEl.textContent = selectedFiscalYear
-                    ? (selectedFiscalYear + '年度の表示対象：' + inYearCount + '名／全' + (tData.players || []).length + '名（入学年度が未入力の選手は常に対象）')
-                    : ('登録選手：' + (tData.players || []).length + '名');
-            }
             if (yearBtnEl) {
                 yearBtnEl.textContent = settingsShowAllYears ? '年度の対象だけ表示' : '対象外の選手も表示';
             }
@@ -15267,7 +15258,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             try { updateHomeScreenUI(); } catch (e) { /* 画面更新の失敗で投入結果の通知を止めない */ }
             updateDemoDataStatus();
             if (addedPlayers + addedGames + addedFitness === 0) {
-                showToast('デモデータはすでに入っています。体力測定ではデモ選手1を選択した状態で総合評価・個人記録の確認が表示されます', 'info');
+                showToast('デモデータはすでに入っています。体力測定ではデモ選手1を選択した状態で総合評価・個人記録の推移が表示されます', 'info');
             } else {
                 showToast('デモデータを入れました（選手' + addedPlayers + '名・試合' + addedGames + '試合・体力測定' + addedFitness + '件）', 'success');
             }
