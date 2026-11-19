@@ -221,6 +221,236 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             #screen-team-settings input, #screen-team-settings select,
             [id^="modal-"] input, [id^="modal-"] select, [id^="modal-"] textarea { font-size: 16px; }
         }
+
+        /* ============================================================
+           スタイリッシュ・テーマ（2026-11-19 全体リデザイン）
+           - 構成・文言・機能はそのままに、色味／形状／質感だけを刷新
+           - 基調は深いネイビー＋白。セクション色（緑=スコアブック／
+             オレンジ=体力測定／青=チーム設定）は従来どおり維持し、
+             グラデーションと柔らかい影で立体感を持たせた
+           ============================================================ */
+        :root {
+            --ink-900: #0a1322;
+            --ink-800: #12203a;
+            --ink-700: #1d3357;
+            --line-soft: #e2e8f2;
+            --accent-green: #059669;
+            --accent-orange: #ea580c;
+            --accent-blue: #2563eb;
+        }
+
+        /* --- 背景：ごく淡いグラデーション＋セクション色の気配 --- */
+        body {
+            background-color: #edf1f6;
+            background-image:
+                radial-gradient(560px 300px at 8% -60px, rgba(16, 185, 129, 0.10), rgba(16, 185, 129, 0) 70%),
+                radial-gradient(620px 320px at 96% -80px, rgba(37, 99, 235, 0.09), rgba(37, 99, 235, 0) 70%),
+                radial-gradient(700px 380px at 50% 115%, rgba(249, 115, 22, 0.06), rgba(249, 115, 22, 0) 70%),
+                linear-gradient(180deg, #f8fafc 0%, #edf1f6 340px);
+            background-attachment: fixed;
+        }
+        ::selection { background: #a7f3d0; }
+
+        /* --- 角の丸み：全体を一段柔らかくモダンに --- */
+        [class*="rounded-2xl"] { border-radius: 20px; }
+        [class*="rounded-xl"] { border-radius: 16px; }
+        [class*="rounded-lg"] { border-radius: 11px; }
+
+        /* --- パネル／カード：二層の柔らかい影と淡い境界線 --- */
+        [class*="bg-white"][class*="shadow-sm"] {
+            border-color: var(--line-soft);
+            box-shadow: 0 1px 2px rgba(10, 19, 34, 0.05), 0 14px 34px -18px rgba(10, 19, 34, 0.22);
+        }
+        [class*="bg-white"][class*="shadow-md"] {
+            border-color: var(--line-soft);
+            box-shadow: 0 2px 4px rgba(10, 19, 34, 0.05), 0 20px 40px -18px rgba(10, 19, 34, 0.28);
+        }
+
+        /* --- 主要カラーのグラデーション化（ボタン／アイコンタイル／見出しバー） --- */
+        [class*="bg-emerald-600"]:not(tr) { background-image: linear-gradient(135deg, #10b981 0%, #059669 55%, #047857 100%); }
+        [class*="bg-emerald-700"]:not(tr) { background-image: linear-gradient(135deg, #059669 0%, #047857 60%, #065f46 100%); }
+        [class*="bg-emerald-800"]:not(tr) { background-image: linear-gradient(135deg, #047857 0%, #065f46 60%, #064e3b 100%); }
+        [class*="bg-emerald-900"]:not(tr) { background-image: linear-gradient(135deg, #065f46 0%, #064e3b 60%, #022c22 100%); }
+        [class*="bg-orange-600"]:not(tr) { background-image: linear-gradient(135deg, #fb923c 0%, #ea580c 55%, #c2410c 100%); }
+        [class*="bg-orange-500"]:not(tr) { background-image: linear-gradient(135deg, #fdba74 0%, #f97316 55%, #ea580c 100%); }
+        [class*="bg-blue-600"]:not(tr) { background-image: linear-gradient(135deg, #60a5fa 0%, #2563eb 55%, #1d4ed8 100%); }
+        [class*="bg-blue-700"]:not(tr) { background-image: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 60%, #1e40af 100%); }
+        [class*="bg-slate-900"]:not(tr):not(header) { background-image: linear-gradient(135deg, #1b2a47 0%, #0f172a 55%, #0a1322 100%); }
+        [class*="bg-slate-800"]:not(tr) { background-image: linear-gradient(135deg, #27364f 0%, #1e293b 60%, #16233a 100%); }
+        [class*="bg-rose-600"]:not(tr) { background-image: linear-gradient(135deg, #fb7185 0%, #e11d48 55%, #be123c 100%); }
+        [class*="bg-amber-500"]:not(tr) { background-image: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%); }
+        [class*="bg-amber-600"]:not(tr) { background-image: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%); }
+
+        /* --- ヘッダー：ネイビーのグラデーション＋下端に3色ライン --- */
+        header[class] {
+            background-color: var(--ink-900);
+            background-image: linear-gradient(100deg, #0a1322 0%, #14263f 52%, #0d2b23 130%);
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, #10b981 0%, #10b981 33%, #f97316 33%, #f97316 66%, #3b82f6 66%, #3b82f6 100%) 1;
+            box-shadow: 0 10px 30px -12px rgba(10, 19, 34, 0.55);
+        }
+        header [class*="bg-emerald-600"] {
+            border-radius: 12px;
+            box-shadow: 0 6px 16px -4px rgba(16, 185, 129, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+        header h1 { letter-spacing: 0.02em; }
+        header button[class] {
+            border-radius: 999px;
+            background-color: rgba(255, 255, 255, 0.07);
+            background-image: none;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: #e2e8f0;
+            backdrop-filter: blur(6px);
+            transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+        }
+        header button[class]:hover:not(:disabled) { background-color: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3); }
+        header button[class]:active:not(:disabled) { transform: scale(0.97); }
+        header button[id="btn-undo"] {
+            background-color: rgba(217, 119, 6, 0.92);
+            background-image: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+            border-color: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+        }
+        header button:disabled { opacity: 0.38; }
+
+        /* --- ボタン共通：滑らかな変化と押し感 --- */
+        button { transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease, opacity 0.18s ease; }
+        button:active:not(:disabled) { transform: scale(0.98); }
+        button[class*="bg-emerald-600"], button[class*="bg-blue-600"], button[class*="bg-orange-600"] {
+            box-shadow: 0 8px 18px -8px rgba(10, 19, 34, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+
+        /* --- ホーム：入口カードを「色の面」で魅せる --- */
+        #screen-home > div:first-child span {
+            background: #ffffff; color: #065f46; border: 1px solid #a7f3d0;
+            box-shadow: 0 6px 16px -8px rgba(6, 95, 70, 0.45);
+            letter-spacing: 0.14em; padding: 6px 14px;
+        }
+        #home-hub > div, #home-scorebook-menu [onclick] {
+            position: relative; overflow: hidden;
+            border-width: 1px; border-color: var(--line-soft);
+            box-shadow: 0 1px 2px rgba(10, 19, 34, 0.05), 0 18px 38px -20px rgba(10, 19, 34, 0.3);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        }
+        #home-hub > div::before, #home-scorebook-menu [onclick]::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+        #home-hub > div:nth-child(2)::before { background: linear-gradient(90deg, #fb923c, #ea580c); }
+        #home-hub > div:nth-child(3)::before { background: linear-gradient(90deg, #60a5fa, #2563eb); }
+        #home-scorebook-menu [onclick]::before { background: linear-gradient(90deg, #10b981, #059669); }
+        #home-hub > div:hover, #home-scorebook-menu [onclick]:hover { transform: translateY(-5px); }
+        #home-hub > div:nth-child(1):hover { box-shadow: 0 2px 4px rgba(10, 19, 34, 0.05), 0 26px 44px -18px rgba(5, 150, 105, 0.5); }
+        #home-hub > div:nth-child(2):hover { box-shadow: 0 2px 4px rgba(10, 19, 34, 0.05), 0 26px 44px -18px rgba(234, 88, 12, 0.5); }
+        #home-hub > div:nth-child(3):hover { box-shadow: 0 2px 4px rgba(10, 19, 34, 0.05), 0 26px 44px -18px rgba(37, 99, 235, 0.5); }
+        #home-scorebook-menu [onclick]:hover { box-shadow: 0 2px 4px rgba(10, 19, 34, 0.05), 0 26px 44px -18px rgba(5, 150, 105, 0.45); }
+        #home-hub [class*="w-14"], #home-scorebook-menu [class*="w-12"] {
+            border-radius: 18px;
+            box-shadow: 0 10px 20px -8px rgba(10, 19, 34, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+        #home-scorebook-menu [class*="w-12"] { border-radius: 15px; }
+
+        /* --- 体力測定：カテゴリカードもホームと同じ演出（オレンジ基調） --- */
+        #physical-category-grid > div {
+            position: relative; overflow: hidden;
+            border-width: 1px; border-color: var(--line-soft);
+            box-shadow: 0 1px 2px rgba(10, 19, 34, 0.05), 0 18px 38px -20px rgba(10, 19, 34, 0.3);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        }
+        #physical-category-grid > div::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+            background: linear-gradient(90deg, #fb923c, #ea580c);
+        }
+        #physical-category-grid > div:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 2px 4px rgba(10, 19, 34, 0.05), 0 26px 44px -18px rgba(234, 88, 12, 0.5);
+        }
+        #physical-category-grid [class*="w-14"] {
+            border-radius: 18px;
+            box-shadow: 0 10px 20px -8px rgba(10, 19, 34, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+
+        /* --- 入力欄：柔らかい面＋セクション色のフォーカスリング --- */
+        input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+        select, textarea {
+            border-radius: 12px;
+            border-color: #d3dce8;
+            background-color: #fcfdff;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+        }
+        input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):hover,
+        select:hover, textarea:hover { border-color: #aebdd2; }
+        input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.16);
+            background-color: #ffffff;
+        }
+        #screen-physical input:not([type="checkbox"]):not([type="radio"]):focus,
+        #screen-physical select:focus, #screen-physical textarea:focus {
+            border-color: var(--accent-orange); box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.16);
+        }
+        #screen-team-settings input:not([type="checkbox"]):not([type="radio"]):focus,
+        #screen-team-settings select:focus, #screen-team-settings textarea:focus {
+            border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.16);
+        }
+        select[class] {
+            appearance: none; -webkit-appearance: none;
+            padding-right: 2rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.6rem center;
+            background-size: 14px;
+        }
+        input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-green); }
+        #screen-physical input[type="checkbox"], #screen-physical input[type="radio"] { accent-color: var(--accent-orange); }
+        #screen-team-settings input[type="checkbox"], #screen-team-settings input[type="radio"] { accent-color: var(--accent-blue); }
+        label { letter-spacing: 0.02em; }
+
+        /* --- タブ：下線式からピル型セグメントへ --- */
+        #screen-scorebook nav { border-radius: 18px; padding-top: 6px; padding-bottom: 6px; gap: 4px; }
+        #screen-scorebook nav button { border-radius: 999px; padding-top: 9px; padding-bottom: 9px; }
+        #screen-scorebook nav button:hover { background-color: #f1f5f9; }
+        .tab-active {
+            border-bottom: none;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            box-shadow: 0 8px 16px -8px rgba(5, 150, 105, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        .tab-active [data-lucide], .tab-active svg { color: #ffffff !important; }
+        #screen-scorebook nav button.tab-active:hover { background-color: #059669; }
+
+        /* --- テーブル：見出しの質感と行ホバー --- */
+        thead th { letter-spacing: 0.05em; }
+        tbody tr { transition: background-color 0.14s ease; }
+        #view-boxscore tbody tr:hover > td { background-color: #f0fdf7; }
+        .overflow-x-auto { border-radius: 14px; }
+
+        /* --- モーダル：深い影・大きめの角・背景ぼかし --- */
+        [id^="modal-"] { backdrop-filter: blur(7px) saturate(1.15); -webkit-backdrop-filter: blur(7px) saturate(1.15); }
+        [id^="modal-"] > div {
+            border-radius: 24px;
+            box-shadow: 0 32px 64px -20px rgba(10, 19, 34, 0.5), 0 4px 12px rgba(10, 19, 34, 0.12);
+        }
+
+        /* --- 画面遷移：ふわりと現れる --- */
+        [id^="screen-"] { animation: sb-screen-in 0.3s ease both; }
+        /* 画面内のビュー切り替え（タブ・サブ画面など）でも同じ浮き上がりアニメーションを使う */
+        .sb-view-in { animation: sb-screen-in 0.3s ease both; }
+        @keyframes sb-screen-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+        /* --- スクロールバー --- */
+        ::-webkit-scrollbar { width: 9px; height: 9px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #b6c2d4; border-radius: 99px; border: 2px solid #edf1f6; }
+        ::-webkit-scrollbar-thumb:hover { background: #8fa1ba; }
+
+        @media (prefers-reduced-motion: reduce) {
+            [id^="screen-"], .sb-view-in { animation: none; }
+            #home-hub > div:hover, #home-scorebook-menu [onclick]:hover, #physical-category-grid > div:hover { transform: none; }
+            button:active:not(:disabled), header button[class]:active:not(:disabled) { transform: none; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
@@ -3364,6 +3594,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
         }
 
+        // ビュー切り替え時の「少し下からフェードイン」アニメーションを再生する共通処理。
+        // 対象要素が表示された直後に呼ぶと、クラスを付け直してアニメーションを最初から再生する。
+        // 再生が終わったらクラスを外し、次回の切り替えや親画面の表示切り替えに影響させない。
+        function playViewIn(el) {
+            if (!el) return;
+            el.classList.remove('sb-view-in');
+            void el.offsetWidth; // リフローを挟んでアニメーションを確実に再起動する
+            el.classList.add('sb-view-in');
+            el.addEventListener('animationend', function sbViewInEnd(ev) {
+                if (ev.target !== el || ev.animationName !== 'sb-screen-in') return;
+                el.classList.remove('sb-view-in');
+                el.removeEventListener('animationend', sbViewInEnd);
+            });
+        }
+
         function goBackScreen() {
             const prev = navHistoryStack.pop();
             if (!prev) { updateNavBackButtons(); return; }
@@ -3384,9 +3629,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     if (prev.oppTeam) {
                         selectedOpponentTeam = prev.oppTeam;
                         renderOpponentDetail();
+                        playViewIn(document.getElementById('opponents-detail-view'));
                     } else {
                         selectedOpponentTeam = null;
                         renderOpponentList();
+                        playViewIn(document.getElementById('opponents-list-view'));
                     }
                 }
             } finally {
@@ -3468,6 +3715,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const menu = document.getElementById('home-scorebook-menu');
             if (hub) hub.classList.remove('hidden');
             if (menu) menu.classList.add('hidden');
+            playViewIn(hub);
             scrollAppToTop();
         }
 
@@ -3481,6 +3729,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (hub) hub.classList.add('hidden');
             if (menu) menu.classList.remove('hidden');
             if (typeof lucide !== 'undefined') lucide.createIcons();
+            playViewIn(menu);
             scrollAppToTop();
         }
 
@@ -3513,6 +3762,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             physicalMode = 'view';
             renderPhysicalScreen();
             if (typeof lucide !== 'undefined') lucide.createIcons();
+            playViewIn(document.getElementById('physical-category-hub'));
             scrollAppToTop();
         }
 
@@ -3533,6 +3783,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             populatePhysicalFitnessTestSelect();
             renderPhysicalScreen();
             if (typeof lucide !== 'undefined') lucide.createIcons();
+            playViewIn(document.getElementById('physical-detail'));
             scrollAppToTop();
         }
 
@@ -3558,6 +3809,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             navPhysicalMode = targetMode;
             syncPhysicalModeUI();
             if (typeof lucide !== 'undefined') lucide.createIcons();
+            playViewIn(document.getElementById('physical-detail'));
             scrollAppToTop();
         }
 
@@ -5087,6 +5339,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             __setBranchButton(document.getElementById('btn-player-branch-pitcher'), playerStatsBranch === 'pitcher', 'bg-emerald-700');
             if (playerStatsBranch === 'pitcher') renderAggregatedPitcherStrikeStats();
             else renderAggregatedPlayerStats();
+            playViewIn(playerStatsBranch === 'pitcher' ? pitcherPanel : batterPanel);
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
@@ -5099,6 +5352,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             __setBranchButton(document.getElementById('btn-box-branch-batter'), boxscoreBranch === 'batter', 'bg-emerald-600');
             __setBranchButton(document.getElementById('btn-box-branch-pitcher'), boxscoreBranch === 'pitcher', 'bg-emerald-700');
             if (boxscoreBranch === 'pitcher' && typeof renderPitcherStrikeBoxscore === 'function') renderPitcherStrikeBoxscore();
+            playViewIn(boxscoreBranch === 'pitcher' ? pitcherPanel : batterPanel);
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
@@ -6181,6 +6435,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (!navRestoring) pushNavHistory();
             selectedOpponentTeam = rec.name;
             renderOpponentDetail();
+            playViewIn(document.getElementById('opponents-detail-view'));
             scrollAppToTop();
         }
 
@@ -6188,6 +6443,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (!navRestoring && navCurrentScreen === 'opponents' && selectedOpponentTeam) pushNavHistory();
             selectedOpponentTeam = null;
             renderOpponentList();
+            playViewIn(document.getElementById('opponents-list-view'));
             scrollAppToTop();
         }
 
@@ -10267,6 +10523,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 // 前回選んだ分岐（打者／投手）を維持する
                 try { switchBoxscoreBranch(boxscoreBranch); } catch (e) { /* 既定の打者表示のまま */ }
             }
+            playViewIn(document.getElementById(`view-${tabName}`));
             scrollAppToTop();
         }
 
@@ -10288,6 +10545,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 btnTable.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
                 renderInteractiveFieldMap();
             }
+            playViewIn(mode === 'table' ? tableContainer : fieldContainer);
         }
 
         function renderInteractiveFieldMap() {
