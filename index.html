@@ -1345,15 +1345,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <th class="py-2.5 px-3 text-center">打率</th>
                             <th class="py-2.5 px-3 text-center">長打率</th>
                             <th class="py-2.5 px-2 text-center">試合</th>
-                            <th class="py-2.5 px-2 text-center">打席</th>
-                            <th class="py-2.5 px-2 text-center">打数</th>
-                            <th class="py-2.5 px-2 text-center">安打</th>
-                            <th class="py-2.5 px-2 text-center">二塁打</th>
-                            <th class="py-2.5 px-2 text-center">三塁打</th>
                             <th class="py-2.5 px-2 text-center">本塁打</th>
-                            <th class="py-2.5 px-2 text-center">塁打</th>
-                            <th class="py-2.5 px-2 text-center">打点</th>
-                            <th class="py-2.5 px-2 text-center">得点</th>
                             <th class="py-2.5 px-2 text-center">三振</th>
                             <th class="py-2.5 px-2 text-center">四死球</th>
                             <th class="py-2.5 px-2 text-center">犠打飛</th>
@@ -1376,7 +1368,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1560px]">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1080px]">
                     <thead>
                         <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 font-semibold">
                             <th class="py-2.5 px-3">投手名</th>
@@ -1389,18 +1381,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <th class="py-2.5 px-3 text-center">IR率</th>
                             <th class="py-2.5 px-3 text-center">ERA</th>
                             <th class="py-2.5 px-2 text-center">投球回</th>
-                            <th class="py-2.5 px-2 text-center">対戦打者</th>
-                            <th class="py-2.5 px-2 text-center">被安打</th>
-                            <th class="py-2.5 px-2 text-center">奪三振</th>
                             <th class="py-2.5 px-2 text-center">与四球</th>
-                            <th class="py-2.5 px-2 text-center">失点</th>
-                            <th class="py-2.5 px-2 text-center">自責点</th>
-                            <th class="py-2.5 px-2 text-center">継承走者</th>
-                            <th class="py-2.5 px-2 text-center">継承生還</th>
-                            <th class="py-2.5 px-2 text-center">投球数</th>
-                            <th class="py-2.5 px-2 text-center">ストライク</th>
                             <th class="py-2.5 px-3 text-center">全体ストライク率</th>
-                            <th class="py-2.5 px-2 text-center">対象打席</th>
                             <th class="py-2.5 px-3 text-center">初球ストライク率</th>
                         </tr>
                     </thead>
@@ -1427,7 +1409,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <p id="team-stats-own-label" class="text-[13px] text-slate-600 mt-1 leading-relaxed">自チームのみ表示します。</p>
             </div>
             <div class="flex flex-wrap items-center gap-2 shrink-0">
-                <button onclick="exportTeamStatsExcel('all')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#107C41] hover:bg-[#0B5C2E] text-white text-xs font-bold transition shadow-sm" title="チーム成績（基本・打者・投手・1試合平均・カウント別）をExcelファイルでダウンロード">
+                <button onclick="exportTeamStatsExcel('all')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#107C41] hover:bg-[#0B5C2E] text-white text-xs font-bold transition shadow-sm" title="チーム成績（基本・打者・投手・1試合平均）をExcelファイルでダウンロード">
                     <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel出力（チーム成績）</span>
                 </button>
             </div>
@@ -1487,15 +1469,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <th class="py-2.5 px-3 text-center">打率</th>
                             <th class="py-2.5 px-3 text-center">長打率</th>
                             <th class="py-2.5 px-2 text-center">試合</th>
-                            <th class="py-2.5 px-2 text-center">打席</th>
-                            <th class="py-2.5 px-2 text-center">打数</th>
-                            <th class="py-2.5 px-2 text-center">安打</th>
-                            <th class="py-2.5 px-2 text-center">二塁打</th>
-                            <th class="py-2.5 px-2 text-center">三塁打</th>
                             <th class="py-2.5 px-2 text-center">本塁打</th>
-                            <th class="py-2.5 px-2 text-center">塁打</th>
-                            <th class="py-2.5 px-2 text-center">打点</th>
-                            <th class="py-2.5 px-2 text-center">得点</th>
                             <th class="py-2.5 px-2 text-center">三振</th>
                             <th class="py-2.5 px-2 text-center">四死球</th>
                             <th class="py-2.5 px-2 text-center">犠打飛</th>
@@ -1511,17 +1485,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             </div>
         </div>
 
-        <!-- 投手成績（チーム平均・通算）― K/BB・BB/K・WHIP・K/9・BB/9・IR率・ERA ＋ ストライク率（個人成績と同じ指標） -->
+        <!-- 投手成績（チーム平均・通算）― K/BB・BB/K・WHIP・K/9・BB/9・IR率・ERA ＋ 投球回・与四球（ストライク率系は個人成績の投手成績に掲載） -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="bg-emerald-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
                 <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>投手成績（チーム平均・通算）― K/BB・WHIP・防御率ほか</h3>
                 <div class="flex items-center gap-2">
                     <span class="text-[11px] text-slate-300">タップ：並び替え／長押し：指標の説明</span>
-                    <button onclick="exportTeamStatsExcel('pitcher')" class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 border border-white/25 text-white text-[11px] font-bold transition" title="投手成績（チーム平均）・カウント別・1試合平均をExcelでダウンロード"><i data-lucide="download" class="w-3.5 h-3.5"></i>Excel</button>
+                    <button onclick="exportTeamStatsExcel('pitcher')" class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 border border-white/25 text-white text-[11px] font-bold transition" title="投手成績（チーム平均）と1試合平均をExcelでダウンロード"><i data-lucide="download" class="w-3.5 h-3.5"></i>Excel</button>
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1500px]">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[860px]">
                     <thead>
                         <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 font-semibold">
                             <th class="py-2.5 px-3">チーム名</th>
@@ -1533,30 +1507,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <th class="py-2.5 px-3 text-center">IR率</th>
                             <th class="py-2.5 px-3 text-center">ERA</th>
                             <th class="py-2.5 px-2 text-center">投球回</th>
-                            <th class="py-2.5 px-2 text-center">対戦打者</th>
-                            <th class="py-2.5 px-2 text-center">被安打</th>
-                            <th class="py-2.5 px-2 text-center">奪三振</th>
                             <th class="py-2.5 px-2 text-center">与四球</th>
-                            <th class="py-2.5 px-2 text-center">失点</th>
-                            <th class="py-2.5 px-2 text-center">自責点</th>
-                            <th class="py-2.5 px-2 text-center">継承走者</th>
-                            <th class="py-2.5 px-2 text-center">継承生還</th>
-                            <th class="py-2.5 px-2 text-center">投球数</th>
-                            <th class="py-2.5 px-2 text-center">ストライク</th>
-                            <th class="py-2.5 px-3 text-center">全体ストライク率</th>
-                            <th class="py-2.5 px-2 text-center">対象打席</th>
-                            <th class="py-2.5 px-3 text-center">初球ストライク率</th>
                         </tr>
                     </thead>
                     <tbody id="aggregated-team-pitcher-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
                 </table>
             </div>
-            <div class="p-4 space-y-3 border-t border-slate-100">
-                <div class="flex flex-wrap items-center gap-2">
-                    <label for="filter-team-pitcher-strike" class="text-xs font-bold text-slate-600">カウント別ストライク率を見るチーム:</label>
-                    <select id="filter-team-pitcher-strike" onchange="renderAggregatedTeamPitcherDetail()" class="border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-50"></select>
-                </div>
-                <div id="aggregated-team-pitcher-detail" class="space-y-3"></div>
+            <div class="p-4 space-y-2 border-t border-slate-100">
                 <h4 class="text-xs font-bold text-slate-700">1試合平均（チーム平均）</h4>
                 <div id="aggregated-team-pitcher-pergame" class="space-y-2"></div>
             </div>
@@ -8542,7 +8499,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             });
 
             if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="26" class="py-8 text-center text-slate-400 font-sans">試合データがありません。</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="18" class="py-8 text-center text-slate-400 font-sans">試合データがありません。</td></tr>';
                 return;
             }
 
@@ -8563,15 +8520,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <td class="py-2.5 px-3 text-center font-extrabold text-slate-900">${fmtRate3(rt.avg)}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.slg)}</td>
                         <td class="py-2.5 px-2 text-center">${p.games}</td>
-                        <td class="py-2.5 px-2 text-center">${p.pa}</td>
-                        <td class="py-2.5 px-2 text-center">${p.ab}</td>
-                        <td class="py-2.5 px-2 text-center font-bold text-emerald-700">${p.h}</td>
-                        <td class="py-2.5 px-2 text-center">${p.b2}</td>
-                        <td class="py-2.5 px-2 text-center">${p.b3}</td>
                         <td class="py-2.5 px-2 text-center">${p.hr}</td>
-                        <td class="py-2.5 px-2 text-center">${rt.tb}</td>
-                        <td class="py-2.5 px-2 text-center font-bold">${p.rbi}</td>
-                        <td class="py-2.5 px-2 text-center">${p.r}</td>
                         <td class="py-2.5 px-2 text-center">${p.so}</td>
                         <td class="py-2.5 px-2 text-center">${p.bbHbp}</td>
                         <td class="py-2.5 px-2 text-center">${p.sacSf}</td>
@@ -8652,7 +8601,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (list.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="10" class="py-8 text-center text-slate-400 font-sans">試合データがありません。</td></tr>';
                 const emptyBatterTbody = document.getElementById('aggregated-team-batter-tbody');
-                if (emptyBatterTbody) emptyBatterTbody.innerHTML = '<tr><td colspan="25" class="py-8 text-center text-slate-400 font-sans">試合データがありません。</td></tr>';
+                if (emptyBatterTbody) emptyBatterTbody.innerHTML = '<tr><td colspan="17" class="py-8 text-center text-slate-400 font-sans">試合データがありません。</td></tr>';
                 const emptyBatterPg = document.getElementById('aggregated-team-batter-pergame');
                 if (emptyBatterPg) emptyBatterPg.innerHTML = '';
                 renderAggregatedTeamPitcherStats();
@@ -8698,15 +8647,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <td class="py-2.5 px-3 text-center font-extrabold text-slate-900">${fmtRate3(rt.avg)}</td>
                             <td class="py-2.5 px-3 text-center text-slate-700">${fmtRate3(rt.slg)}</td>
                             <td class="py-2.5 px-2 text-center">${t.games}</td>
-                            <td class="py-2.5 px-2 text-center">${t.pa}</td>
-                            <td class="py-2.5 px-2 text-center">${t.ab}</td>
-                            <td class="py-2.5 px-2 text-center font-bold text-emerald-700">${t.h}</td>
-                            <td class="py-2.5 px-2 text-center">${t.b2}</td>
-                            <td class="py-2.5 px-2 text-center">${t.b3}</td>
                             <td class="py-2.5 px-2 text-center">${t.hr}</td>
-                            <td class="py-2.5 px-2 text-center">${rt.tb}</td>
-                            <td class="py-2.5 px-2 text-center font-bold">${t.rbi}</td>
-                            <td class="py-2.5 px-2 text-center">${t.r}</td>
                             <td class="py-2.5 px-2 text-center">${t.so}</td>
                             <td class="py-2.5 px-2 text-center">${t.bbHbp}</td>
                             <td class="py-2.5 px-2 text-center">${t.sacSf}</td>
@@ -8722,14 +8663,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 batterPg.innerHTML = list.map(t => `
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700">
                         <span class="font-sans font-extrabold text-slate-900">${t.name}</span>
-                        <span>打席 <b class="font-mono text-slate-900">${pg(t.pa, t.games)}</b></span>
-                        <span>打数 <b class="font-mono text-slate-900">${pg(t.ab, t.games)}</b></span>
-                        <span>安打 <b class="font-mono text-slate-900">${pg(t.h, t.games)}</b></span>
-                        <span>二塁打 <b class="font-mono text-slate-900">${pg(t.b2, t.games)}</b></span>
-                        <span>三塁打 <b class="font-mono text-slate-900">${pg(t.b3, t.games)}</b></span>
                         <span>本塁打 <b class="font-mono text-slate-900">${pg(t.hr, t.games)}</b></span>
-                        <span>打点 <b class="font-mono text-slate-900">${pg(t.rbi, t.games)}</b></span>
-                        <span>得点 <b class="font-mono text-slate-900">${pg(t.r, t.games)}</b></span>
                         <span>三振 <b class="font-mono text-slate-900">${pg(t.so, t.games)}</b></span>
                         <span>四死球 <b class="font-mono text-slate-900">${pg(t.bbHbp, t.games)}</b></span>
                         <span>犠打飛 <b class="font-mono text-slate-900">${pg(t.sacSf, t.games)}</b></span>
@@ -8738,7 +8672,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 `).join('');
             }
 
-            // 投手成績（チーム平均・通算）― ストライク率
+            // 投手成績（チーム平均・通算）
             renderAggregatedTeamPitcherStats();
         }
 
@@ -8774,8 +8708,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function renderAggregatedTeamPitcherStats() {
             const tbody = document.getElementById('aggregated-team-pitcher-tbody');
             if (!tbody) return;
-            const detailEl = document.getElementById('aggregated-team-pitcher-detail');
-            const selectEl = document.getElementById('filter-team-pitcher-strike');
             const pergameEl = document.getElementById('aggregated-team-pitcher-pergame');
             const games = getArchivedGames().map(a => (a && a.data) ? a.data : null).filter(Boolean);
             const gamesMap = {};
@@ -8788,9 +8720,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             });
             teamPitcherGamesMap = gamesMap;
             // チーム成績の投手集計も自チームのみに絞る
-            const list = aggregateTeamPitcherStrikeStats(games).filter(st => isOwnTeamName(st.team));
-            teamPitcherStrikeCache = list;
-
             // 投手ライン（K/BB・WHIP・ERAなど7指標の土台）をチームごとに合算する
             const lineByTeam = {};
             aggregatePitcherLines(games).forEach(l => {
@@ -8799,18 +8728,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ['outs', 'bf', 'h', 'bb', 'so', 'r', 'er', 'ir', 'irs'].forEach(f => { t[f] += l[f] || 0; });
             });
             teamPitcherLineByTeam = lineByTeam;
-            const strikeByTeam = {};
-            list.forEach(st => { strikeByTeam[st.team] = st; });
-            const teamNames = Array.from(new Set([...Object.keys(lineByTeam), ...Object.keys(strikeByTeam)])).filter(n => isOwnTeamName(n));
-            const mergedRows = teamNames.map(team => ({ team: team, line: lineByTeam[team] || { outs: 0, bf: 0, h: 0, bb: 0, so: 0, r: 0, er: 0, ir: 0, irs: 0 }, strike: strikeByTeam[team] || null }));
-            mergedRows.sort((a, b) => ((b.strike ? b.strike.total : 0) - (a.strike ? a.strike.total : 0)) || (b.line.outs - a.line.outs));
+            const teamNames = Object.keys(lineByTeam).filter(n => isOwnTeamName(n));
+            const mergedRows = teamNames.map(team => ({ team: team, line: lineByTeam[team] }));
+            mergedRows.sort((a, b) => b.line.outs - a.line.outs);
 
             if (mergedRows.length === 0) {
                 tbody.innerHTML = games.length === 0
-                    ? '<tr><td colspan="22" class="py-8 text-center text-slate-400 font-sans">投球記録がありません。</td></tr>'
-                    : '<tr><td colspan="22" class="py-8 text-center text-slate-400 font-sans">投球記録のあるチームがありません。</td></tr>';
-                if (selectEl) selectEl.innerHTML = '';
-                if (detailEl) detailEl.innerHTML = '';
+                    ? '<tr><td colspan="10" class="py-8 text-center text-slate-400 font-sans">投球記録がありません。</td></tr>'
+                    : '<tr><td colspan="10" class="py-8 text-center text-slate-400 font-sans">投球記録のあるチームがありません。</td></tr>';
                 if (pergameEl) pergameEl.innerHTML = '';
                 return;
             }
@@ -8818,7 +8743,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             tbody.innerHTML = mergedRows.map(row => {
                 const L = row.line;
                 const rt = computePitcherRates(L);
-                const st = row.strike;
                 return `
                 <tr class="hover:bg-slate-50">
                     <td class="py-2.5 px-3 font-sans font-extrabold text-slate-900">${row.team}</td>
@@ -8830,64 +8754,30 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtPct1(rt.irPct)}</td>
                     <td class="py-2.5 px-3 text-center font-extrabold text-slate-900">${fmtDecimal2(rt.era)}</td>
                     <td class="py-2.5 px-2 text-center">${rt.ipText}</td>
-                    <td class="py-2.5 px-2 text-center">${L.bf}</td>
-                    <td class="py-2.5 px-2 text-center">${L.h}</td>
-                    <td class="py-2.5 px-2 text-center font-bold">${L.so}</td>
                     <td class="py-2.5 px-2 text-center">${L.bb}</td>
-                    <td class="py-2.5 px-2 text-center">${L.r}</td>
-                    <td class="py-2.5 px-2 text-center">${L.er}</td>
-                    <td class="py-2.5 px-2 text-center">${L.ir}</td>
-                    <td class="py-2.5 px-2 text-center">${L.irs}</td>
-                    <td class="py-2.5 px-2 text-center">${st ? st.total : '-'}</td>
-                    <td class="py-2.5 px-2 text-center">${st ? st.strikes : '-'}</td>
-                    <td class="py-2.5 px-3 text-center font-extrabold text-slate-900">${st ? fmtStrikeRate(st.strikes, st.total) : '-'}</td>
-                    <td class="py-2.5 px-2 text-center">${st ? st.firstPitchTotal : '-'}</td>
-                    <td class="py-2.5 px-3 text-center font-bold text-slate-800">${st ? fmtStrikeRate(st.firstPitchStrikes, st.firstPitchTotal) : '-'}</td>
                 </tr>
             `;
             }).join('');
             __restoreTableSort('aggregated-team-pitcher-tbody');
 
-            if (selectEl) {
-                const currentVal = selectEl.value;
-                selectEl.innerHTML = list.map((st, i) => `<option value="${i}">${st.team}</option>`).join('');
-                if (currentVal !== '' && list[Number(currentVal)]) selectEl.value = currentVal;
-            }
-            renderAggregatedTeamPitcherDetail();
-
             if (pergameEl) {
                 const pg = (v, g) => g > 0 ? (v / g).toFixed(1) : '-';
                 pergameEl.innerHTML = mergedRows.map(row => {
                     const g = teamPitcherGamesMap[row.team] || 0;
-                    const st = row.strike;
                     const L = row.line;
                     return `
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700">
                         <span class="font-sans font-extrabold text-slate-900">${row.team}</span>
-                        <span>被安打 <b class="font-mono text-slate-900">${pg(L.h, g)}</b></span>
-                        <span>奪三振 <b class="font-mono text-slate-900">${pg(L.so, g)}</b></span>
                         <span>与四球 <b class="font-mono text-slate-900">${pg(L.bb, g)}</b></span>
-                        <span>失点 <b class="font-mono text-slate-900">${pg(L.r, g)}</b></span>
-                        <span>自責点 <b class="font-mono text-slate-900">${pg(L.er, g)}</b></span>
-                        <span>投球数 <b class="font-mono text-slate-900">${st ? pg(st.total, g) : '-'}</b>球</span>
-                        <span>ストライク <b class="font-mono text-slate-900">${st ? pg(st.strikes, g) : '-'}</b>球</span>
-                        <span>対象打席 <b class="font-mono text-slate-900">${st ? pg(st.firstPitchTotal, g) : '-'}</b></span>
                     </div>
                     `;
                 }).join('');
             }
         }
 
-        function renderAggregatedTeamPitcherDetail() {
-            const detailEl = document.getElementById('aggregated-team-pitcher-detail');
-            if (!detailEl) return;
-            const selectEl = document.getElementById('filter-team-pitcher-strike');
-            const list = teamPitcherStrikeCache;
-            if (!list || list.length === 0) { detailEl.innerHTML = ''; return; }
-            const idx = selectEl ? (parseInt(selectEl.value, 10) || 0) : 0;
-            const st = list[Math.min(Math.max(idx, 0), list.length - 1)];
-            detailEl.innerHTML = st ? buildPitcherStrikeDetailHtml(st) : '';
-        }
+        // チーム成績にはストライク率系を表示しないため、チーム投手の詳細表示は行わない。
+        // （公開リスト互換のため関数名だけ残す）
+        function renderAggregatedTeamPitcherDetail() { return; }
 
         // ================= 他チーム情報一覧 =================
         // 対戦経歴のあるチーム（自チームとして登録されていないチーム）の一覧と、
@@ -13759,6 +13649,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             `;
         }
 
+        // 個人成績の投手詳細用：全体・初球ストライク率は上の投手成績表に
+        // WHIPなどの指標と並べて表示済みのため、ここではカウント別だけを返す（重複回避）。
+        function buildPitcherCountOnlyHtml(st) {
+            return `
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">カウント別ストライク率（${st.name}）</h4>
+                    ${buildCountStrikeTableHtml(st)}
+                </div>
+            `;
+        }
+
         // この試合の投手成績ライン（K/BB・BB/K・WHIP・K/9・BB/9・IR率・ERA）
         function renderPitcherLineBoxscore() {
             const wrap = document.getElementById('box-pitcher-line-body');
@@ -13856,8 +13757,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         // 通算の投手成績（選手成績画面：蓄積アーカイブから集計）
         // 7指標（K/BB・BB/K・WHIP・K/9・BB/9・IR率・ERA）を優先順位順に先頭へ置き、
-        // 後ろに合算系（投球回・対戦打者・被安打・奪三振・与四球・失点・自責点・継承）と
-        // ストライク率系（投球数・ストライク・全体／初球）を並べる。
+        // 後ろに投球回・与四球とストライク率系（全体／初球）を並べる。
+        // 対戦打者・被安打・奪三振・失点・自責点・継承走者・継承生還・投球数・ストライク・
+        // 対象打席などの合算系は表示しない（集計・保存データは従来どおり保持する）。
         function renderAggregatedPitcherStrikeStats() {
             const tbody = document.getElementById('aggregated-pitcher-tbody');
             if (!tbody) return;
@@ -13883,8 +13785,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
             if (rows.length === 0) {
                 tbody.innerHTML = (allStrike.length === 0 && allLines.length === 0)
-                    ? '<tr><td colspan="23" class="py-8 text-center text-slate-400 font-sans">投球記録がありません。</td></tr>'
-                    : '<tr><td colspan="23" class="py-8 text-center text-slate-400 font-sans">選択したチームの投手記録がありません。チームの絞り込みを変更してください。</td></tr>';
+                    ? '<tr><td colspan="13" class="py-8 text-center text-slate-400 font-sans">投球記録がありません。</td></tr>'
+                    : '<tr><td colspan="13" class="py-8 text-center text-slate-400 font-sans">選択したチームの投手記録がありません。チームの絞り込みを変更してください。</td></tr>';
                 if (selectEl) selectEl.innerHTML = '';
                 if (detailEl) detailEl.innerHTML = '';
                 return;
@@ -13906,18 +13808,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <td class="py-2.5 px-3 text-center text-slate-700">${fmtPct1(rt.irPct)}</td>
                     <td class="py-2.5 px-3 text-center font-extrabold text-slate-900">${fmtDecimal2(rt.era)}</td>
                     <td class="py-2.5 px-2 text-center">${rt.ipText}</td>
-                    <td class="py-2.5 px-2 text-center">${L.bf}</td>
-                    <td class="py-2.5 px-2 text-center">${L.h}</td>
-                    <td class="py-2.5 px-2 text-center font-bold">${L.so}</td>
                     <td class="py-2.5 px-2 text-center">${L.bb}</td>
-                    <td class="py-2.5 px-2 text-center">${L.r}</td>
-                    <td class="py-2.5 px-2 text-center">${L.er}</td>
-                    <td class="py-2.5 px-2 text-center">${L.ir}</td>
-                    <td class="py-2.5 px-2 text-center">${L.irs}</td>
-                    <td class="py-2.5 px-2 text-center">${st ? st.total : '-'}</td>
-                    <td class="py-2.5 px-2 text-center">${st ? st.strikes : '-'}</td>
                     <td class="py-2.5 px-3 text-center font-extrabold text-slate-900">${st ? fmtStrikeRate(st.strikes, st.total) : '-'}</td>
-                    <td class="py-2.5 px-2 text-center">${st ? st.firstPitchTotal : '-'}</td>
                     <td class="py-2.5 px-3 text-center font-bold text-slate-800">${st ? fmtStrikeRate(st.firstPitchStrikes, st.firstPitchTotal) : '-'}</td>
                 </tr>
             `;
@@ -13933,7 +13825,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (detailEl) {
                 const idx = selectEl ? (parseInt(selectEl.value, 10) || 0) : 0;
                 const st = strikeRows[Math.min(Math.max(idx, 0), Math.max(strikeRows.length - 1, 0))];
-                detailEl.innerHTML = st ? buildPitcherStrikeDetailHtml(st) : '';
+                detailEl.innerHTML = st ? buildPitcherCountOnlyHtml(st) : '';
             }
         }
 
@@ -14136,7 +14028,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             if (mode === 'all' || mode === 'pitcher') {
                 sheets.push(__excelTableSheet('aggregated-team-pitcher-tbody', '投手成績（チーム平均）', '投手成績（チーム平均・通算）', '', __PITCHER_NOTE));
-                sheets.push(__excelPitcherCountSheet(true));
                 sheets.push(__excelPerGameSheet('aggregated-team-pitcher-pergame', '投手1試合平均', '投手成績 1試合平均（チーム平均）'));
             }
             const base = mode === 'basic' ? 'チーム成績_基本' : (mode === 'batter' ? 'チーム成績_打者' : (mode === 'pitcher' ? 'チーム成績_投手' : 'チーム成績'));
