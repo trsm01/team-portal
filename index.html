@@ -105,8 +105,48 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         .hover\:bg-orange-50\/40:hover { background-color: rgb(255 247 237 / 0.4); }
         .bg-emerald-700 { background-color: #047857; }
         .bg-emerald-800 { background-color: #065f46; }
+        /* 交代マーク作成モーダルのチーム選択（選択中）用 */
+        .border-slate-900 { border-color: #0f172a; }
         .diamond-base { transition: all 0.15s ease; }
         .diamond-base:hover { filter: brightness(1.08); }
+        /* === 走者進塁先の重なり防止（打者イベント） ===
+           ほかの走者・打者がすでに選んでいる塁のボタンは選択不可にする */
+        .advance-btn-occupied, .advance-btn-blocked { opacity: 0.35 !important; cursor: not-allowed !important; background-color: #e2e8f0 !important; color: #64748b !important; border-color: #cbd5e1 !important; }
+        /* === 経過ログの色分け（専用クラス） ===
+           内蔵のコンパイル済みTailwindには text-red-600 / text-red-700 / bg-yellow-200 /
+           text-yellow-600 等が含まれておらず、ユーティリティ名だけでは色が付かなかった。
+           そのため経過ログの色分けは専用クラスで確実に色を付ける（!importantで親の文字色より優先）。 */
+        .log-hl-score { color: #b91c1c !important; background-color: #fde047 !important; font-weight: 800 !important; padding: 1px 6px; border-radius: 6px; }
+        .log-hl-hit { color: #dc2626 !important; font-weight: 800 !important; }
+        .log-hl-walk { color: #2563eb !important; font-weight: 800 !important; }
+        .log-hl-error { color: #a16207 !important; font-weight: 800 !important; }
+        /* === テレビ中継風スコア表示（カウント入力画面：BSO数字・ダイヤモンド・スコア） === */
+        .tv-scorebug { background-color: #0b1526; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 24px -12px rgba(2, 6, 23, 0.55); color: #f8fafc; }
+        .tv-scorebug-main { display: flex; align-items: stretch; gap: 6px; padding: 12px 12px 10px; }
+        .tv-bso { display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 8px 14px 8px 8px; border-right: 1px solid rgba(148, 163, 184, 0.28); min-width: 86px; }
+        .tv-bso-row { display: flex; align-items: center; gap: 10px; }
+        .tv-bso-label { font-size: 15px; font-weight: 800; width: 16px; text-align: center; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+        .tv-bso-label-b { color: #34d399; }
+        .tv-bso-label-s { color: #fbbf24; }
+        .tv-bso-label-o { color: #fb7185; }
+        .tv-bso-num { font-size: 27px; line-height: 1; font-weight: 800; color: #ffffff; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; min-width: 22px; text-align: center; }
+        .tv-diamond-wrap { flex: 1 1 0%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; }
+        .tv-diamond-svg { width: 172px; height: 150px; max-width: 100%; overflow: visible; }
+        .tv-diamond-hint { font-size: 10px; font-weight: 700; line-height: 1.5; color: #6ee7b7; background-color: rgba(16, 185, 129, 0.14); border: 1px solid rgba(52, 211, 153, 0.35); padding: 2px 8px; border-radius: 6px; }
+        .tv-scores { border-top: 1px solid rgba(148, 163, 184, 0.28); }
+        .tv-score-row { display: flex; align-items: center; gap: 10px; padding: 7px 12px; }
+        .tv-score-row + .tv-score-row { border-top: 1px solid rgba(148, 163, 184, 0.16); }
+        .tv-score-row.is-batting { background-color: rgba(251, 191, 36, 0.10); }
+        .tv-score-side { font-size: 10px; font-weight: 800; line-height: 1.5; color: #0b1526; background-color: #cbd5e1; border-radius: 4px; padding: 2px 6px; letter-spacing: 0.08em; flex-shrink: 0; }
+        .tv-score-name { flex: 1 1 0%; min-width: 0; font-size: 14px; font-weight: 800; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tv-score-bat { color: #fbbf24; font-size: 11px; width: 14px; text-align: center; flex-shrink: 0; }
+        .tv-score-num { font-size: 24px; line-height: 1; font-weight: 800; color: #ffffff; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; min-width: 34px; text-align: right; }
+        @media (max-width: 420px) {
+            .tv-bso { min-width: 74px; padding-right: 10px; }
+            .tv-bso-num { font-size: 23px; }
+            .tv-diamond-svg { width: 150px; height: 131px; }
+            .tv-score-num { font-size: 21px; }
+        }
         .no-select { user-select: none; -webkit-user-select: none; }
         /* === 成績表ヘッダーのソート（指標名タップで降順／昇順） === */
         th.sortable-th { cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
@@ -2375,6 +2415,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                     <i data-lucide="user-plus" class="w-3 h-3"></i>
                                     <span>攻撃側選手交代</span>
                                 </button>
+                                <button onclick="openSubMarkCreateModal()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded-md shadow-2xs transition flex items-center gap-1" title="選手交代の入力が間に合わないとき、この場面にマークだけ付けておき、後から交代を入力できます">
+                                    <i data-lucide="flag" class="w-3 h-3"></i>
+                                    <span>交代マーク</span>
+                                    <span id="submark-unresolved-badge" class="hidden bg-white text-amber-700 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">0</span>
+                                </button>
                                 <button onclick="openTiebreakSetupModal()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-md border border-indigo-200 transition" title="タイブレークの走者配置を設定">
                                     タイブレーク配置
                                 </button>
@@ -2393,10 +2438,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 <span class="text-[11px] font-bold text-emerald-700">打者</span>
                                 <span id="curr-batter-order" class="font-mono text-slate-600">1番</span>
                                 <span id="curr-batter-name" class="font-bold text-slate-800">選手名</span>
+                                <span id="curr-batter-hand" class="inline-flex items-center"></span>
                             </div>
                             <div class="flex items-center space-x-1.5">
                                 <span class="text-[11px] font-bold text-rose-700">投手</span>
                                 <span id="curr-pitcher-name" class="font-bold text-slate-800">投手名</span>
+                                <span id="curr-pitcher-hand" class="inline-flex items-center"></span>
                             </div>
                         </div>
 
@@ -2413,58 +2460,65 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         </div>
                     </div>
 
-                    <!-- BSOカウント & ダイヤモンド -->
-                    <div class="grid grid-cols-12 gap-3 items-center">
-                        <!-- BSOランプ（左揃え・コンパクト幅） -->
-                        <div class="col-span-5 flex justify-start">
-                            <div class="bg-slate-900 text-white rounded-xl px-3.5 py-3 space-y-2.5 font-mono w-fit shadow-xs">
-                                <div class="flex items-center space-x-2.5">
-                                    <span class="text-xs font-bold text-emerald-400 w-3.5 text-left">B</span>
-                                    <div class="flex space-x-1.5" id="lamps-b">
-                                        <span class="w-4 h-4 rounded-full bg-slate-700"></span>
-                                        <span class="w-4 h-4 rounded-full bg-slate-700"></span>
-                                        <span class="w-4 h-4 rounded-full bg-slate-700"></span>
-                                    </div>
+                    <!-- テレビ中継風スコア表示：左にBSO（数字）／その上にダイヤモンド（中央にイニング）／下段に両チームのスコア -->
+                    <div class="tv-scorebug">
+                        <div class="tv-scorebug-main">
+                            <!-- BSOカウント（ランプ式ではなく数字で表示） -->
+                            <div class="tv-bso" aria-label="ボール・ストライク・アウトのカウント">
+                                <div class="tv-bso-row">
+                                    <span class="tv-bso-label tv-bso-label-b">B</span>
+                                    <span class="tv-bso-num" id="bso-num-b">0</span>
                                 </div>
-                                <div class="flex items-center space-x-2.5">
-                                    <span class="text-xs font-bold text-amber-400 w-3.5 text-left">S</span>
-                                    <div class="flex space-x-1.5" id="lamps-s">
-                                        <span class="w-4 h-4 rounded-full bg-slate-700"></span>
-                                        <span class="w-4 h-4 rounded-full bg-slate-700"></span>
-                                    </div>
+                                <div class="tv-bso-row">
+                                    <span class="tv-bso-label tv-bso-label-s">S</span>
+                                    <span class="tv-bso-num" id="bso-num-s">0</span>
                                 </div>
-                                <div class="flex items-center space-x-2.5">
-                                    <span class="text-xs font-bold text-rose-500 w-3.5 text-left">O</span>
-                                    <div class="flex space-x-1.5" id="lamps-o">
-                                        <span class="w-4 h-4 rounded-full bg-slate-700"></span>
-                                        <span class="w-4 h-4 rounded-full bg-slate-700"></span>
-                                    </div>
+                                <div class="tv-bso-row">
+                                    <span class="tv-bso-label tv-bso-label-o">O</span>
+                                    <span class="tv-bso-num" id="bso-num-o">0</span>
                                 </div>
+                            </div>
+
+                            <!-- ダイヤモンド（走者タップで走者イベント選択・真ん中にイニング表示） -->
+                            <div class="tv-diamond-wrap">
+                                <svg viewBox="0 0 160 140" class="tv-diamond-svg no-select" role="img" aria-label="走者の出塁状況">
+                                    <polygon points="80,20 130,70 80,120 30,70" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
+                                    <polygon points="80,125 86,119 86,113 74,113 74,119" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1.5"/>
+                                    <text id="tv-inning-center" x="80" y="77" text-anchor="middle" font-size="17" font-weight="800" fill="#ffffff">1回表</text>
+                                    <g onclick="clickBase(2)" id="group-base-2" class="diamond-base" style="cursor:pointer">
+                                        <circle cx="80" cy="20" r="20" fill="transparent"/>
+                                        <rect id="svg-base-2" x="71" y="11" width="18" height="18" transform="rotate(45 80 20)" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+                                        <text x="80" y="8" text-anchor="middle" font-size="9" font-weight="bold" fill="#a7f3d0">2B</text>
+                                    </g>
+                                    <g onclick="clickBase(1)" id="group-base-1" class="diamond-base" style="cursor:pointer">
+                                        <circle cx="130" cy="70" r="20" fill="transparent"/>
+                                        <rect id="svg-base-1" x="121" y="61" width="18" height="18" transform="rotate(45 130 70)" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+                                        <text x="148" y="73" text-anchor="start" font-size="9" font-weight="bold" fill="#a7f3d0">1B</text>
+                                    </g>
+                                    <g onclick="clickBase(3)" id="group-base-3" class="diamond-base" style="cursor:pointer">
+                                        <circle cx="30" cy="70" r="20" fill="transparent"/>
+                                        <rect id="svg-base-3" x="21" y="61" width="18" height="18" transform="rotate(45 30 70)" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+                                        <text x="12" y="73" text-anchor="end" font-size="9" font-weight="bold" fill="#a7f3d0">3B</text>
+                                    </g>
+                                </svg>
+                                <span class="tv-diamond-hint">走者タップでイベント・代走</span>
                             </div>
                         </div>
 
-                        <!-- ダイヤモンドSVG（走者タップでポップアップ） -->
-                        <div class="col-span-7 flex flex-col items-center justify-center relative">
-                            <svg viewBox="0 0 160 140" class="w-36 h-32 overflow-visible no-select">
-                                <polygon points="80,20 130,70 80,120 30,70" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
-                                <polygon points="80,125 86,119 86,113 74,113 74,119" fill="#cbd5e1" stroke="#64748b" stroke-width="1.5"/>
-                                <g onclick="clickBase(2)" id="group-base-2" class="diamond-base" style="cursor:pointer">
-                                    <circle cx="80" cy="20" r="20" fill="transparent"/>
-                                    <rect id="svg-base-2" x="71" y="11" width="18" height="18" transform="rotate(45 80 20)" fill="#ffffff" stroke="#475569" stroke-width="2"/>
-                                    <text x="80" y="8" text-anchor="middle" font-size="9" font-weight="bold" fill="#475569">2B</text>
-                                </g>
-                                <g onclick="clickBase(1)" id="group-base-1" class="diamond-base" style="cursor:pointer">
-                                    <circle cx="130" cy="70" r="20" fill="transparent"/>
-                                    <rect id="svg-base-1" x="121" y="61" width="18" height="18" transform="rotate(45 130 70)" fill="#ffffff" stroke="#475569" stroke-width="2"/>
-                                    <text x="148" y="73" text-anchor="start" font-size="9" font-weight="bold" fill="#475569">1B</text>
-                                </g>
-                                <g onclick="clickBase(3)" id="group-base-3" class="diamond-base" style="cursor:pointer">
-                                    <circle cx="30" cy="70" r="20" fill="transparent"/>
-                                    <rect id="svg-base-3" x="21" y="61" width="18" height="18" transform="rotate(45 30 70)" fill="#ffffff" stroke="#475569" stroke-width="2"/>
-                                    <text x="12" y="73" text-anchor="end" font-size="9" font-weight="bold" fill="#475569">3B</text>
-                                </g>
-                            </svg>
-                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-1">走者タップでイベント・代走</span>
+                        <!-- スコア（先攻・後攻） -->
+                        <div class="tv-scores">
+                            <div class="tv-score-row is-batting" id="tv-score-row-away">
+                                <span class="tv-score-side">先攻</span>
+                                <span class="tv-score-name" id="tv-score-away-name">先攻チーム</span>
+                                <span class="tv-score-bat" id="tv-bat-away" aria-hidden="true">▲</span>
+                                <span class="tv-score-num" id="tv-score-away">0</span>
+                            </div>
+                            <div class="tv-score-row" id="tv-score-row-home">
+                                <span class="tv-score-side">後攻</span>
+                                <span class="tv-score-name" id="tv-score-home-name">後攻チーム</span>
+                                <span class="tv-score-bat" id="tv-bat-home" style="visibility:hidden" aria-hidden="true">▼</span>
+                                <span class="tv-score-num" id="tv-score-home">0</span>
+                            </div>
                         </div>
                     </div>
 
@@ -2527,6 +2581,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             </button>
                         </div>
                     </div>
+                </div>
+
+                <!-- 交代マーク一覧（タップで後から選手交代を入力） -->
+                <div id="submark-panel" class="hidden bg-amber-50 rounded-xl shadow-sm border border-amber-300 p-4 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="flag" class="w-3.5 h-3.5"></i>交代マーク
+                        </h3>
+                        <span id="submark-panel-count" class="text-[11px] font-bold text-amber-700"></span>
+                    </div>
+                    <div id="submark-list" class="space-y-2"></div>
                 </div>
             </div>
 
@@ -2862,6 +2927,76 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
             <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end space-x-2 shrink-0">
                 <button onclick="closeModal('modal-sub-center')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 交代マーク作成モーダル -->
+    <div id="modal-submark-create" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between shrink-0">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i data-lucide="flag" class="w-5 h-5 text-amber-400"></i>交代マークを付ける
+                </h3>
+                <button onclick="closeModal('modal-submark-create')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto text-sm flex-1 space-y-4">
+                <div id="submark-create-situation" class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800"></div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1.5">交代があったチーム</label>
+                    <div id="submark-create-teams" class="grid grid-cols-2 gap-2"></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1.5">メモ（任意）</label>
+                    <input id="submark-create-memo" type="text" placeholder="例：投手交代、代打 など" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <p class="text-[11px] text-slate-500 leading-relaxed">マークだけ先に付けてスコア入力を続けられます。あとでマークをタップすると、その場面の選手交代（誰から誰へ）を入力でき、投手交代の場合は球数や投手成績もその場面から付け替えて再計算します。</p>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end space-x-2 shrink-0">
+                <button onclick="closeModal('modal-submark-create')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
+                <button onclick="confirmSubMarkCreate()" class="px-4 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition">マークを付ける</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 交代マークからの選手交代入力モーダル -->
+    <div id="modal-submark-resolve" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between shrink-0">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-5 h-5 text-emerald-400"></i>交代を入力（マークから）
+                </h3>
+                <button onclick="closeModal('modal-submark-resolve')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto text-sm flex-1 space-y-4">
+                <div id="submark-resolve-situation" class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs font-bold text-slate-800"></div>
+                <div id="submark-resolve-done" class="hidden bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-xs font-bold text-emerald-900"></div>
+                <div id="submark-resolve-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1.5">退く選手</label>
+                        <select id="submark-resolve-out" onchange="onSubMarkOutChange()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1.5">入る選手</label>
+                        <select id="submark-resolve-in" onchange="onSubMarkInChange()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white"></select>
+                        <div id="submark-resolve-new-wrap" class="hidden grid-cols-2 gap-2 mt-2">
+                            <input id="submark-resolve-new-name" type="text" placeholder="新しい選手名" class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                            <input id="submark-resolve-new-num" type="text" placeholder="背番号" class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1.5">入る選手のポジション</label>
+                        <select id="submark-resolve-pos" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white"></select>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">投手交代の場合、このマークの場面以降の投球は入る投手の記録に付け替え、球数・投手成績を再計算します。代打の場合も、この場面以降の打席を入る選手の記録に付け替えます。</p>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between shrink-0">
+                <button id="submark-resolve-delete" onclick="deleteSubMark()" class="px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-100 rounded-lg transition flex items-center gap-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i>マークを削除</button>
+                <div class="flex space-x-2">
+                    <button onclick="closeModal('modal-submark-resolve')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
+                    <button id="submark-resolve-confirm" onclick="confirmSubMarkResolution()" class="px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition">この内容で交代を記録</button>
+                </div>
             </div>
         </div>
     </div>
@@ -3314,6 +3449,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <div id="wizard-step-2" class="hidden space-y-3">
                     <div id="wizard-selected-cat-title" class="font-bold text-slate-800 text-xs uppercase tracking-wider"></div>
                     <div class="grid grid-cols-2 gap-2" id="wizard-sub-buttons"></div>
+                </div>
+
+                <!-- ステップ2.5：安打の打球性質（ゴロ・ライナー・フライ）選択 -->
+                <div id="wizard-step-hit-quality" class="hidden space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">打球の性質を選択</span>
+                        <button onclick="backToWizardStep2()" class="text-xs text-slate-500 hover:text-slate-800 underline">← 戻る</button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="selectWizardHitQuality('grounder')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold py-3 px-2 rounded-xl text-sm shadow-xs transition">ゴロ</button>
+                        <button onclick="selectWizardHitQuality('liner')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold py-3 px-2 rounded-xl text-sm shadow-xs transition">ライナー</button>
+                        <button onclick="selectWizardHitQuality('fly')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold py-3 px-2 rounded-xl text-sm shadow-xs transition">フライ</button>
+                    </div>
                 </div>
 
                 <!-- ステップ2.2：フライ・ライナーの通常アウト / 併殺打選択 -->
@@ -4290,6 +4438,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         const POS_NAMES = { 1: '投', 2: '捕', 3: '一', 4: '二', 5: '三', 6: '遊', 7: '左', 8: '中', 9: '右', LC: '左中間', RC: '右中間' };
         // ファウルの打球の質・方向の表示名（方向はフェアゾーンではなくファウルゾーンの5区分から選ぶ）
         const FOUL_QUALITY_LABELS = { fly: 'フライ', liner: 'ライナー', grounder: 'ゴロ' };
+        // 安打の打球性質の表示名（打者イベント入力で単打・二塁打・三塁打・本塁打を選んだときに選択する）
+        const BATTED_QUALITY_LABELS = { grounder: 'ゴロ', liner: 'ライナー', fly: 'フライ' };
         const FOUL_DIRECTION_LABELS = { catcher: '捕手周辺', first_side: '一塁側', third_side: '三塁側', right_field: '右翼側', left_field: '左翼側' };
         // 学年カラー（本校の学年色分け：青・赤・緑）。選手マスタの gradeColor に
         // 'blue' | 'red' | 'green' | ''（未設定）で保持する。旧データには項目自体が
@@ -4377,7 +4527,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         let pendingMultiRunnerEvent = null;
         let pendingPickoffAttempt = null;
         let pendingFoulDetail = null; // ファウル入力中の一時状態: { pitchType: 'foul_hitting'|'foul_bunt', quality: 'fly'|'liner'|'grounder'|null, direction: 'catcher'|'first_side'|'third_side'|'right_field'|'left_field'|null }
-        let wizardState = { category: null, subResult: null, airBaseType: null, airDpShown: false, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false };
+        let wizardState = { category: null, subResult: null, airBaseType: null, airDpShown: false, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false, hitQuality: null };
         let currentSettingsTeam = 'away';
         let pendingInningChangeMode = null;
         let selectedKType = 'K_ADVANCE';
@@ -4580,6 +4730,35 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (batsVal !== undefined && batsVal !== null) set('ba', batsVal);
         }
 
+        // カウント入力画面（試合中）の打者・投手名の横に置く利き手チェック。
+        // 変更したらその場で現在の打者／投手の記録へ保存する（経過ログには残さない）。
+        function liveHandChecksHtml(idBase, throwsVal, batsVal, who) {
+            const t = throwsVal || '', b = batsVal || '';
+            const chk = (v, side) => (v === side || v === '両') ? 'checked' : '';
+            return `<span class="inline-flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] font-bold text-slate-600" title="投・打とも右と左の両方にチェックすると両投げ・両打ちになります">
+                <span class="text-slate-500">投:</span>
+                <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="${idBase}-thr" ${chk(t, '右')} onchange="onLiveHandChange('${who}')" class="w-3.5 h-3.5 accent-indigo-600">右</label>
+                <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="${idBase}-thl" ${chk(t, '左')} onchange="onLiveHandChange('${who}')" class="w-3.5 h-3.5 accent-indigo-600">左</label>
+                <span class="text-slate-500 ml-1">打:</span>
+                <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="${idBase}-bar" ${chk(b, '右')} onchange="onLiveHandChange('${who}')" class="w-3.5 h-3.5 accent-indigo-600">右</label>
+                <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="${idBase}-bal" ${chk(b, '左')} onchange="onLiveHandChange('${who}')" class="w-3.5 h-3.5 accent-indigo-600">左</label>
+            </span>`;
+        }
+        function onLiveHandChange(who) {
+            if (!gameState) return;
+            const isBatter = who === 'batter';
+            const player = isBatter ? getCurrentBatter() : getCurrentPitcher();
+            if (!player) return;
+            const idBase = isBatter ? 'live-batter-hand' : 'live-pitcher-hand';
+            const th = readHandChecks(idBase, 'th');
+            const ba = readHandChecks(idBase, 'ba');
+            if (th === null && ba === null) return;
+            pushUndoState();
+            if (th !== null) player.throws = th;
+            if (ba !== null) player.bats = ba;
+            saveAndRender();
+        }
+
         // スタメン選択で選手を選び直したら、その行の背番号プルダウンの
         // 初期値を、選んだ選手の既存データの背番号に合わせる
         function onSetupMyPlayerChange(idx) {
@@ -4697,11 +4876,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             gameState.teams.home.name = document.getElementById('inp-home-name').value.trim() || '後攻チーム';
             const ruleSel = document.getElementById('inp-rule-mode');
             if (ruleSel) {
-                const prevMode = getRuleMode();
                 gameState.meta.dhRuleMode = ruleSel.value === 'relaxed' ? 'relaxed' : 'strict';
-                if (prevMode !== gameState.meta.dhRuleMode) {
-                    addLog(`DHルール運用モードを変更: ${gameState.meta.dhRuleMode === 'relaxed' ? '練習試合モード（緩やか）' : '公式戦モード（規則5.11準拠）'}`);
-                }
             }
             saveAndRender();
             closeModal('modal-game-info');
@@ -8946,8 +9121,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const twP = oppPlayers.find(p => p.isTwoWay);
                 addLog(`二刀流・指名打者使用〔規則5.11(b)〕 (${oppTeamName}): ${twP ? `${twP.order}番 ${twP.name} が先発投手と指名打者を兼任` : '先発投手が指名打者を兼任'}`);
             }
-            addLog(`DHルール運用モード: ${setupRuleMode === 'relaxed' ? '練習試合モード（緩やか）' : '公式戦モード（規則5.11準拠）'}`);
-
             undoStack = [];
             safeStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
             closeModal('modal-new-game-setup');
@@ -9148,7 +9321,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     else gameState.live.homeBatterIdx = ix;
                 }
             });
-            addLog(`スタメンを試合中に編集（${team.name}）：打順・守備位置・利き手などを更新`);
             saveAndRender();
             closeModal('modal-lineup-edit');
             showToast('スタメンを保存しました', 'success');
@@ -11267,7 +11439,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     home: buildTeam('home')
                 },
                 logs: [],
-                atBatRecords: []
+                atBatRecords: [],
+                subMarks: []
             };
         }
 
@@ -11705,6 +11878,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 document.getElementById('wizard-step-indicator').textContent = 'ステップ 3: バント方向';
                 document.getElementById('wizard-step-2').classList.add('hidden');
                 document.getElementById('wizard-step-bunt-map').classList.remove('hidden');
+            } else if (['1B', '2B', '3B', 'HR'].indexOf(subType) !== -1) {
+                // 安打は打球方向の前に打球性質（ゴロ・ライナー・フライ）を選ぶ
+                wizardState.hitQuality = null;
+                document.getElementById('wizard-step-indicator').textContent = 'ステップ 2.5: 打球の性質';
+                document.getElementById('wizard-step-2').classList.add('hidden');
+                document.getElementById('wizard-step-hit-quality').classList.remove('hidden');
             } else if (requiresPos) {
                 document.getElementById('wizard-step-indicator').textContent = 'ステップ 3: 打球方向';
                 document.getElementById('wizard-step-3-title').textContent = '打球方向をタップして選択';
@@ -11713,6 +11892,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             } else {
                 executeWizardFinalize(null);
             }
+        }
+
+        function selectWizardHitQuality(quality) {
+            wizardState.hitQuality = quality;
+            document.getElementById('wizard-step-hit-quality').classList.add('hidden');
+            document.getElementById('wizard-step-indicator').textContent = 'ステップ 3: 打球方向';
+            document.getElementById('wizard-step-3-title').textContent = '打球方向をタップして選択';
+            document.getElementById('wizard-step-3').classList.remove('hidden');
         }
 
         function selectWizardAirOutMode(isDoublePlay) {
@@ -11769,6 +11956,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const isErrorBuntVisible = !document.getElementById('wizard-step-error-bunt').classList.contains('hidden');
             const isErrorTypeVisible = !document.getElementById('wizard-step-error-type').classList.contains('hidden');
             const isStep3Visible = !document.getElementById('wizard-step-3').classList.contains('hidden');
+            const isHitQualityVisible = !document.getElementById('wizard-step-hit-quality').classList.contains('hidden');
+
+            if (isHitQualityVisible) {
+                document.getElementById('wizard-step-hit-quality').classList.add('hidden');
+                document.getElementById('wizard-step-2').classList.remove('hidden');
+                document.getElementById('wizard-step-indicator').textContent = 'ステップ 2: 詳細を選択';
+                return;
+            }
+
+            if (isStep3Visible && ['1B', '2B', '3B', 'HR'].indexOf(wizardState.subResult) !== -1) {
+                document.getElementById('wizard-step-3').classList.add('hidden');
+                document.getElementById('wizard-step-hit-quality').classList.remove('hidden');
+                document.getElementById('wizard-step-indicator').textContent = 'ステップ 2.5: 打球の性質';
+                return;
+            }
 
             if ((wizardState.subResult === 'FO' || wizardState.subResult === 'LO' || wizardState.subResult === 'FO_DP' || wizardState.subResult === 'LO_DP') && isStep3Visible && wizardState.airDpShown) {
                 document.getElementById('wizard-step-3').classList.add('hidden');
@@ -11817,13 +12019,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             document.getElementById('wizard-step-air-dp').classList.add('hidden');
             document.getElementById('wizard-step-error-bunt').classList.add('hidden');
             document.getElementById('wizard-step-error-type').classList.add('hidden');
+            document.getElementById('wizard-step-hit-quality').classList.add('hidden');
             document.getElementById('wizard-step-2').classList.remove('hidden');
             document.getElementById('wizard-step-indicator').textContent = 'ステップ 2: 詳細を選択';
         }
 
         function resetWizard() {
-            wizardState = { category: null, subResult: null, airBaseType: null, airDpShown: false, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false };
+            wizardState = { category: null, subResult: null, airBaseType: null, airDpShown: false, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false, hitQuality: null };
             document.getElementById('wizard-step-2').classList.add('hidden');
+            document.getElementById('wizard-step-hit-quality').classList.add('hidden');
             document.getElementById('wizard-step-air-dp').classList.add('hidden');
             document.getElementById('wizard-step-error-bunt').classList.add('hidden');
             document.getElementById('wizard-step-error-type').classList.add('hidden');
@@ -11860,6 +12064,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function openRunnerAdvanceModal(subType) {
             const container = document.getElementById('runner-advance-container');
             container.innerHTML = '';
+            const advanceNote = document.createElement('div');
+            advanceNote.className = 'text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2';
+            advanceNote.textContent = '同じ塁には2人入れません。ほかの走者・打者が選んでいる塁は選べなくなります（生還・アウトは複数選べます）。また、今いる塁より後ろには戻れず、前の走者を追い越す進塁も選べません。';
+            container.appendChild(advanceNote);
             const bases = gameState.live.bases;
             const baseNames = ['1塁走者', '2塁走者', '3塁走者'];
             const batter = getCurrentBatter();
@@ -11927,45 +12135,238 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             `;
             container.appendChild(batterDiv);
 
+            // 初期値の重なり解消：打者の進塁先を優先し、3塁→2塁→1塁の順（先行走者優先）に
+            // 確定していく。初期値が重なる走者は、空いている次の塁→生還の順にずらす。
+            // （例：二塁打で打者が2塁に入るため、1塁走者の初期値「2塁」を3塁／生還へずらす）
+            const occupiedByDefault = new Set();
+            if (batterDefaultTarget >= 1 && batterDefaultTarget <= 3) occupiedByDefault.add(batterDefaultTarget);
+            for (let rIdx = 2; rIdx >= 0; rIdx--) {
+                if (!bases[rIdx]) continue;
+                let t = defaultRunnerTargets[rIdx];
+                if (t >= 1 && t <= 3) {
+                    if (occupiedByDefault.has(t)) {
+                        let shifted = 4;
+                        for (let b = t + 1; b <= 3; b++) {
+                            if (!occupiedByDefault.has(b)) { shifted = b; break; }
+                        }
+                        t = shifted;
+                        defaultRunnerTargets[rIdx] = t;
+                    }
+                    if (t >= 1 && t <= 3) occupiedByDefault.add(t);
+                }
+            }
+
+            // 初期値の順序解消：後ろの選手の進塁先に前の選手が追い越されないよう、
+            // 打者→1塁走者→2塁走者→3塁走者の順に、前の選手の初期値を前へずらす。
+            // （例：満塁で二塁打なら、打者が2塁に入るため1塁走者は3塁、2塁走者は生還が初期値になる。
+            //   アウトの選手は追い越してよいのでずらさない）
+            {
+                const backToFront = [
+                    { exists: true, get: () => batterDefaultTarget, set: v => { batterDefaultTarget = v; } },
+                    { exists: !!bases[0], get: () => defaultRunnerTargets[0], set: v => { defaultRunnerTargets[0] = v; } },
+                    { exists: !!bases[1], get: () => defaultRunnerTargets[1], set: v => { defaultRunnerTargets[1] = v; } },
+                    { exists: !!bases[2], get: () => defaultRunnerTargets[2], set: v => { defaultRunnerTargets[2] = v; } }
+                ];
+                for (let i = 0; i < backToFront.length - 1; i++) {
+                    const back = backToFront[i];
+                    if (!back.exists) continue;
+                    const bt = back.get();
+                    if (bt === 0) continue;
+                    let j = i + 1;
+                    while (j < backToFront.length && !backToFront[j].exists) j++;
+                    if (j >= backToFront.length) break;
+                    const front = backToFront[j];
+                    const ft = front.get();
+                    if (ft !== 0 && ft !== 4) {
+                        if (bt >= 1 && bt <= 3 && ft <= bt) front.set(bt + 1 <= 3 ? bt + 1 : 4);
+                        else if (bt === 4) front.set(4);
+                    }
+                    i = j - 1;
+                }
+            }
+
             pendingWizardData = {
                 subResult: subType,
                 runnerTargets: defaultRunnerTargets,
                 batterTarget: batterDefaultTarget
             };
+            refreshRunnerAdvanceButtons();
             openModal('modal-runner-advance');
         }
 
-        function setRunnerTarget(runnerIdx, targetBase) {
-            pendingWizardData.runnerTargets[runnerIdx] = targetBase;
+        // ===== 走者進塁先の重なり防止 =====
+        // 1〜3塁は1人だけが選べる（生還=4・アウト=0は複数可）。
+        // self: { runnerIdx: n } または { isBatter: true } で自分自身を除外して判定する。
+        function isAdvanceBaseTaken(base, self) {
+            if (!pendingWizardData || base < 1 || base > 3) return false;
+            if (!(self && self.isBatter) && pendingWizardData.batterTarget === base) return true;
+            const liveBases = (gameState && gameState.live && gameState.live.bases) || [];
+            for (let i = 0; i < 3; i++) {
+                if (self && self.runnerIdx === i) continue;
+                if (!liveBases[i]) continue;
+                if (pendingWizardData.runnerTargets[i] === base) return true;
+            }
+            return false;
+        }
+
+        // ===== 走者進塁先の後退・追い越し防止 =====
+        // 前後の並び順（前→後）：3塁走者・2塁走者・1塁走者・打者走者。
+        // ランクが小さいほど前の選手。
+        function advanceRankOf(self) {
+            return (self && self.isBatter) ? 3 : (2 - self.runnerIdx);
+        }
+
+        function getAdvancePersons() {
+            const persons = [];
+            const liveBases = (gameState && gameState.live && gameState.live.bases) || [];
+            for (let i = 0; i < 3; i++) {
+                if (!liveBases[i]) continue;
+                persons.push({ runnerIdx: i, isBatter: false, target: pendingWizardData.runnerTargets[i] });
+            }
+            persons.push({ isBatter: true, target: pendingWizardData.batterTarget });
+            return persons;
+        }
+
+        function isSameAdvancePerson(a, b) {
+            return !!a.isBatter === !!b.isBatter && (!!a.isBatter || a.runnerIdx === b.runnerIdx);
+        }
+
+        // 後退：既に出塁している走者は、今いる塁より前の塁（小さい塁）には戻れない。
+        // 「そのまま（同じ塁）」・進塁・生還・アウトは可。打者走者は本塁が出発点なので後退なし。
+        function isAdvanceBackward(self, target) {
+            if (!self || self.isBatter) return false;
+            return target >= 1 && target <= 3 && target < self.runnerIdx + 1;
+        }
+
+        // 追い越し：自分より前の選手が塁上に残る（1〜3塁）進塁先では、その選手を追い越せない。
+        // 逆に、自分が前の選手のときは、後ろの選手の進塁先より前にいないと入れ替わってしまう。
+        // 前の選手がアウト（0）なら追い越してよい。生還（4）は、前の選手全員が生還かアウトのときだけ可。
+        function isAdvanceOrderViolation(self, target) {
+            if (!pendingWizardData || target === 0) return false;
+            const selfRank = advanceRankOf(self);
+            const persons = getAdvancePersons();
+            for (let k = 0; k < persons.length; k++) {
+                const q = persons[k];
+                if (isSameAdvancePerson(q, self)) continue;
+                const u = q.target;
+                if (u === 0) continue;
+                if (selfRank > advanceRankOf(q)) {
+                    // 自分が後ろ、qが前の選手
+                    if (target >= 1 && target <= 3 && u >= 1 && u <= 3 && u <= target) return true;
+                    if (target === 4 && u >= 1 && u <= 3) return true;
+                } else {
+                    // 自分が前、qが後ろの選手
+                    if (u >= 1 && u <= 3 && target >= 1 && target <= 3 && target <= u) return true;
+                    if (u === 4 && target >= 1 && target <= 3) return true;
+                }
+            }
+            return false;
+        }
+
+        // 進塁先が選べない理由を返す（選べる場合は null）。
+        // 'backward'=後退 / 'occupied'=重なり / 'order'=追い越し・順序入れ替わり
+        function advanceBlockReason(self, target) {
+            if (!pendingWizardData) return null;
+            if (target === 0) return null;
+            if (isAdvanceBackward(self, target)) return 'backward';
+            if (target >= 1 && target <= 3 && isAdvanceBaseTaken(target, self)) return 'occupied';
+            if (isAdvanceOrderViolation(self, target)) return 'order';
+            return null;
+        }
+
+        // 全グループ（各走者＋打者）のボタンの選択中表示と、重なる塁の選択不可表示を再描画する
+        function refreshRunnerAdvanceButtons() {
+            if (!pendingWizardData) return;
             const container = document.getElementById('runner-advance-container');
-            const group = container.querySelector(`[data-runner-idx="${runnerIdx}"]`);
-            if (group) {
-                const values = [1, 2, 3, 4, 0];
+            if (!container) return;
+            const values = [1, 2, 3, 4, 0];
+            const paintGroup = (group, selected, self, activeFor) => {
+                if (!group) return;
+                const kind = group.getAttribute('data-batter-target') === 'true' ? 'batter-btn' : `runner-btn-${self.runnerIdx}`;
                 Array.from(group.children).forEach((btn, i) => {
                     const val = values[i];
-                    const activeCls = val === 4 ? 'bg-amber-500 text-white' : (val === 0 ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white');
-                    btn.className = `runner-btn-${runnerIdx} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${val === targetBase ? activeCls : 'bg-white text-slate-700'}`;
+                    const reason = val !== selected ? advanceBlockReason(self, val) : null;
+                    const taken = reason !== null;
+                    btn.disabled = taken;
+                    if (reason === 'backward') btn.title = '今いる塁より後ろには戻れません';
+                    else if (reason === 'occupied') btn.title = 'ほかの走者・打者が選んでいる塁です';
+                    else if (reason === 'order') btn.title = '前後の走者の順序が入れ替わる進塁はできません';
+                    else btn.removeAttribute('title');
+                    if (val === selected) {
+                        btn.className = `${kind} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${activeFor(val)}`;
+                    } else if (taken) {
+                        btn.className = `${kind} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold bg-white text-slate-700 advance-btn-blocked`;
+                    } else {
+                        btn.className = `${kind} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold bg-white text-slate-700`;
+                    }
                 });
+            };
+            for (let idx = 0; idx < 3; idx++) {
+                const group = container.querySelector(`[data-runner-idx="${idx}"]`);
+                if (!group) continue;
+                paintGroup(group, pendingWizardData.runnerTargets[idx], { runnerIdx: idx },
+                    (val) => val === 4 ? 'bg-amber-500 text-white' : (val === 0 ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white'));
             }
+            const batterGroup = container.querySelector('[data-batter-target="true"]');
+            if (batterGroup) {
+                paintGroup(batterGroup, pendingWizardData.batterTarget, { isBatter: true },
+                    (val) => val === 4 ? 'bg-amber-500 text-white' : (val === 0 ? 'bg-rose-600 text-white' : 'bg-indigo-600 text-white'));
+            }
+        }
+
+        function setRunnerTarget(runnerIdx, targetBase) {
+            if (!pendingWizardData) return;
+            // 重なり・後退・追い越しになる塁は選べない（ボタンの無効化に加えた二重ガード）
+            if (advanceBlockReason({ runnerIdx }, targetBase) !== null) return;
+            pendingWizardData.runnerTargets[runnerIdx] = targetBase;
+            refreshRunnerAdvanceButtons();
         }
 
         function setBatterTarget(targetBase) {
+            if (!pendingWizardData) return;
+            // 重なり・追い越しになる塁は打者も選べない（ボタンの無効化に加えた二重ガード）
+            if (advanceBlockReason({ isBatter: true }, targetBase) !== null) return;
             pendingWizardData.batterTarget = targetBase;
-            const container = document.getElementById('runner-advance-container');
-            const group = container.querySelector(`[data-batter-target="true"]`);
-            if (group) {
-                const values = [1, 2, 3, 4, 0];
-                Array.from(group.children).forEach((btn, i) => {
-                    const val = values[i];
-                    let activeCls = 'bg-indigo-600 text-white';
-                    if (val === 4) activeCls = 'bg-amber-500 text-white';
-                    if (val === 0) activeCls = 'bg-rose-600 text-white';
-                    btn.className = `batter-btn flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${val === targetBase ? activeCls : 'bg-white text-slate-700'}`;
-                });
-            }
+            refreshRunnerAdvanceButtons();
         }
 
         function confirmRunnerAdvance() {
+            // 最終ガード：1〜3塁に2人重なっていたら記録せず、直してもらう
+            if (pendingWizardData) {
+                const seenBases = {};
+                let dupBase = null;
+                const checkTarget = (t) => {
+                    if (t >= 1 && t <= 3) {
+                        if (seenBases[t]) dupBase = t;
+                        seenBases[t] = true;
+                    }
+                };
+                const liveBasesForCheck = (gameState && gameState.live && gameState.live.bases) || [];
+                pendingWizardData.runnerTargets.forEach((t, i) => { if (liveBasesForCheck[i]) checkTarget(t); });
+                checkTarget(pendingWizardData.batterTarget);
+                if (dupBase !== null) {
+                    showToast(`${dupBase}塁に走者が重なっています。進塁先を変更してください`, 'warning');
+                    return;
+                }
+                // 後退・追い越しの最終チェック：今いる塁より後ろに戻る進塁先や、
+                // 前後の走者の順序が入れ替わる進塁先が残っていたら記録しない
+                for (let i = 0; i < 3; i++) {
+                    if (!liveBasesForCheck[i]) continue;
+                    const t = pendingWizardData.runnerTargets[i];
+                    if (t >= 1 && t <= 3 && t < i + 1) {
+                        showToast('今いる塁より後ろに戻る進塁先が選ばれています。進塁先を変更してください', 'warning');
+                        return;
+                    }
+                    if (advanceBlockReason({ runnerIdx: i }, t) === 'order') {
+                        showToast('前後の走者の順序が入れ替わる進塁先が選ばれています。進塁先を変更してください', 'warning');
+                        return;
+                    }
+                }
+                if (advanceBlockReason({ isBatter: true }, pendingWizardData.batterTarget) === 'order') {
+                    showToast('前後の走者の順序が入れ替わる進塁先が選ばれています。進塁先を変更してください', 'warning');
+                    return;
+                }
+            }
             closeModal('modal-runner-advance');
             pushUndoState();
             executePlateAppearanceLogic(pendingWizardData.subResult, false, pendingWizardData);
@@ -13467,6 +13868,499 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return found ? `${found.num}・${found.label}（${symbol}）` : (symbol || '未定');
         }
 
+        // ================= 選手交代マーキング（後から入力） =================
+        // 試合中に交代の入力が間に合わない場面に「交代マーク」だけ付けておき、
+        // 任意のタイミングでマークを開いて選手交代を後から入力する仕組み。
+        // マークには場面（回・表裏・アウト・カウント）と、その時点の打席記録の
+        // 位置（paIndex＝完了済み打席数）と、進行中打席の投球位置（pitchIdx）を保存する。
+        // 投手交代を後から入力した場合は、この位置を境に打席記録の投手帰属
+        // （各投球の pitcherId と打席の pitcherId）を付け替え、保存済みの投手成績
+        // ライン（対戦打者・投球回・被安打・与四球・奪三振）も差分を移し替え、
+        // 球数（pitcherPitchCounts / inningPitches）は打席記録から再計算する。
+        // ストライク率・牽制・打球などの分析集計は打席記録から都度集計されるため、
+        // 付け替えがそのまま反映される。代打の場合も、打席記録の打者帰属と
+        // 打撃成績の累計（打席・打数・安打・四球など）を付け替える。
+        function ensureSubMarks() {
+            if (!gameState) return [];
+            if (!Array.isArray(gameState.subMarks)) gameState.subMarks = [];
+            return gameState.subMarks;
+        }
+
+        let subMarkCreateState = { teamKey: null };
+        let subMarkResolveState = { markId: null };
+
+        function openSubMarkCreateModal() {
+            if (!hasCurrentGame()) return;
+            const { defenseKey } = getActiveTeams();
+            subMarkCreateState = { teamKey: defenseKey };
+            const batter = getCurrentBatter();
+            const pitcher = getCurrentPitcher();
+            const sitEl = document.getElementById('submark-create-situation');
+            if (sitEl) {
+                sitEl.innerHTML = `場面: ${getInningLabel()} / ${gameState.live.outs}アウト / カウント ${gameState.live.balls}-${gameState.live.strikes}`
+                    + (batter ? `<br>打者: ${batter.order}番 ${batter.name}` : '')
+                    + (pitcher ? `<br>投手: ${pitcher.name}` : '');
+            }
+            renderSubMarkCreateTeams();
+            const memoEl = document.getElementById('submark-create-memo');
+            if (memoEl) memoEl.value = '';
+            openModal('modal-submark-create');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function renderSubMarkCreateTeams() {
+            const wrap = document.getElementById('submark-create-teams');
+            if (!wrap || !gameState || !gameState.teams) return;
+            wrap.innerHTML = ['away', 'home'].map(tk => {
+                const selected = subMarkCreateState.teamKey === tk;
+                return `<button onclick="selectSubMarkTeam('${tk}')" class="px-3 py-2.5 rounded-lg border text-sm font-bold transition ${selected ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'}">${gameState.teams[tk].name}</button>`;
+            }).join('');
+        }
+
+        function selectSubMarkTeam(teamKey) {
+            subMarkCreateState.teamKey = teamKey;
+            renderSubMarkCreateTeams();
+        }
+
+        function confirmSubMarkCreate() {
+            if (!hasCurrentGame()) return;
+            const teamKey = subMarkCreateState.teamKey;
+            if (!teamKey || !gameState.teams[teamKey]) { showToast('交代があったチームを選んでください', 'warning'); return; }
+            pushUndoState();
+            const live = gameState.live;
+            const { offenseKey, defenseKey } = getActiveTeams();
+            const batter = getCurrentBatter();
+            const pitcher = getCurrentPitcher();
+            const memoEl = document.getElementById('submark-create-memo');
+            const mark = {
+                id: 'mark_' + Date.now() + '_' + Math.floor(Math.random() * 1000000),
+                createdAt: Date.now(),
+                teamKey: teamKey,
+                inning: live.inning,
+                half: live.half,
+                inningLabel: getInningLabel(),
+                outs: live.outs || 0,
+                balls: live.balls || 0,
+                strikes: live.strikes || 0,
+                paIndex: Array.isArray(gameState.atBatRecords) ? gameState.atBatRecords.length : 0,
+                pitchIdx: Array.isArray(live.pitchHistory) ? live.pitchHistory.length : 0,
+                batterId: batter ? batter.id : null,
+                batterName: batter ? batter.name : '',
+                batterOrder: batter ? batter.order : null,
+                pitcherId: pitcher ? pitcher.id : null,
+                pitcherName: pitcher ? pitcher.name : '',
+                offenseKey: offenseKey,
+                defenseKey: defenseKey,
+                memo: memoEl ? memoEl.value.trim() : '',
+                resolved: false,
+                resolution: null
+            };
+            ensureSubMarks().push(mark);
+            closeModal('modal-submark-create');
+            saveAndRender();
+            showToast('交代マークを付けました。マークをタップすると後から交代を入力できます', 'success');
+        }
+
+        function renderSubMarks() {
+            const panel = document.getElementById('submark-panel');
+            const badge = document.getElementById('submark-unresolved-badge');
+            if (!panel) return;
+            if (!gameState || !gameState.teams) {
+                panel.classList.add('hidden');
+                if (badge) badge.classList.add('hidden');
+                return;
+            }
+            const marks = ensureSubMarks();
+            const unresolvedCount = marks.filter(m => !m.resolved).length;
+            if (badge) {
+                badge.textContent = unresolvedCount;
+                badge.classList.toggle('hidden', unresolvedCount === 0);
+            }
+            if (marks.length === 0) { panel.classList.add('hidden'); return; }
+            panel.classList.remove('hidden');
+            const countEl = document.getElementById('submark-panel-count');
+            if (countEl) countEl.textContent = unresolvedCount > 0 ? `未入力 ${unresolvedCount}件` : 'すべて入力済み';
+            const list = document.getElementById('submark-list');
+            if (list) {
+                list.innerHTML = marks.map(m => {
+                    const teamName = gameState.teams[m.teamKey] ? gameState.teams[m.teamKey].name : '';
+                    const situation = `${m.inningLabel} / ${m.outs}アウト / ${m.balls}-${m.strikes}`;
+                    if (m.resolved && m.resolution) {
+                        return `<div class="w-full text-left bg-white border border-slate-200 rounded-lg px-3 py-2">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-xs font-extrabold text-slate-700">${situation}</span>
+                                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">入力済み</span>
+                            </div>
+                            <div class="text-[11px] text-slate-600 mt-0.5">${teamName}: ${m.resolution.outName} → ${m.resolution.inName}（${m.resolution.pos}）${m.memo ? ` / ${m.memo}` : ''}</div>
+                        </div>`;
+                    }
+                    return `<button onclick="openSubMarkResolveModal('${m.id}')" class="w-full text-left bg-white border border-amber-400 rounded-lg px-3 py-2 hover:bg-amber-50 transition">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-extrabold text-amber-800">${situation}</span>
+                            <span class="text-[10px] font-bold text-white bg-amber-500 px-1.5 py-0.5 rounded-full">未入力・タップで交代入力</span>
+                        </div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">${teamName}の交代${m.memo ? ` / ${m.memo}` : ''}</div>
+                    </button>`;
+                }).join('');
+            }
+        }
+
+        // マーク時点にそのチームで実際に投げていた投手（打席記録上の帰属）を返す。
+        // マーク以降で最初に記録された、そのチームが守備側の打席の投手を正とする。
+        function getMarkRecordedPitcherId(mark) {
+            if (!mark || !gameState) return null;
+            const defKeyOf = (half) => half === 'top' ? 'home' : 'away';
+            if (defKeyOf(mark.half) !== mark.teamKey) return null;
+            const records = Array.isArray(gameState.atBatRecords) ? gameState.atBatRecords : [];
+            for (let i = Math.min(mark.paIndex || 0, records.length); i < records.length; i++) {
+                const rec = records[i];
+                if (!rec) continue;
+                if (defKeyOf(rec.half) !== mark.teamKey) continue;
+                if (rec.pitcherId) return rec.pitcherId;
+            }
+            // まだ打席記録が無い場合は、マーク作成時のスナップショットを使う
+            if (mark.defenseKey === mark.teamKey) return mark.pitcherId || null;
+            return null;
+        }
+
+        function openSubMarkResolveModal(markId) {
+            if (!hasCurrentGame()) return;
+            const mark = ensureSubMarks().find(m => m.id === markId);
+            if (!mark) return;
+            subMarkResolveState = { markId: markId };
+            const team = gameState.teams[mark.teamKey];
+            const sitEl = document.getElementById('submark-resolve-situation');
+            if (sitEl) {
+                sitEl.innerHTML = `場面: ${mark.inningLabel} / ${mark.outs}アウト / カウント ${mark.balls}-${mark.strikes}`
+                    + `<br>交代チーム: ${team ? team.name : ''}`
+                    + (mark.batterName ? `<br>その場面の打者: ${mark.batterOrder ? mark.batterOrder + '番 ' : ''}${mark.batterName}` : '')
+                    + (mark.pitcherName ? `<br>その場面の投手: ${mark.pitcherName}` : '')
+                    + (mark.memo ? `<br>メモ: ${mark.memo}` : '');
+            }
+            const doneEl = document.getElementById('submark-resolve-done');
+            const formEl = document.getElementById('submark-resolve-form');
+            const confirmBtn = document.getElementById('submark-resolve-confirm');
+            const deleteBtn = document.getElementById('submark-resolve-delete');
+            if (mark.resolved && mark.resolution) {
+                if (doneEl) { doneEl.classList.remove('hidden'); doneEl.innerHTML = `入力済み: ${mark.resolution.outName} → ${mark.resolution.inName}（${mark.resolution.pos}）`; }
+                if (formEl) formEl.classList.add('hidden');
+                if (confirmBtn) confirmBtn.classList.add('hidden');
+                if (deleteBtn) deleteBtn.classList.add('hidden');
+            } else {
+                if (doneEl) doneEl.classList.add('hidden');
+                if (formEl) formEl.classList.remove('hidden');
+                if (confirmBtn) confirmBtn.classList.remove('hidden');
+                if (deleteBtn) deleteBtn.classList.remove('hidden');
+                buildSubMarkResolveForm(mark);
+            }
+            openModal('modal-submark-resolve');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function buildSubMarkResolveForm(mark) {
+            const team = gameState.teams[mark.teamKey];
+            if (!team) return;
+            const outSel = document.getElementById('submark-resolve-out');
+            const inSel = document.getElementById('submark-resolve-in');
+            const posSel = document.getElementById('submark-resolve-pos');
+            const optFor = (p) => `<option value="${p.id}">${(p.order >= 1 && p.order <= 9) ? p.order + '番 ' : ((p.dhPitcher || p.order === 10) ? '投手（打順なし） ' : '')}(${p.pos}) ${p.name}</option>`;
+            if (outSel) {
+                const actives = team.players.filter(p => p.isActive);
+                const inactives = team.players.filter(p => !p.isActive);
+                outSel.innerHTML = actives.map(optFor).join('') + (inactives.length ? `<optgroup label="既に退いている選手">${inactives.map(optFor).join('')}</optgroup>` : '');
+                // 既定の退く選手: 投手交代ならマーク時点の投手、攻撃側の交代ならマーク時点の打者
+                let defId = null;
+                const pitcherAtMark = getMarkRecordedPitcherId(mark);
+                if (pitcherAtMark && team.players.some(p => p.id === pitcherAtMark)) defId = pitcherAtMark;
+                else if (mark.offenseKey === mark.teamKey && mark.batterId && team.players.some(p => p.id === mark.batterId)) defId = mark.batterId;
+                if (defId) outSel.value = defId;
+            }
+            if (inSel) {
+                const bench = team.players.filter(p => !p.isActive);
+                inSel.innerHTML = '<option value="">選択してください</option>'
+                    + bench.map(p => `<option value="existing:${p.id}">ベンチ: ${p.name}${p.number ? ' (#' + p.number + ')' : ''}</option>`).join('')
+                    + '<option value="new">＋ 新しい選手を登録</option>';
+            }
+            if (posSel) {
+                const posList = DEFENSE_POSITIONS.map(d => d.symbol).concat(['指']);
+                posSel.innerHTML = posList.map(s => `<option value="${s}">${s === '指' ? '指・指名打者' : defensePosLabel(s)}</option>`).join('');
+            }
+            onSubMarkOutChange();
+            onSubMarkInChange();
+        }
+
+        function onSubMarkOutChange() {
+            const outSel = document.getElementById('submark-resolve-out');
+            const posSel = document.getElementById('submark-resolve-pos');
+            if (!outSel || !posSel || !gameState) return;
+            const mark = ensureSubMarks().find(m => m.id === subMarkResolveState.markId);
+            if (!mark) return;
+            const team = gameState.teams[mark.teamKey];
+            const outPlayer = team ? team.players.find(p => p.id === outSel.value) : null;
+            if (outPlayer && Array.from(posSel.options).some(o => o.value === outPlayer.pos)) {
+                posSel.value = outPlayer.pos;
+            }
+        }
+
+        function onSubMarkInChange() {
+            const inSel = document.getElementById('submark-resolve-in');
+            const wrap = document.getElementById('submark-resolve-new-wrap');
+            if (!inSel || !wrap) return;
+            const isNew = inSel.value === 'new';
+            wrap.classList.toggle('hidden', !isNew);
+            wrap.classList.toggle('grid', isNew);
+        }
+
+        function deleteSubMark() {
+            const marks = ensureSubMarks();
+            const idx = marks.findIndex(m => m.id === subMarkResolveState.markId);
+            if (idx < 0) return;
+            if (marks[idx].resolved) { showToast('入力済みのマークは削除できません', 'warning'); return; }
+            pushUndoState();
+            marks.splice(idx, 1);
+            closeModal('modal-submark-resolve');
+            saveAndRender();
+            showToast('交代マークを削除しました', 'info');
+        }
+
+        // 打席記録1件分の投手成績ライン寄与（derivePitcherLineFromRecords と同じ算出）
+        function pitchingContributionOfRecord(rec) {
+            const c = { bf: 1, outs: 0, h: 0, bb: 0, so: 0 };
+            const r = rec.result || '';
+            if (['1B', '2B', '3B', 'HR', 'BUNT_HIT'].indexOf(r) !== -1) c.h = 1;
+            else if (r === 'BB' || r === 'IBB') c.bb = 1;
+            if (r === 'SO' || r === 'BUNT_SO' || (typeof r === 'string' && r.indexOf('K_') === 0)) c.so = 1;
+            if (['SO', 'BUNT_SO', 'GO', 'FO', 'LO', 'SAC', 'SF', 'SAC_FAIL'].indexOf(r) !== -1) c.outs += 1;
+            else if (['DP', 'FO_DP', 'LO_DP'].indexOf(r) !== -1) c.outs += 2;
+            const seq = Array.isArray(rec.sequence) ? rec.sequence : [];
+            seq.forEach(ev => {
+                if (ev && ev.type === 'runner_event' && typeof ev.label === 'string' && (ev.label.indexOf('牽制死') !== -1 || ev.label.indexOf('盗塁死') !== -1)) c.outs += 1;
+            });
+            return c;
+        }
+
+        // 投手交代の後付け入力: マーク位置以降の打席記録の投手帰属を付け替え、
+        // 保存済み投手成績ラインの差分も移し替える。戻り値: 付け替えた投球数
+        function reassignPitchingAfterMark(mark, outPlayer, inPlayer) {
+            const records = Array.isArray(gameState.atBatRecords) ? gameState.atBatRecords : [];
+            const defKeyOf = (half) => half === 'top' ? 'home' : 'away';
+            const delta = { bf: 0, outs: 0, h: 0, bb: 0, so: 0 };
+            let movedPitches = 0;
+            const startIdx = Math.min(mark.paIndex || 0, records.length);
+            for (let i = startIdx; i < records.length; i++) {
+                const rec = records[i];
+                if (!rec || defKeyOf(rec.half) !== mark.teamKey) continue;
+                const seq = Array.isArray(rec.sequence) ? rec.sequence : [];
+                let fromIdx = 0;
+                if (i === startIdx && (mark.pitchIdx || 0) > 0) {
+                    // マークが打席の途中で、その打席の全投球が終わった後に付けられた
+                    // 場合は、その打席は旧投手のままにして次の打席から付け替える
+                    if ((mark.pitchIdx || 0) >= seq.length) continue;
+                    fromIdx = mark.pitchIdx;
+                }
+                for (let j = fromIdx; j < seq.length; j++) {
+                    const ev = seq[j];
+                    if (ev && ev.pitcherId === outPlayer.id) {
+                        ev.pitcherId = inPlayer.id;
+                        ev.pitcherName = inPlayer.name;
+                        if (ev.type !== 'pickoff' && ev.type !== 'runner_event') movedPitches += 1;
+                    }
+                }
+                if (rec.pitcherId === outPlayer.id) {
+                    rec.pitcherId = inPlayer.id;
+                    rec.pitcherName = inPlayer.name;
+                    const c = pitchingContributionOfRecord(rec);
+                    ['bf', 'outs', 'h', 'bb', 'so'].forEach(f => { delta[f] += c[f]; });
+                }
+            }
+            // 進行中の打席がマーク時点の打席のままなら、その投球履歴も付け替える
+            const live = gameState.live;
+            if (records.length === (mark.paIndex || 0) && live.inning === mark.inning && live.half === mark.half && Array.isArray(live.pitchHistory)) {
+                for (let j = (mark.pitchIdx || 0); j < live.pitchHistory.length; j++) {
+                    const ev = live.pitchHistory[j];
+                    if (ev && ev.pitcherId === outPlayer.id) {
+                        ev.pitcherId = inPlayer.id;
+                        ev.pitcherName = inPlayer.name;
+                        if (ev.type !== 'pickoff' && ev.type !== 'runner_event') movedPitches += 1;
+                    }
+                }
+            }
+            if (delta.bf > 0 || delta.outs > 0 || delta.h > 0 || delta.bb > 0 || delta.so > 0) {
+                const outLine = ensurePitchingLine(outPlayer);
+                const inLine = ensurePitchingLine(inPlayer);
+                ['bf', 'outs', 'h', 'bb', 'so'].forEach(f => {
+                    outLine[f] = Math.max(0, (outLine[f] || 0) - delta[f]);
+                    inLine[f] = (inLine[f] || 0) + delta[f];
+                });
+            }
+            return movedPitches;
+        }
+
+        // 球数を打席記録＋進行中の投球履歴から再計算する（付け替え後の整合用）
+        function recomputePitchCountsFromRecords() {
+            if (!gameState || !gameState.live) return;
+            const isPitch = (ev) => ev && ev.type !== 'pickoff' && ev.type !== 'runner_event';
+            const counts = {};
+            const addSeq = (seq) => {
+                (Array.isArray(seq) ? seq : []).forEach(ev => {
+                    if (isPitch(ev) && ev.pitcherId) counts[ev.pitcherId] = (counts[ev.pitcherId] || 0) + 1;
+                });
+            };
+            (Array.isArray(gameState.atBatRecords) ? gameState.atBatRecords : []).forEach(rec => addSeq(rec.sequence));
+            addSeq(gameState.live.pitchHistory);
+            gameState.live.pitcherPitchCounts = counts;
+            let inn = 0;
+            (Array.isArray(gameState.atBatRecords) ? gameState.atBatRecords : []).forEach(rec => {
+                if (rec && rec.inning === gameState.live.inning && rec.half === gameState.live.half) {
+                    (Array.isArray(rec.sequence) ? rec.sequence : []).forEach(ev => { if (isPitch(ev)) inn += 1; });
+                }
+            });
+            (Array.isArray(gameState.live.pitchHistory) ? gameState.live.pitchHistory : []).forEach(ev => { if (isPitch(ev)) inn += 1; });
+            gameState.live.inningPitches = inn;
+        }
+
+        // 打席記録1件分の打撃成績寄与を、退く選手から入る選手へ移し替える
+        function transferBattingForRecord(rec, outPlayer, inPlayer) {
+            const r = rec.result || '';
+            const c = { pa: 1, ab: 0, h: 0, b2: 0, b3: 0, hr: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, sacFail: 0 };
+            if (r === 'SAC') c.sac = 1;
+            else if (r === 'SF') c.sf = 1;
+            else if (r === 'SAC_FAIL') { c.ab = 1; c.sacFail = 1; }
+            else if (r === 'BB' || r === 'IBB') c.bb = 1;
+            else if (r === 'HBP') c.hbp = 1;
+            else if (r === 'CI') { /* 打席数のみ */ }
+            else {
+                c.ab = 1;
+                if (['1B', '2B', '3B', 'HR', 'BUNT_HIT'].indexOf(r) !== -1) {
+                    c.h = 1;
+                    if (r === '2B') c.b2 = 1;
+                    else if (r === '3B') c.b3 = 1;
+                    else if (r === 'HR') c.hr = 1;
+                }
+                if (r === 'SO' || r === 'BUNT_SO' || (typeof r === 'string' && r.indexOf('K_') === 0)) c.so = 1;
+            }
+            [outPlayer, inPlayer].forEach(p => {
+                if (!p.batting) p.batting = { pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} };
+                if (!p.batting.results) p.batting.results = {};
+            });
+            Object.keys(c).forEach(f => {
+                outPlayer.batting[f] = Math.max(0, (outPlayer.batting[f] || 0) - c[f]);
+                inPlayer.batting[f] = (inPlayer.batting[f] || 0) + c[f];
+            });
+            const innKey = rec.inning;
+            if (Array.isArray(outPlayer.batting.results[innKey])) {
+                const idx = outPlayer.batting.results[innKey].indexOf(rec.resultLabel);
+                if (idx >= 0) outPlayer.batting.results[innKey].splice(idx, 1);
+            }
+            if (!Array.isArray(inPlayer.batting.results[innKey])) inPlayer.batting.results[innKey] = [];
+            inPlayer.batting.results[innKey].push(rec.resultLabel);
+        }
+
+        // 代打の後付け入力: マーク位置以降の打席記録の打者帰属を付け替える。
+        // 戻り値: 付け替えた打席数
+        function reassignBattingAfterMark(mark, outPlayer, inPlayer) {
+            const records = Array.isArray(gameState.atBatRecords) ? gameState.atBatRecords : [];
+            const offKeyOf = (half) => half === 'top' ? 'away' : 'home';
+            // マークが打席の途中に付いていた場合、その打席は元の打者のものとして残す
+            const startIdx = (mark.pitchIdx || 0) === 0 ? (mark.paIndex || 0) : (mark.paIndex || 0) + 1;
+            let moved = 0;
+            for (let i = startIdx; i < records.length; i++) {
+                const rec = records[i];
+                if (!rec || offKeyOf(rec.half) !== mark.teamKey) continue;
+                if (rec.batterId !== outPlayer.id) continue;
+                rec.batterId = inPlayer.id;
+                rec.batterName = inPlayer.name;
+                transferBattingForRecord(rec, outPlayer, inPlayer);
+                moved += 1;
+            }
+            return moved;
+        }
+
+        function confirmSubMarkResolution() {
+            if (!hasCurrentGame()) return;
+            const mark = ensureSubMarks().find(m => m.id === subMarkResolveState.markId);
+            if (!mark || mark.resolved) return;
+            const teamKey = mark.teamKey;
+            const team = gameState.teams[teamKey];
+            if (!team) return;
+            const outSel = document.getElementById('submark-resolve-out');
+            const inSel = document.getElementById('submark-resolve-in');
+            const posSel = document.getElementById('submark-resolve-pos');
+            if (!outSel || !inSel || !posSel) return;
+            const outPlayer = team.players.find(p => p.id === outSel.value);
+            if (!outPlayer) { showToast('退く選手を選んでください', 'warning'); return; }
+            if (!inSel.value) { showToast('入る選手を選んでください', 'warning'); return; }
+            if (inSel.value === 'existing:' + outPlayer.id) { showToast('退く選手と入る選手が同じです', 'warning'); return; }
+            const posVal = posSel.value || outPlayer.pos;
+
+            pushUndoState();
+            let inPlayer = null;
+            if (outPlayer.isActive) {
+                // 通常の選手交代と同じ手順でラインナップを入れ替える
+                inPlayer = resolveIncomingBenchPlayer(teamKey, inSel.value, 'submark-resolve-new-name', 'submark-resolve-new-num', outPlayer.order, posVal);
+                if (!inPlayer) { undoStack.pop(); return; }
+                outPlayer.isActive = false;
+                if (Array.isArray(gameState.live.bases)) {
+                    gameState.live.bases = gameState.live.bases.map(rId => (rId === outPlayer.id ? inPlayer.id : rId));
+                }
+                if (gameState.live.runnerResp && gameState.live.runnerResp[outPlayer.id]) {
+                    gameState.live.runnerResp[inPlayer.id] = gameState.live.runnerResp[outPlayer.id];
+                    delete gameState.live.runnerResp[outPlayer.id];
+                }
+                // DH投手同士の交代では、退く投手のDH投手フラグを外して引き継ぐ
+                if (outPlayer.dhPitcher && posVal === '投') outPlayer.dhPitcher = false;
+            } else {
+                // 退く選手が既に退場している場合は、現在のラインナップは変えず記録の付け替えのみ行う
+                if (inSel.value === 'new') {
+                    const nameEl = document.getElementById('submark-resolve-new-name');
+                    const numEl = document.getElementById('submark-resolve-new-num');
+                    const nm = nameEl ? nameEl.value.trim() : '';
+                    if (!nm) { undoStack.pop(); showToast('出場する選手名を入力してください', 'warning'); return; }
+                    inPlayer = {
+                        id: `${teamKey}_p_${Date.now()}`,
+                        order: outPlayer.order,
+                        pos: posVal,
+                        number: numEl ? (numEl.value.trim() || '0') : '0',
+                        name: nm,
+                        isActive: false,
+                        hasEnteredGame: true,
+                        batting: { pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} }
+                    };
+                    team.players.push(inPlayer);
+                } else {
+                    inPlayer = team.players.find(p => p.id === inSel.value.replace('existing:', ''));
+                }
+                if (!inPlayer) { undoStack.pop(); showToast('入る選手を選んでください', 'warning'); return; }
+            }
+
+            // マーク位置を境に記録を付け替える
+            let movedPitches = 0;
+            let movedAtBats = 0;
+            const pitcherAtMarkId = getMarkRecordedPitcherId(mark);
+            const isPitchingChange = !!(pitcherAtMarkId && pitcherAtMarkId === outPlayer.id && posVal === '投');
+            if (isPitchingChange) {
+                movedPitches = reassignPitchingAfterMark(mark, outPlayer, inPlayer);
+                recomputePitchCountsFromRecords();
+            }
+            const isBatterChange = !!(mark.offenseKey === teamKey && mark.batterId && mark.batterId === outPlayer.id);
+            if (isBatterChange) {
+                movedAtBats = reassignBattingAfterMark(mark, outPlayer, inPlayer);
+            }
+
+            mark.resolved = true;
+            mark.resolution = {
+                outId: outPlayer.id, outName: outPlayer.name,
+                inId: inPlayer.id, inName: inPlayer.name,
+                pos: posVal, resolvedAt: Date.now(),
+                movedPitches: movedPitches, movedAtBats: movedAtBats
+            };
+            const roleLabel = isPitchingChange ? '投手交代' : (isBatterChange ? '代打・選手交代' : '選手交代');
+            addLog(`${roleLabel}（後から入力） (${team.name}): ${outPlayer.name} → ${inPlayer.name} (${posVal}) ※${mark.inningLabel}の交代マークより`);
+            closeModal('modal-submark-resolve');
+            saveAndRender();
+            showToast(`${roleLabel}を記録しました（${mark.inningLabel}の場面）`, 'success');
+        }
+
         function ensurePendingDefenseSubs() {
             if (!gameState || !gameState.live) return [];
             if (!Array.isArray(gameState.live.pendingDefenseSubs)) gameState.live.pendingDefenseSubs = [];
@@ -14424,6 +15318,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const posText = selectedFieldPos ? POS_NAMES[selectedFieldPos] : '';
             selectedFieldPos = null;
             let runsScored = 0, rbi = 0, outsAdded = 0, logDesc = '', shortLabel = '';
+            let battedQuality = null, battedQualityLabel = null;
+            const scorerNames = [];
             const bases = [...gameState.live.bases];
             let newBases = [null, null, null];
 
@@ -14436,7 +15332,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 runsScored += 1;
                 rbi += 1;
                 const p = findPlayerById(runnerId);
-                if (p) p.batting.r += 1;
+                if (p) { p.batting.r += 1; scorerNames.push(p.name); }
                 // 投手成績：得点はその走者を出した投手（責任投手）の失点に数える。
                 // 失策で出塁した打者の打席や、振り逃げの失策が絡んだ打席での得点は自責点に含めない。
                 const runEarned = !(type === 'E' || (isDroppedKType(type) && parseKDetail(type).errorCode));
@@ -14548,8 +15444,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 else if (type === '3B') batter.batting.b3 = (batter.batting.b3 || 0) + 1;
                 else if (type === 'HR') batter.batting.hr = (batter.batting.hr || 0) + 1;
                 const hitNames = { '1B': '安', '2B': '二', '3B': '三', 'HR': '本', 'BUNT_HIT': 'バント安' };
-                shortLabel = `${posText}${hitNames[type]}`;
-                logDesc = type === 'BUNT_HIT' ? `${posText}バントヒット` : `${posText}${type}安打`;
+                // 安打の打球性質（ゴロ・ライナー・フライ）：ウィザードで選択された場合のみ（バントヒットは対象外）
+                if (type !== 'BUNT_HIT' && wizardState.hitQuality && BATTED_QUALITY_LABELS[wizardState.hitQuality]) {
+                    battedQuality = wizardState.hitQuality;
+                    battedQualityLabel = BATTED_QUALITY_LABELS[wizardState.hitQuality];
+                }
+                shortLabel = battedQualityLabel ? `${posText}${battedQualityLabel}${hitNames[type]}` : `${posText}${hitNames[type]}`;
+                logDesc = type === 'BUNT_HIT' ? `${posText}バントヒット` : `${posText}${type}安打${battedQualityLabel ? `（${battedQualityLabel}）` : ''}`;
                 
                 if (runnerTargets) {
                     outsAdded = baseAdvanceOuts;
@@ -14677,6 +15578,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 pitcherName: pitcherForRecord ? pitcherForRecord.name : '',
                 result: type,
                 resultLabel: shortLabel,
+                battedQuality: battedQuality,
+                battedQualityLabel: battedQualityLabel,
                 hadRunnerOnStart: bases.some(Boolean),
                 sequence: seqSnapshot,
                 pickoffCount: seqSnapshot.filter(e => e.type === 'pickoff').length,
@@ -14708,6 +15611,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
             resetCount();
             addRuns(runsScored);
+            if (runsScored > 0) {
+                // 打点・得点があったプレーは、誰が生還したかと打点を経過ログに明記する
+                const scorerText = scorerNames.filter(Boolean).join('、');
+                logDesc += scorerText ? ` ― ${scorerText}が生還（打点${rbi}）` : ` ― ${runsScored}得点（打点${rbi}）`;
+            }
             addLog(`${batter.order}番 ${batter.name}：${logDesc}`);
 
             gameState.live.bases = newBases;
@@ -14735,6 +15643,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             renderInteractiveFieldMap();
             renderBoxScores();
             renderLogs();
+            renderSubMarks();
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
@@ -14778,8 +15687,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     }
 
                     const val = team.innings[i - 1];
-                    const displayVal = isPlayed ? (val !== undefined && val !== null ? val : 0) : '';
                     const isCellActive = (i === currentInning && ((teamIdx === 0 && currentHalf === 'top') || (teamIdx === 1 && currentHalf === 'bottom')));
+                    // 攻撃中のイニングが0点で進行中の間は「0」を入れず空欄にする（得点が入ったらその得点を表示する）
+                    const displayVal = (isCellActive && (val === undefined || val === null || val === 0))
+                        ? ''
+                        : (isPlayed ? (val !== undefined && val !== null ? val : 0) : '');
                     rowHtml += `<td class="py-2 px-2 relative ${isCellActive ? 'bg-rose-50/50 font-bold text-slate-900' : ''}">${displayVal}${isCellActive ? '<div class="absolute bottom-0 left-1 right-1 h-0.5 bg-rose-500"></div>' : ''}</td>`;
                 }
                 
@@ -14795,13 +15707,27 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             document.getElementById('live-inning-badge').textContent = getInningLabel();
             document.getElementById('live-attack-team').textContent = `攻撃: ${offense.name}`;
 
-            const renderLamps = (id, count, activeClass) => {
-                const c = document.getElementById(id);
-                Array.from(c.children).forEach((el, idx) => { el.className = `w-4 h-4 rounded-full ${idx < count ? activeClass : 'bg-slate-700'}`; });
-            };
-            renderLamps('lamps-b', gameState.live.balls, 'bg-emerald-400');
-            renderLamps('lamps-s', gameState.live.strikes, 'bg-amber-400');
-            renderLamps('lamps-o', gameState.live.outs, 'bg-rose-500');
+            // テレビ中継風表示：BSOはランプではなく数字で表示し、ダイヤモンド中央にイニング、スコア欄に両チームの得点を表示する
+            const setLiveText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+            setLiveText('bso-num-b', String(gameState.live.balls || 0));
+            setLiveText('bso-num-s', String(gameState.live.strikes || 0));
+            setLiveText('bso-num-o', String(gameState.live.outs || 0));
+            setLiveText('tv-inning-center', getInningLabel());
+            const tvAwayRuns = (gameState.teams.away.innings || []).reduce((a, b) => a + (b || 0), 0);
+            const tvHomeRuns = (gameState.teams.home.innings || []).reduce((a, b) => a + (b || 0), 0);
+            setLiveText('tv-score-away-name', gameState.teams.away.name);
+            setLiveText('tv-score-home-name', gameState.teams.home.name);
+            setLiveText('tv-score-away', String(tvAwayRuns));
+            setLiveText('tv-score-home', String(tvHomeRuns));
+            const tvIsTop = gameState.live.half === 'top';
+            const tvBatAway = document.getElementById('tv-bat-away');
+            const tvBatHome = document.getElementById('tv-bat-home');
+            if (tvBatAway) tvBatAway.style.visibility = tvIsTop ? 'visible' : 'hidden';
+            if (tvBatHome) tvBatHome.style.visibility = tvIsTop ? 'hidden' : 'visible';
+            const tvRowAway = document.getElementById('tv-score-row-away');
+            const tvRowHome = document.getElementById('tv-score-row-home');
+            if (tvRowAway) tvRowAway.classList.toggle('is-batting', tvIsTop);
+            if (tvRowHome) tvRowHome.classList.toggle('is-batting', !tvIsTop);
 
             const history = Array.isArray(gameState.live.pitchHistory) ? gameState.live.pitchHistory : [];
             const realPitchCount = history.filter(p => p.type !== 'pickoff' && p.type !== 'runner_event').length;
@@ -14850,6 +15776,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (batter) {
                 document.getElementById('curr-batter-order').textContent = `${batter.order}番 (${batter.pos})`;
                 document.getElementById('curr-batter-name').textContent = batter.name;
+                const batterHandEl = document.getElementById('curr-batter-hand');
+                if (batterHandEl) batterHandEl.innerHTML = liveHandChecksHtml('live-batter-hand', batter.throws || '', batter.bats || '', 'batter');
 
                 const statsEl = document.getElementById('curr-batter-stats');
                 if (statsEl) {
@@ -14867,6 +15795,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 document.getElementById('curr-pitcher-name').textContent = pitcher.isTwoWay && pitcher.twoWayPitcher
                     ? `${pitcher.name}（二刀流：投手兼DH）`
                     : ((pitcher.dhPitcher || pitcher.order === 10) ? `${pitcher.name}（DH・10人目／打順なし）` : pitcher.name);
+                const pitcherHandEl = document.getElementById('curr-pitcher-hand');
+                if (pitcherHandEl) pitcherHandEl.innerHTML = liveHandChecksHtml('live-pitcher-hand', pitcher.throws || '', pitcher.bats || '', 'pitcher');
 
                 const pitchesEl = document.getElementById('curr-pitcher-pitches');
                 if (pitchesEl) {
@@ -14954,18 +15884,48 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             renderPitcherStrikeBoxscore();
         }
 
+        // 経過ログには野球的な記録（打撃結果・守備変更・失策・得点など）だけを表示する。
+        // 利き手や守備位置の登録、スタメン編集、設定変更など、サイト上での作業の記録は表示しない
+        // （過去の試合で既に保存されている分も、表示時にここで除外する。保存データ自体は変更しない）。
+        function isRegistrationLogText(text) {
+            if (!text) return false;
+            return text.indexOf('スタメン編集') !== -1
+                || text.indexOf('スタメンを試合中に編集') !== -1
+                || text.indexOf('グラウンド図から編集') !== -1
+                || text.indexOf('利き手') !== -1
+                || text.indexOf('DHルール運用モード') !== -1
+                || text.indexOf('交代マーク (') !== -1;
+        }
+
+        function getVisibleLogs() {
+            return (gameState.logs || []).filter(l => !isRegistrationLogText(l.text));
+        }
+
+        // 経過ログの色分け：得点プレーは赤文字＋黄背景、安打は赤文字、四死球は青文字、エラーは黄色で目立たせる。
+        // 返すのは専用CSSクラス（.log-hl-*）。内蔵のコンパイル済みTailwindに無いユーティリティ名
+        // （text-red-600等）を返しても色は付かないため、必ず専用クラスを使うこと。
+        function logHighlightClass(text) {
+            const t = text || '';
+            if (/生還|打点|得点|本盗|サヨナラ/.test(t)) return 'log-hl-score';
+            if (/安打|バントヒット/.test(t)) return 'log-hl-hit';
+            if (/四球|死球|敬遠/.test(t)) return 'log-hl-walk';
+            if (/失策|エラー|悪送球|受球ミス/.test(t)) return 'log-hl-error';
+            return '';
+        }
+
         function renderLogs() {
+            const visibleLogs = getVisibleLogs();
             const countEl = document.getElementById('log-count');
-            if (countEl) countEl.textContent = gameState.logs.length;
+            if (countEl) countEl.textContent = visibleLogs.length;
             const recentEl = document.getElementById('recent-logs-list');
             const fullEl = document.getElementById('full-logs-list');
-            if (gameState.logs.length === 0) {
+            if (visibleLogs.length === 0) {
                 recentEl.innerHTML = '<p class="text-slate-400 italic">まだ記録がありません。</p>';
                 fullEl.innerHTML = '<p class="text-slate-400 py-4 text-center">記録されたプレイはまだありません。</p>';
                 return;
             }
-            recentEl.innerHTML = gameState.logs.slice(0, 8).map(l => `<div class="py-1 border-b border-slate-100 flex items-center gap-2"><span class="text-[10px] font-bold bg-slate-800 text-white px-1.5 py-0.5 rounded">${l.inningText}</span><span>${l.text}</span></div>`).join('');
-            fullEl.innerHTML = gameState.logs.map(l => `<div class="py-2.5 flex items-center gap-3"><span class="text-xs font-bold bg-slate-800 text-white px-2 py-0.5 rounded">${l.inningText}</span><span class="text-slate-800">${l.text}</span></div>`).join('');
+            recentEl.innerHTML = visibleLogs.slice(0, 8).map(l => `<div class="py-1 border-b border-slate-100 flex items-center gap-2"><span class="text-[10px] font-bold bg-slate-800 text-white px-1.5 py-0.5 rounded shrink-0">${l.inningText}</span><span class="${logHighlightClass(l.text)}">${l.text}</span></div>`).join('');
+            fullEl.innerHTML = visibleLogs.map(l => `<div class="py-2.5 flex items-center gap-3"><span class="text-xs font-bold bg-slate-800 text-white px-2 py-0.5 rounded shrink-0">${l.inningText}</span><span class="${logHighlightClass(l.text) || 'text-slate-800'}">${l.text}</span></div>`).join('');
         }
 
         function switchTab(tabName) {
@@ -15348,9 +16308,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     target.order = 10;
                     target.pos = '投';
                     target.isActive = true;
-                    addLog(`投手を変更（グラウンド図から編集・${team.name}）: ${dhPitcher.name} → ${target.name}（DH投手・打順なし）`);
-                } else {
-                    addLog(`スタメン編集（グラウンド図・${team.name}）: 投手 ${target.name} の利き手を更新`);
                 }
                 applyHands(target);
             } else if (fieldEditContext.twoWayPitcher) {
@@ -15367,11 +16324,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     if (!team.cannotPitchIds.includes(pitcher.id)) team.cannotPitchIds.push(pitcher.id);
                     team.dhMode = 'standard';
                     applyHands(target);
-                    addLog(`投手交代（グラウンド図から編集・${team.name}）: ${pitcher.name} → ${target.name}（${pitcher.name} は指名打者として出場を継続〔規則5.11(b)〕）`);
                 } else {
                     if (newOrder) assignFieldEditOrder(team, target, newOrder);
                     applyHands(target);
-                    addLog(`スタメン編集（グラウンド図・${team.name}）: 投手 ${target.name}（${target.order}番）の打順・利き手を更新`);
                 }
             } else {
                 const occupant = posSymbol === '投'
@@ -15394,7 +16349,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (target.dhPitcher) target.dhPitcher = false;
                 if (newOrder) assignFieldEditOrder(team, target, newOrder);
                 applyHands(target);
-                addLog(`スタメン編集（グラウンド図・${team.name}）: ${posSymbol} に ${target.name}（${target.order}番・${target.throws || ''}投${target.bats || ''}打）を登録`);
             }
             ['away', 'home'].forEach(k => {
                 const lu = getActiveLineup(k);
@@ -15417,7 +16371,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function copyLogsToClipboard() {
-            const text = gameState.logs.map(l => `[${l.inningText}] ${l.text}`).join('\n');
+            const text = getVisibleLogs().map(l => `[${l.inningText}] ${l.text}`).join('\n');
             const ta = document.createElement('textarea');
             ta.value = text; document.body.appendChild(ta); ta.select();
             document.execCommand('copy'); document.body.removeChild(ta);
@@ -16408,11 +17362,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (c === '中' || c === '投' || c === '捕') return 'center';
             return 'unknown';
         }
-        function analysisBattedQuality(result) {
+        function analysisBattedQuality(result, battedQuality) {
             if (result === 'GO' || result === 'DP') return 'grounder';
             if (result === 'FO' || result === 'FO_DP' || result === 'SF') return 'fly';
             if (result === 'LO' || result === 'LO_DP') return 'liner';
-            if (['1B', '2B', '3B', 'HR', 'BUNT_HIT'].indexOf(result) !== -1) return 'hit';
+            if (['1B', '2B', '3B', 'HR'].indexOf(result) !== -1) {
+                // 安打は入力時に打球性質が選ばれていればそれで分類する（旧記録は従来どおり「安打」として扱う）
+                if (battedQuality === 'grounder' || battedQuality === 'fly' || battedQuality === 'liner') return battedQuality;
+                return 'hit';
+            }
+            if (result === 'BUNT_HIT') return 'hit';
             if (result === 'SAC' || result === 'SAC_FAIL') return 'bunt';
             return 'other';
         }
@@ -16432,7 +17391,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     const result = ab.result || '';
                     if (ANALYSIS_BATTED_RESULTS.indexOf(result) !== -1) {
                         const zone = analysisBattedZone(result, ab.resultLabel || '');
-                        const quality = analysisBattedQuality(result);
+                        const quality = analysisBattedQuality(result, ab.battedQuality);
                         const batter = (ab.batterId && lookup.byId[ab.batterId]) || lookup.byName[name] || null;
                         const bats = batter ? String(batter.bats || '') : '';
                         targets.forEach(st => {
@@ -17515,6 +18474,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         if (gameState.live.inningPitches === undefined) gameState.live.inningPitches = 0;
                         if (!Array.isArray(gameState.live.pitchHistory)) gameState.live.pitchHistory = [];
                         if (!Array.isArray(gameState.atBatRecords)) gameState.atBatRecords = [];
+                        if (!Array.isArray(gameState.subMarks)) gameState.subMarks = [];
                         if (gameState.live.isTiebreakActive === undefined) gameState.live.isTiebreakActive = false;
                         if (!Array.isArray(gameState.live.pendingDefenseSubs)) gameState.live.pendingDefenseSubs = [];
                         if (!gameState.live.runnerResp) gameState.live.runnerResp = {};
@@ -18367,6 +19327,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             openRunnerEventModal, openPinchRunnerFromRunnerModal, executeBalkImmediately,
             promptRunnerEventPitchLink,
             openSubModal, openSwingStrikeModal, openTiebreakSetupModal,
+            openSubMarkCreateModal, selectSubMarkTeam, confirmSubMarkCreate,
+            openSubMarkResolveModal, onSubMarkOutChange, onSubMarkInChange, deleteSubMark, confirmSubMarkResolution,
             openTiebreakConfirmModal, confirmEnterTiebreak, confirmTiebreakSetup, applyDefaultTiebreakRunners,
             promptPickoffOut, selectPickoffSource, backToRunnerEventFromPickoff, backToPickoffSource,
             selectPickoffAttemptSource, backToPickoffAttemptSource, selectPickoffAttemptCount, proceedToPickoffTargetSelection, finalizePickoffAttempt,
