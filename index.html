@@ -112,14 +112,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         /* === 走者進塁先の重なり防止（打者イベント） ===
            ほかの走者・打者がすでに選んでいる塁のボタンは選択不可にする */
         .advance-btn-occupied, .advance-btn-blocked { opacity: 0.35 !important; cursor: not-allowed !important; background-color: #e2e8f0 !important; color: #64748b !important; border-color: #cbd5e1 !important; }
-        /* === 経過ログの色分け（専用クラス） ===
-           内蔵のコンパイル済みTailwindには text-red-600 / text-red-700 / bg-yellow-200 /
-           text-yellow-600 等が含まれておらず、ユーティリティ名だけでは色が付かなかった。
-           そのため経過ログの色分けは専用クラスで確実に色を付ける（!importantで親の文字色より優先）。 */
-        .log-hl-score { color: #b91c1c !important; background-color: #fde047 !important; font-weight: 800 !important; padding: 1px 6px; border-radius: 6px; }
-        .log-hl-hit { color: #dc2626 !important; font-weight: 800 !important; }
+        /* === 経過ログ／打者成績表示の色分け（専用クラス） ===
+           配色は打者成績表示と共通：アウトは黒（既定色）、安打はピンク、犠打は黄色、
+           四死球は青、エラーは緑。
+           内蔵のコンパイル済みTailwindには無いユーティリティ名だけでは色が付かないため、
+           色分けは専用クラスで確実に色を付ける（!importantで親の文字色より優先）。 */
+        .log-hl-hit { color: #db2777 !important; font-weight: 800 !important; }
+        .log-hl-sac { color: #ca8a04 !important; font-weight: 800 !important; }
         .log-hl-walk { color: #2563eb !important; font-weight: 800 !important; }
-        .log-hl-error { color: #a16207 !important; font-weight: 800 !important; }
+        .log-hl-error { color: #16a34a !important; font-weight: 800 !important; }
+        .res-hl-hit { color: #db2777 !important; font-weight: 800; }
+        .res-hl-sac { color: #ca8a04 !important; font-weight: 800; }
+        .res-hl-walk { color: #2563eb !important; font-weight: 800; }
+        .res-hl-error { color: #16a34a !important; font-weight: 800; }
         /* === 利き手スイッチ（カウント入力画面の投・打） ===
            左＝左利き／右＝右利きの位置にノブが寄る3ポジションスイッチ。
            選んだ側が色付き（ノブ＋白文字）、選んでいない側は白いまま。
@@ -2516,29 +2521,29 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 </div>
                             </div>
 
-                            <!-- ダイヤモンド（走者タップで走者イベント選択・真ん中にイニング表示） -->
+                            <!-- ダイヤモンド（走者の出塁状況表示・真ん中にイニング表示。走者イベントはボタンから開く） -->
                             <div class="tv-diamond-wrap">
                                 <svg viewBox="0 0 160 140" class="tv-diamond-svg no-select" role="img" aria-label="走者の出塁状況">
                                     <polygon points="80,20 130,70 80,120 30,70" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
                                     <polygon points="80,125 86,119 86,113 74,113 74,119" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1.5"/>
                                     <text id="tv-inning-center" x="80" y="77" text-anchor="middle" font-size="17" font-weight="800" fill="#ffffff">1回表</text>
-                                    <g onclick="clickBase(2)" id="group-base-2" class="diamond-base" style="cursor:pointer">
+                                    <g id="group-base-2" class="diamond-base">
                                         <circle cx="80" cy="20" r="20" fill="transparent"/>
                                         <rect id="svg-base-2" x="71" y="11" width="18" height="18" transform="rotate(45 80 20)" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
                                         <text x="80" y="8" text-anchor="middle" font-size="9" font-weight="bold" fill="#047857">2B</text>
                                     </g>
-                                    <g onclick="clickBase(1)" id="group-base-1" class="diamond-base" style="cursor:pointer">
+                                    <g id="group-base-1" class="diamond-base">
                                         <circle cx="130" cy="70" r="20" fill="transparent"/>
                                         <rect id="svg-base-1" x="121" y="61" width="18" height="18" transform="rotate(45 130 70)" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
                                         <text x="148" y="73" text-anchor="start" font-size="9" font-weight="bold" fill="#047857">1B</text>
                                     </g>
-                                    <g onclick="clickBase(3)" id="group-base-3" class="diamond-base" style="cursor:pointer">
+                                    <g id="group-base-3" class="diamond-base">
                                         <circle cx="30" cy="70" r="20" fill="transparent"/>
                                         <rect id="svg-base-3" x="21" y="61" width="18" height="18" transform="rotate(45 30 70)" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
                                         <text x="12" y="73" text-anchor="end" font-size="9" font-weight="bold" fill="#047857">3B</text>
                                     </g>
                                 </svg>
-                                <span class="tv-diamond-hint">走者タップでイベント・代走</span>
+                                <span class="tv-diamond-hint">走者イベント・代走は下の「走者イベント」ボタンから</span>
                             </div>
                         </div>
 
@@ -2610,11 +2615,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             </div>
                         </div>
 
-                        <!-- 打者イベント入力ボタン（ポップアップ起動） -->
-                        <div class="pt-2 border-t border-slate-100">
-                            <button onclick="openBatterEventModal()" class="w-full bg-sky-600 hover:bg-sky-700 active:scale-[0.99] text-white font-extrabold py-3 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-2 text-sm">
+                        <!-- 打者イベント／走者イベント入力ボタン（ポップアップ起動） -->
+                        <div class="pt-2 border-t border-slate-100 grid grid-cols-2 gap-2">
+                            <button onclick="openBatterEventModal()" class="bg-sky-600 hover:bg-sky-700 active:scale-[0.99] text-white font-extrabold py-3 px-3 rounded-xl shadow-sm transition flex items-center justify-center gap-2 text-sm">
                                 <i data-lucide="user-check" class="w-4 h-4"></i>
                                 <span>打者イベント入力</span>
+                            </button>
+                            <button onclick="openRunnerEventFromButton()" class="bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white font-extrabold py-3 px-3 rounded-xl shadow-sm transition flex items-center justify-center gap-2 text-sm">
+                                <i data-lucide="zap" class="w-4 h-4"></i>
+                                <span>走者イベント</span>
                             </button>
                         </div>
                     </div>
@@ -3223,7 +3232,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
     </div>
 
-    <!-- 走者イベントモーダル（ダイヤモンドの走者をタップで開く） -->
+    <!-- 走者イベントモーダル（「走者イベント」ボタンで開く） -->
     <div id="modal-runner-event" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden max-h-[90vh] flex flex-col">
             <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between shrink-0">
@@ -3246,6 +3255,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <span class="text-sm font-extrabold">盗塁成功</span>
                             <span class="text-[10px] text-emerald-100 font-normal">選択した走者が1つ進塁（3塁走者は生還）</span>
                         </button>
+                        <button onclick="promptRunnerEventPitchLink('out_steal')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-3 rounded-xl text-xs shadow-xs transition flex flex-col items-start gap-0.5">
+                            <span class="text-sm font-extrabold">盗塁死</span>
+                            <span class="text-[10px] text-slate-300 font-normal">盗塁失敗で走者アウト（+1アウト）</span>
+                        </button>
                         <button onclick="promptRunnerEventPitchLink('wp')" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-3 rounded-xl text-xs shadow-xs transition flex flex-col items-start gap-0.5">
                             <span class="text-sm font-extrabold">暴投（ワイルドピッチ）</span>
                             <span class="text-[10px] text-sky-100 font-normal">投手の暴投により進塁</span>
@@ -3262,9 +3275,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <span class="text-sm font-extrabold">牽制死</span>
                             <span class="text-[10px] text-rose-100 font-normal">投手から／捕手からを選択（+1アウト）</span>
                         </button>
-                        <button onclick="promptRunnerEventPitchLink('out_steal')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-3 rounded-xl text-xs shadow-xs transition flex flex-col items-start gap-0.5">
-                            <span class="text-sm font-extrabold">盗塁死</span>
-                            <span class="text-[10px] text-slate-300 font-normal">盗塁失敗で走者アウト（+1アウト）</span>
+                        <button onclick="promptRunnerEventPitchLink('obstruction')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-3 rounded-xl text-xs shadow-xs transition flex flex-col items-start gap-0.5">
+                            <span class="text-sm font-extrabold">走塁妨害</span>
+                            <span class="text-[10px] text-teal-100 font-normal">守備側の妨害で進塁権付与（選択した走者が1つ進塁）</span>
+                        </button>
+                        <button onclick="promptRunnerEventPitchLink('out_interference')" class="bg-rose-700 hover:bg-rose-800 text-white font-bold py-3 px-3 rounded-xl text-xs shadow-xs transition flex flex-col items-start gap-0.5">
+                            <span class="text-sm font-extrabold">守備妨害</span>
+                            <span class="text-[10px] text-rose-100 font-normal">走者の妨害で強制アウト（+1アウト）</span>
                         </button>
                     </div>
                 </div>
@@ -4014,20 +4031,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <span class="text-[10px] text-amber-700 font-normal">次に打球方向を選択</span>
                         <span id="bunt-foul-warning" class="text-[10px] text-rose-600 font-bold hidden">※現在2ストライクのためスリーバント失敗になります</span>
                     </button>
-                    <button onclick="selectFoulType('foul_tip')" class="w-full py-2.5 px-3 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-900 font-bold text-xs flex flex-col items-start gap-0.5 transition">
-                        <span class="w-full flex items-center justify-between">
-                            <span>ファウルチップ</span>
-                            <span class="text-[11px] text-teal-600">そのまま記録</span>
-                        </span>
-                        <span class="text-[10px] text-teal-700 font-normal">バットにかすって捕手が直接捕球（打球の質・方向は選ばず記録します）</span>
-                    </button>
                     <div class="pt-2 border-t border-slate-100 space-y-1.5">
 
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="quickRecordFoul('foul_hitting')" class="py-2 px-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs transition">ヒッティングで記録</button>
                             <button onclick="quickRecordFoul('foul_bunt')" class="py-2 px-2 rounded-lg border border-amber-300 bg-white hover:bg-amber-50 text-amber-800 font-bold text-xs transition">バントで記録</button>
                         </div>
-                        <button onclick="quickRecordFoul('foul_tip')" class="w-full py-2 px-2 rounded-lg border border-teal-300 bg-white hover:bg-teal-50 text-teal-800 font-bold text-xs transition">ファウルチップで記録</button>
                     </div>
                 </div>
 
@@ -4051,6 +4060,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             
                         </button>
                     </div>
+                    <button onclick="selectFoulTip()" class="w-full py-2.5 px-3 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-900 font-bold text-xs flex flex-col items-start gap-0.5 transition">
+                        <span class="w-full flex items-center justify-between">
+                            <span>ファウルチップ</span>
+                            <span class="text-[11px] text-teal-600">そのまま記録</span>
+                        </span>
+                        <span class="text-[10px] text-teal-700 font-normal">バットにかすって捕手が直接捕球（ヒッティングファウルの一種として、打球の質・方向は選ばず記録します）</span>
+                    </button>
                     <button onclick="selectFoulQuality(null)" class="w-full py-2 rounded-lg border border-slate-300 bg-slate-100 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">質を指定せず、方向の選択へ進む</button>
                     <button onclick="finalizeFoulRecording()" class="w-full py-2 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-500 hover:bg-slate-50 transition">質も方向も指定せず記録する</button>
                 </div>
@@ -8415,7 +8431,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const oppTwoWay = oppDHVal === '2';
 
             // 再描画（DH切り替え・チーム切替）前に、入力済みの値を保持する
-            const snap = { myPlayer: [], myPos: [], myNum: [], myName: [], oppPos: [], oppNum: [], oppName: [], oppPlayer: [], myPitcher: '', myPitcherNum: '', myPitcherName: '', oppPitcher: '', oppPitcherNum: '', oppPitcherName: '', myBench: [], oppBench: [], myThrows: [], myBats: [], oppThrows: [], oppBats: [], myPitcherThrows: null, myPitcherBats: null, oppPitcherThrows: null, oppPitcherBats: null };
+            const snap = { myPlayer: [], myPos: [], myNum: [], myName: [], oppPos: [], oppNum: [], oppName: [], oppPlayer: [], myPitcher: '', myPitcherNum: '', myPitcherName: '', oppPitcher: '', oppPitcherNum: '', oppPitcherName: '', myBench: [], oppBench: [], myBenchNum: [], oppBenchNum: [], myThrows: [], myBats: [], oppThrows: [], oppBats: [], myPitcherThrows: null, myPitcherBats: null, oppPitcherThrows: null, oppPitcherBats: null };
             for (let i = 0; i < 9; i++) {
                 const mp = document.getElementById(`setup-my-player-${i}`);
                 if (mp) snap.myPlayer[i] = mp.value;
@@ -8441,8 +8457,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             for (let b = 0; b < 3; b++) {
                 const mb = document.getElementById(`setup-my-bench-name-${b}`);
                 if (mb) snap.myBench[b] = mb.value;
+                const mbn = document.getElementById(`setup-my-bench-num-${b}`);
+                if (mbn) snap.myBenchNum[b] = mbn.value;
                 const ob = document.getElementById(`setup-opp-bench-name-${b}`);
                 if (ob) snap.oppBench[b] = ob.value;
+                const obn = document.getElementById(`setup-opp-bench-num-${b}`);
+                if (obn) snap.oppBenchNum[b] = obn.value;
             }
             const snapMyPitcherEl = document.getElementById('setup-my-pitcher-player');
             if (snapMyPitcherEl) snap.myPitcher = snapMyPitcherEl.value;
@@ -8594,7 +8614,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (mySource === 'manual') {
                     let benchHtml = '<div class="text-[10px] font-extrabold text-slate-600 mb-1">ベンチ選手（任意・空欄可）</div><div class="space-y-1.5">';
                     for (let b = 0; b < 3; b++) {
-                        benchHtml += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-my-bench-name-${b}" value="${snap.myBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"></div>`;
+                        benchHtml += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-my-bench-name-${b}" value="${snap.myBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"><select id="setup-my-bench-num-${b}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.myBenchNum[b]))}</select></div>`;
                     }
                     benchHtml += '</div>';
                     myBenchArea.innerHTML = benchHtml;
@@ -8716,7 +8736,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (oppSource === 'manual') {
                     let benchHtmlO = '<div class="text-[10px] font-extrabold text-slate-600 mb-1">ベンチ選手（任意・空欄可）</div><div class="space-y-1.5">';
                     for (let b = 0; b < 3; b++) {
-                        benchHtmlO += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-opp-bench-name-${b}" value="${snap.oppBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"></div>`;
+                        benchHtmlO += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-opp-bench-name-${b}" value="${snap.oppBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"><select id="setup-opp-bench-num-${b}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.oppBenchNum[b]))}</select></div>`;
                     }
                     benchHtmlO += '</div>';
                     oppBenchArea.innerHTML = benchHtmlO;
@@ -9006,7 +9026,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 for (let b = 0; b < 3; b++) {
                     const benchEl = document.getElementById(`setup-my-bench-name-${b}`);
                     const benchName = benchEl ? benchEl.value.trim() : '';
-                    if (benchName) myPlayers.push({ id: `${mySide}_bench_${b}_${Date.now()}`, order: 0, pos: '控', number: '', name: benchName, isActive: false, batting: emptyBatting() });
+                    const benchNumEl = document.getElementById(`setup-my-bench-num-${b}`);
+                    if (benchName) myPlayers.push({ id: `${mySide}_bench_${b}_${Date.now()}`, order: 0, pos: '控', number: officialSetup && benchNumEl ? (benchNumEl.value || '') : '', name: benchName, isActive: false, batting: emptyBatting() });
                 }
             } else {
             for (let i = 0; i < 9; i++) {
@@ -9157,7 +9178,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             for (let b = 0; b < 3; b++) {
                 const benchEl = document.getElementById(`setup-opp-bench-name-${b}`);
                 const benchName = benchEl ? benchEl.value.trim() : '';
-                if (benchName) oppPlayers.push({ id: `${oppSide}_bench_${b}_${Date.now()}`, order: 0, pos: '控', number: '', name: benchName, isActive: false, batting: emptyBatting() });
+                const benchNumEl = document.getElementById(`setup-opp-bench-num-${b}`);
+                if (benchName) oppPlayers.push({ id: `${oppSide}_bench_${b}_${Date.now()}`, order: 0, pos: '控', number: officialSetup && benchNumEl ? (benchNumEl.value || '') : '', name: benchName, isActive: false, batting: emptyBatting() });
             }
             }
             if (oppTwoWay) {
@@ -10260,7 +10282,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 else if (['DP', 'FO_DP', 'LO_DP'].indexOf(r) !== -1) d.outs += 2;
                 const seq = Array.isArray(ab.sequence) ? ab.sequence : [];
                 seq.forEach(ev => {
-                    if (ev && ev.type === 'runner_event' && typeof ev.label === 'string' && (ev.label.indexOf('牽制死') !== -1 || ev.label.indexOf('盗塁死') !== -1)) d.outs += 1;
+                    if (ev && ev.type === 'runner_event' && typeof ev.label === 'string' && (ev.label.indexOf('牽制死') !== -1 || ev.label.indexOf('盗塁死') !== -1 || ev.label.indexOf('守備妨害') !== -1)) d.outs += 1;
                 });
             });
             return map;
@@ -10532,7 +10554,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     else if (['DP', 'FO_DP', 'LO_DP'].indexOf(r) !== -1) d.outs += 2;
                     const seq = Array.isArray(ab.sequence) ? ab.sequence : [];
                     seq.forEach(ev => {
-                        if (ev && ev.type === 'runner_event' && typeof ev.label === 'string' && (ev.label.indexOf('牽制死') !== -1 || ev.label.indexOf('盗塁死') !== -1)) d.outs += 1;
+                        if (ev && ev.type === 'runner_event' && typeof ev.label === 'string' && (ev.label.indexOf('牽制死') !== -1 || ev.label.indexOf('盗塁死') !== -1 || ev.label.indexOf('守備妨害') !== -1)) d.outs += 1;
                     });
                     // ストライク率も同じ打席だけを対象に数える（aggregatePitcherStrikeStats と同じ数え方）
                     if (!strikes[key]) strikes[key] = newPitcherStrikeStats(pName, teamName);
@@ -12123,8 +12145,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             } else if (cat === 'out') {
                 titleText = 'アウトの種類を選択';
                 items = [
-                    { type: 'SO', label: '三振', pos: false, cls: 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-200' },
-                    { type: 'BUNT_SO', label: 'スリーバント失敗', pos: false, cls: 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-200' },
+                    { type: 'SB_OUT', label: 'セーフティバントアウト', pos: 'bunt', cls: 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-200' },
                     { type: 'GO', label: 'ゴロアウト', pos: true, cls: 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300' },
                     { type: 'FO', label: 'フライアウト', pos: true, cls: 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300' },
                     { type: 'LO', label: 'ライナーアウト', pos: true, cls: 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300' },
@@ -12199,7 +12220,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 document.getElementById('wizard-step-indicator').textContent = 'ステップ 2.2: 失策の打球種別';
                 document.getElementById('wizard-step-2').classList.add('hidden');
                 document.getElementById('wizard-step-error-bunt').classList.remove('hidden');
-            } else if (subType === 'BUNT_HIT') {
+            } else if (subType === 'BUNT_HIT' || subType === 'SB_OUT') {
+                // バントヒット／セーフティバントアウトは内野のバントマップで方向を選ぶ
                 document.getElementById('wizard-step-indicator').textContent = 'ステップ 3: バント方向';
                 document.getElementById('wizard-step-2').classList.add('hidden');
                 document.getElementById('wizard-step-bunt-map').classList.remove('hidden');
@@ -12472,7 +12494,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             // 失策出塁は走者がいない場面でも、打者走者が何塁まで進んだかを選べるよう進塁先選択を開く
             // （エラーで大きく弾いた間に2塁・3塁まで進むケースを記録するため）
-            if ((activeRunners.length > 0 || wizardState.subResult === 'E') && ['1B', '2B', '3B', 'BUNT_HIT', 'SAC', 'SAC_FAIL', 'SF', 'GO', 'FO', 'LO', 'DP', 'FO_DP', 'LO_DP', 'E'].includes(wizardState.subResult)) {
+            if ((activeRunners.length > 0 || wizardState.subResult === 'E') && ['1B', '2B', '3B', 'BUNT_HIT', 'SAC', 'SAC_FAIL', 'SF', 'GO', 'FO', 'LO', 'DP', 'FO_DP', 'LO_DP', 'SB_OUT', 'E'].includes(wizardState.subResult)) {
                 openRunnerAdvanceModal(wizardState.subResult);
             } else {
                 pushUndoState();
@@ -13063,6 +13085,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
+        // ファウルチップはヒッティングファウルの一種として、打球の質の選択ステップから記録する。
+        // バットにかすって捕手が直接捕球したものなので、打球の質・方向は選ばずそのまま記録する
+        // （投球種別は従来どおり 'foul_tip' のまま。保存データ形式は変えない）。
+        function selectFoulTip() {
+            if (!pendingFoulDetail) pendingFoulDetail = { pitchType: 'foul_hitting', quality: null, direction: null };
+            pendingFoulDetail.pitchType = 'foul_tip';
+            pendingFoulDetail.quality = null;
+            pendingFoulDetail.direction = null;
+            finalizeFoulRecording();
+        }
+
         function backToFoulTypeStep() {
             showFoulStep('type');
         }
@@ -13615,13 +13648,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         // ================= 走者イベント制御 =================
+        // 走者イベントはダイヤモンドの走者タップではなく、打者イベント入力の横に置いた
+        // 「走者イベント」ボタンから開くボタン式に統一する。
         function clickBase(baseNum) {
-            const runnerId = gameState.live.bases[baseNum - 1];
-            if (!runnerId) {
-                showToast(`${baseNum}塁に走者はいません`, 'info');
-                return;
-            }
-            openRunnerEventModal(baseNum);
+            // 互換のため残す（ダイヤモンドの走者タップでは走者イベントを開かない）
+            showToast('走者イベントは「走者イベント」ボタンから記録してください', 'info');
+        }
+
+        function openRunnerEventFromButton() {
+            // ボタンから開く場合は対象走者を事前にチェックせず、モーダル内で選んでもらう
+            openRunnerEventModal(0);
         }
 
         function openRunnerEventModal(clickedBaseNum) {
@@ -13809,7 +13845,25 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 eventLabel = '捕逸';
             }
 
-            selectedIdxs.forEach(idx => {
+            // 走塁妨害（進塁権付与）は、選択した走者の進塁を妨げる位置にいる走者も
+            // 押し出されて進塁する。そのため実際に進塁する走者の集合を先に確定させる。
+            let iterIdxs = selectedIdxs;
+            const forcedIdxs = new Set();
+            if (actionType === 'obstruction') {
+                const adv = new Set(selectedIdxs);
+                let changed = true;
+                while (changed) {
+                    changed = false;
+                    adv.forEach(idx => {
+                        if (idx < 2 && bases[idx + 1] && !adv.has(idx + 1)) { adv.add(idx + 1); changed = true; }
+                    });
+                }
+                adv.forEach(idx => { if (!selectedIdxs.includes(idx)) forcedIdxs.add(idx); });
+                iterIdxs = Array.from(adv).sort((a, b) => b - a);
+                eventLabel = '走塁妨害';
+            }
+
+            iterIdxs.forEach(idx => {
                 const runnerId = bases[idx];
                 if (!runnerId) return;
                 const runner = findPlayerById(runnerId);
@@ -13840,6 +13894,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         addLog(`${rName} 盗塁成功 (${idx + 2}塁へ)`);
                     }
                     eventLabel = '盗塁';
+                } else if (actionType === 'obstruction') {
+                    bases[idx] = null;
+                    const isForced = forcedIdxs.has(idx);
+                    if (idx === 2) {
+                        if (runner) runner.batting.r += 1;
+                        addRuns(1);
+                        addLog(isForced ? `${rName} (3塁) 走塁妨害（押し出し）により生還` : `${rName} (3塁) 走塁妨害により進塁権付与・生還`);
+                    } else {
+                        bases[idx + 1] = runnerId;
+                        addLog(isForced ? `${rName} (${idx + 1}塁→${idx + 2}塁) 走塁妨害（押し出し）により進塁` : `${rName} (${idx + 1}塁→${idx + 2}塁) 走塁妨害により進塁権付与`);
+                    }
                 } else if (actionType === 'out_pickoff') {
                     bases[idx] = null;
                     let pickoffDetail = '牽制死';
@@ -13870,6 +13935,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     removeFromBequeathed(runnerId);
                     if (gameState.live.runnerResp) delete gameState.live.runnerResp[runnerId];
                     eventLabel = '盗塁死';
+                    isOut = true;
+                } else if (actionType === 'out_interference') {
+                    // 守備妨害（走者が守備を妨害）は、その走者が強制アウトになる
+                    bases[idx] = null;
+                    addLog(`${rName} (${idx + 1}塁) 守備妨害でアウト`);
+                    addOuts(1);
+                    const ifPitcher = getCurrentPitcher();
+                    if (ifPitcher) ensurePitchingLine(ifPitcher).outs += 1;
+                    removeFromBequeathed(runnerId);
+                    if (gameState.live.runnerResp) delete gameState.live.runnerResp[runnerId];
+                    eventLabel = '守備妨害';
                     isOut = true;
                 }
             });
@@ -16139,6 +16215,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const outNames = {
                     'SO': '三振',
                     'BUNT_SO': '三振(ス)',
+                    'SB_OUT': 'バントアウト',
                     'GO': 'ゴロ',
                     'FO': '飛',
                     'LO': '直',
@@ -16149,6 +16226,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const logNames = {
                     'SO': '三振',
                     'BUNT_SO': 'スリーバント失敗(三振)',
+                    'SB_OUT': `${posText}セーフティバントアウト`,
                     'GO': `${posText}ゴロ`,
                     'FO': `${posText}フライ`,
                     'LO': `${posText}ライナー`,
@@ -16386,7 +16464,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
                 el.setAttribute('fill', hasRunner ? '#f59e0b' : '#ffffff');
                 if (groupEl) {
-                    groupEl.style.cursor = hasRunner ? 'pointer' : 'default';
+                    // 走者イベントはボタン式に統一したため、ダイヤモンドの走者タップでは開かない
+                    groupEl.style.cursor = 'default';
                 }
             });
 
@@ -16405,7 +16484,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         .forEach(([inn, arr]) => {
                             arr.forEach(res => pastResults.push(res));
                         });
-                    statsEl.textContent = pastResults.length > 0 ? pastResults.join(', ') : '初打席';
+                    if (pastResults.length > 0) {
+                        // 表示ラベルは従来のまま、結果ごとに色分けだけを付ける
+                        // （アウト：黒／安打：ピンク／犠打：黄／四死球：青／エラー：緑）
+                        statsEl.innerHTML = pastResults.map(res => {
+                            const cls = batterResultColorClass(res);
+                            const safe = physicalEscapeHtml(res);
+                            return cls ? `<span class="${cls}">${safe}</span>` : safe;
+                        }).join(', ');
+                    } else {
+                        statsEl.textContent = '初打席';
+                    }
                 }
             }
             const pitcher = getCurrentPitcher();
@@ -16519,16 +16608,30 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return (gameState.logs || []).filter(l => !isRegistrationLogText(l.text));
         }
 
-        // 経過ログの色分け：得点プレーは赤文字＋黄背景、安打は赤文字、四死球は青文字、エラーは黄色で目立たせる。
-        // 返すのは専用CSSクラス（.log-hl-*）。内蔵のコンパイル済みTailwindに無いユーティリティ名
-        // （text-red-600等）を返しても色は付かないため、必ず専用クラスを使うこと。
+        // 打者成績表示（カウント入力画面）の色分け：アウトは黒（既定色＝クラスなし）、
+        // 安打はピンク、犠打は黄色、四死球は青、エラーは緑。表示ラベル自体は従来のまま変えない。
+        // 返すのは専用CSSクラス（.res-hl-*）。内蔵のコンパイル済みTailwindに無い
+        // ユーティリティ名を返しても色は付かないため、必ず専用クラスを使うこと。
+        function batterResultColorClass(label) {
+            const t = label || '';
+            if (/四球|死球|敬遠|打妨/.test(t)) return 'res-hl-walk';
+            if (/犠失/.test(t)) return ''; // 犠打失敗はアウト扱い（黒）
+            if (/失/.test(t)) return 'res-hl-error';
+            if (/犠/.test(t)) return 'res-hl-sac';
+            if (/安/.test(t) || /[二三本]$/.test(t)) return 'res-hl-hit';
+            return ''; // アウトは黒（既定色）
+        }
+
+        // 経過ログの色分け：打者成績表示と同じ配色（アウトは黒、安打はピンク、犠打は黄色、
+        // 四死球は青、エラーは緑）。返すのは専用CSSクラス（.log-hl-*）。
         function logHighlightClass(text) {
             const t = text || '';
-            if (/生還|打点|得点|本盗|サヨナラ/.test(t)) return 'log-hl-score';
-            if (/安打|バントヒット/.test(t)) return 'log-hl-hit';
-            if (/四球|死球|敬遠/.test(t)) return 'log-hl-walk';
-            if (/失策|エラー|悪送球|受球ミス/.test(t)) return 'log-hl-error';
-            return '';
+            if (/失策|エラー|悪送球|受球ミス|捕球エラー|捕球ミス/.test(t)) return 'log-hl-error';
+            if (/四球|死球|敬遠|打撃妨害/.test(t)) return 'log-hl-walk';
+            if (/犠打失敗/.test(t)) return ''; // 犠打失敗はアウト扱い（黒）
+            if (/犠打|犠飛/.test(t)) return 'log-hl-sac';
+            if (/安打|バントヒット|二塁打|三塁打|本塁打/.test(t)) return 'log-hl-hit';
+            return ''; // アウト・その他は黒（既定色）
         }
 
         function renderLogs() {
@@ -19946,10 +20049,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             handlePickoffButtonClick, loadArchivedGameToScorebook, navigateApp, goBackScreen,
             openBallModal, openBatterEventModal, openCalledStrikeModal,
             openDataIoModal, openDefenseSubOnField, openEndGameModal,
-            openFoulModal, selectFoulType, selectFoulQuality, selectFoulDirection, quickRecordFoul, finalizeFoulRecording, backToFoulTypeStep, backFromFoulDirection, openGameInfoModal, openKDetailModal,
+            openFoulModal, selectFoulType, selectFoulQuality, selectFoulTip, selectFoulDirection, quickRecordFoul, finalizeFoulRecording, backToFoulTypeStep, backFromFoulDirection, openGameInfoModal, openKDetailModal,
             openOffenseSubModal, openPickoffAnalyticsModal, openScoreEntryMenu,
             openDHGuideModal, openDHDefenseModal, confirmDHDefense,
-            openRunnerEventModal, openPinchRunnerFromRunnerModal, executeBalkImmediately,
+            openRunnerEventModal, openRunnerEventFromButton, openPinchRunnerFromRunnerModal, executeBalkImmediately,
             promptRunnerEventPitchLink,
             openSubModal, openSwingStrikeModal, openTiebreakSetupModal,
             openSubMarkCreateModal, selectSubMarkTeam, confirmSubMarkCreate,
