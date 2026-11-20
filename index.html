@@ -3464,6 +3464,24 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                 </div>
 
+                <!-- ステップ2.2：本塁打の種類（柵越え / ランニングホームラン）選択 -->
+                <div id="wizard-step-hr-type" class="hidden space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">本塁打の種類を選択</span>
+                        <button onclick="backToWizardStep2()" class="text-xs text-slate-500 hover:text-slate-800 underline">← 戻る</button>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <button onclick="selectWizardHrType('fence')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold py-3 px-3.5 rounded-xl text-xs shadow-xs transition flex flex-col items-start gap-0.5">
+                            <span class="text-sm font-extrabold text-emerald-900">柵越え</span>
+                            <span class="text-[10px] text-emerald-700 font-normal">フェンスを越えた本塁打（打球性質はフライ／ライナー確定のため選択不要）</span>
+                        </button>
+                        <button onclick="selectWizardHrType('inside')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold py-3 px-3.5 rounded-xl text-xs shadow-xs transition flex flex-col items-start gap-0.5">
+                            <span class="text-sm font-extrabold text-emerald-900">ランニングホームラン（走本）</span>
+                            <span class="text-[10px] text-emerald-700 font-normal">フェンスを越えずに生還した本塁打（次に打球性質を選びます）</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- ステップ2.2：フライ・ライナーの通常アウト / 併殺打選択 -->
                 <div id="wizard-step-air-dp" class="hidden space-y-3">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -4527,7 +4545,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         let pendingMultiRunnerEvent = null;
         let pendingPickoffAttempt = null;
         let pendingFoulDetail = null; // ファウル入力中の一時状態: { pitchType: 'foul_hitting'|'foul_bunt', quality: 'fly'|'liner'|'grounder'|null, direction: 'catcher'|'first_side'|'third_side'|'right_field'|'left_field'|null }
-        let wizardState = { category: null, subResult: null, airBaseType: null, airDpShown: false, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false, hitQuality: null };
+        let wizardState = { category: null, subResult: null, airBaseType: null, airDpShown: false, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false, hitQuality: null, hrType: null };
         let currentSettingsTeam = 'away';
         let pendingInningChangeMode = null;
         let selectedKType = 'K_ADVANCE';
@@ -11878,7 +11896,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 document.getElementById('wizard-step-indicator').textContent = 'ステップ 3: バント方向';
                 document.getElementById('wizard-step-2').classList.add('hidden');
                 document.getElementById('wizard-step-bunt-map').classList.remove('hidden');
-            } else if (['1B', '2B', '3B', 'HR'].indexOf(subType) !== -1) {
+            } else if (subType === 'HR') {
+                // 本塁打はまず柵越えかランニングホームラン（走本）かを選ぶ
+                wizardState.hrType = null;
+                wizardState.hitQuality = null;
+                document.getElementById('wizard-step-indicator').textContent = 'ステップ 2.2: 本塁打の種類';
+                document.getElementById('wizard-step-2').classList.add('hidden');
+                document.getElementById('wizard-step-hr-type').classList.remove('hidden');
+            } else if (['1B', '2B', '3B'].indexOf(subType) !== -1) {
                 // 安打は打球方向の前に打球性質（ゴロ・ライナー・フライ）を選ぶ
                 wizardState.hitQuality = null;
                 document.getElementById('wizard-step-indicator').textContent = 'ステップ 2.5: 打球の性質';
@@ -11891,6 +11916,23 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 document.getElementById('wizard-step-3').classList.remove('hidden');
             } else {
                 executeWizardFinalize(null);
+            }
+        }
+
+        function selectWizardHrType(hrType) {
+            wizardState.hrType = hrType;
+            document.getElementById('wizard-step-hr-type').classList.add('hidden');
+            if (hrType === 'inside') {
+                // ランニングホームランは打球性質（ゴロ・ライナー・フライ）を選ぶ
+                wizardState.hitQuality = null;
+                document.getElementById('wizard-step-indicator').textContent = 'ステップ 2.5: 打球の性質';
+                document.getElementById('wizard-step-hit-quality').classList.remove('hidden');
+            } else {
+                // 柵越えはフライかライナー確定のため打球性質の選択は不要。そのまま打球方向へ
+                wizardState.hitQuality = null;
+                document.getElementById('wizard-step-indicator').textContent = 'ステップ 3: 打球方向';
+                document.getElementById('wizard-step-3-title').textContent = '打球方向をタップして選択';
+                document.getElementById('wizard-step-3').classList.remove('hidden');
             }
         }
 
@@ -11957,18 +11999,38 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const isErrorTypeVisible = !document.getElementById('wizard-step-error-type').classList.contains('hidden');
             const isStep3Visible = !document.getElementById('wizard-step-3').classList.contains('hidden');
             const isHitQualityVisible = !document.getElementById('wizard-step-hit-quality').classList.contains('hidden');
+            const isHrTypeVisible = !document.getElementById('wizard-step-hr-type').classList.contains('hidden');
 
-            if (isHitQualityVisible) {
-                document.getElementById('wizard-step-hit-quality').classList.add('hidden');
+            if (isHrTypeVisible) {
+                document.getElementById('wizard-step-hr-type').classList.add('hidden');
                 document.getElementById('wizard-step-2').classList.remove('hidden');
                 document.getElementById('wizard-step-indicator').textContent = 'ステップ 2: 詳細を選択';
                 return;
             }
 
+            if (isHitQualityVisible) {
+                document.getElementById('wizard-step-hit-quality').classList.add('hidden');
+                if (wizardState.subResult === 'HR') {
+                    // ランニングホームランの打球性質からは本塁打の種類選択へ戻る
+                    document.getElementById('wizard-step-hr-type').classList.remove('hidden');
+                    document.getElementById('wizard-step-indicator').textContent = 'ステップ 2.2: 本塁打の種類';
+                } else {
+                    document.getElementById('wizard-step-2').classList.remove('hidden');
+                    document.getElementById('wizard-step-indicator').textContent = 'ステップ 2: 詳細を選択';
+                }
+                return;
+            }
+
             if (isStep3Visible && ['1B', '2B', '3B', 'HR'].indexOf(wizardState.subResult) !== -1) {
                 document.getElementById('wizard-step-3').classList.add('hidden');
-                document.getElementById('wizard-step-hit-quality').classList.remove('hidden');
-                document.getElementById('wizard-step-indicator').textContent = 'ステップ 2.5: 打球の性質';
+                if (wizardState.subResult === 'HR' && wizardState.hrType === 'fence') {
+                    // 柵越えは打球性質のステップがないため本塁打の種類選択へ戻る
+                    document.getElementById('wizard-step-hr-type').classList.remove('hidden');
+                    document.getElementById('wizard-step-indicator').textContent = 'ステップ 2.2: 本塁打の種類';
+                } else {
+                    document.getElementById('wizard-step-hit-quality').classList.remove('hidden');
+                    document.getElementById('wizard-step-indicator').textContent = 'ステップ 2.5: 打球の性質';
+                }
                 return;
             }
 
@@ -12020,14 +12082,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             document.getElementById('wizard-step-error-bunt').classList.add('hidden');
             document.getElementById('wizard-step-error-type').classList.add('hidden');
             document.getElementById('wizard-step-hit-quality').classList.add('hidden');
+            document.getElementById('wizard-step-hr-type').classList.add('hidden');
             document.getElementById('wizard-step-2').classList.remove('hidden');
             document.getElementById('wizard-step-indicator').textContent = 'ステップ 2: 詳細を選択';
         }
 
         function resetWizard() {
-            wizardState = { category: null, subResult: null, airBaseType: null, airDpShown: false, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false, hitQuality: null };
+            wizardState = { category: null, subResult: null, airBaseType: null, airDpShown: false, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false, hitQuality: null, hrType: null };
             document.getElementById('wizard-step-2').classList.add('hidden');
             document.getElementById('wizard-step-hit-quality').classList.add('hidden');
+            document.getElementById('wizard-step-hr-type').classList.add('hidden');
             document.getElementById('wizard-step-air-dp').classList.add('hidden');
             document.getElementById('wizard-step-error-bunt').classList.add('hidden');
             document.getElementById('wizard-step-error-type').classList.add('hidden');
@@ -15450,7 +15514,18 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     battedQualityLabel = BATTED_QUALITY_LABELS[wizardState.hitQuality];
                 }
                 shortLabel = battedQualityLabel ? `${posText}${battedQualityLabel}${hitNames[type]}` : `${posText}${hitNames[type]}`;
-                logDesc = type === 'BUNT_HIT' ? `${posText}バントヒット` : `${posText}${type}安打${battedQualityLabel ? `（${battedQualityLabel}）` : ''}`;
+                if (type === 'BUNT_HIT') {
+                    logDesc = `${posText}バントヒット`;
+                } else if (type === 'HR') {
+                    // 本塁打は柵越え／走本の種別をログに残す（柵越えは打球性質なし、走本は選んだ性質も併記）
+                    const hrLogParts = [];
+                    if (wizardState.hrType === 'fence') hrLogParts.push('柵越え');
+                    else if (wizardState.hrType === 'inside') hrLogParts.push('走本');
+                    if (battedQualityLabel) hrLogParts.push(battedQualityLabel);
+                    logDesc = `${posText}${type}安打${hrLogParts.length ? `（${hrLogParts.join('・')}）` : ''}`;
+                } else {
+                    logDesc = `${posText}${type}安打${battedQualityLabel ? `（${battedQualityLabel}）` : ''}`;
+                }
                 
                 if (runnerTargets) {
                     outsAdded = baseAdvanceOuts;
