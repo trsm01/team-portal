@@ -204,6 +204,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         /* スコアボード：チーム名はゴシックで、数字と区別する */
         #scoreboard-body td:first-child { font-family: "Inter", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif; font-weight: 700; }
 
+        /* チーム名入力欄は白背景に黒文字で表示する（入力した文字が見えるように固定） */
+        #setup-my-team-name, #setup-opp-team-name, #inp-away-name, #inp-home-name { background-color: #ffffff !important; color: #0f172a !important; caret-color: #0f172a; }
+        #setup-my-team-name::placeholder, #setup-opp-team-name::placeholder, #inp-away-name::placeholder, #inp-home-name::placeholder { color: #64748b; opacity: 1; }
+
         /* タブは指で押しやすい高さに */
         nav button { min-height: 44px; }
 
@@ -3559,7 +3563,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <div class="border border-indigo-200 rounded-xl overflow-hidden">
                         <div class="bg-indigo-900 text-white px-3.5 py-2 flex items-center justify-between gap-2">
                             <span class="text-xs font-extrabold shrink-0">先攻チーム スタメン選択</span>
-                            <input type="text" id="setup-my-team-name" value="" placeholder="先攻チーム名を入力" class="bg-indigo-800 text-white border border-indigo-500 rounded px-2 py-0.5 text-xs font-bold w-40">
+                            <input type="text" id="setup-my-team-name" value="" placeholder="先攻チーム名を入力" class="bg-white text-slate-900 border border-indigo-300 rounded px-2 py-0.5 text-xs font-bold w-40">
                         </div>
                         <div class="px-3 py-2 bg-white border-b border-indigo-100 space-y-2">
                             <div class="flex flex-wrap items-center justify-between gap-2">
@@ -3594,7 +3598,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <div class="border border-slate-300 rounded-xl overflow-hidden">
                         <div class="bg-slate-800 text-white px-3.5 py-2 flex items-center justify-between gap-2">
                             <span class="text-xs font-extrabold shrink-0">後攻チーム スタメン選択</span>
-                            <input type="text" id="setup-opp-team-name" value="対戦相手校" placeholder="後攻チーム名を入力" class="bg-slate-700 text-white border border-slate-500 rounded px-2 py-0.5 text-xs font-bold w-40">
+                            <input type="text" id="setup-opp-team-name" value="対戦相手校" placeholder="後攻チーム名を入力" class="bg-white text-slate-900 border border-slate-300 rounded px-2 py-0.5 text-xs font-bold w-40">
                         </div>
                         <div class="px-3 py-2 bg-white border-b border-slate-200 space-y-2">
                             <div class="flex flex-wrap items-center justify-between gap-2">
