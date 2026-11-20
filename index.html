@@ -2299,6 +2299,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
                 <div class="flex items-center space-x-3">
                     <span id="disp-date" class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>2026-11-15</span>
+                    <button onclick="openLineupEditModal()" class="flex items-center space-x-1 bg-slate-700 hover:bg-slate-800 text-white font-bold px-2.5 py-1 rounded text-[11px] shadow-xs transition" title="試合の途中でもスタメン（打順・守備位置・利き手）を編集できます">
+                        <i data-lucide="clipboard-list" class="w-3 h-3"></i>
+                        <span>スタメン編集</span>
+                    </button>
                     <button onclick="openEndGameModal('manual')" class="flex items-center space-x-1 bg-rose-600 hover:bg-rose-700 text-white font-bold px-2.5 py-1 rounded text-[11px] shadow-xs transition" title="コールド・雨天中止・試合終了時に記録を確定してストックします">
                         <i data-lucide="flag" class="w-3 h-3"></i>
                         <span>試合終了</span>
@@ -2558,6 +2562,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <button onclick="openOffenseSubModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
                         <i data-lucide="user-plus" class="w-3.5 h-3.5"></i><span>攻撃側選手交代 (代打・代走)</span>
                     </button>
+                    <button onclick="openLineupEditModal()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition" title="試合の途中でもスタメン（打順・守備位置・利き手）を編集できます">
+                        <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i><span>スタメン編集</span>
+                    </button>
                 </div>
             </div>
 
@@ -2569,7 +2576,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                     <div>
                         <h3 id="field-view-team-name" class="font-extrabold text-base text-slate-900">チーム名グラウンド配置図</h3>
-                        <p class="text-xs text-slate-500">選手をタップして交代／入れ替え。</p>
+                        <p class="text-xs text-slate-500">ポジションをタップして、選手選択・打順登録・投打の左右の編集、交代／入れ替えができます。</p>
                     </div>
                     <div id="field-swap-status-badge" class="hidden bg-amber-100 text-amber-900 font-bold text-xs px-3 py-1.5 rounded-lg border border-amber-300 flex items-center gap-2">
                         <span id="field-swap-message">入れ替え先ポジションをタップしてください</span>
@@ -2871,8 +2878,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     選手情報
                 </div>
 
-                <!-- ステップ1: 2択（ベンチメンバーと交代 / ポジション入れ替え） -->
+                <!-- ステップ1: 選択（このポジションを編集 / ベンチメンバーと交代 / ポジション入れ替え） -->
                 <div id="field-modal-step-choice" class="grid grid-cols-1 gap-2.5 pt-1">
+                    <button onclick="showFieldLineupEdit()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-xs transition flex items-center justify-between">
+                        <div class="text-left">
+                            <div class="text-sm font-extrabold">このポジションを編集する</div>
+                            <div class="text-[11px] font-bold opacity-90">選手選択・打順登録・投打の左右を設定できます</div>
+                        </div>
+                        <i data-lucide="pencil-line" class="w-5 h-5 shrink-0"></i>
+                    </button>
                     <button onclick="showFieldBenchMemberList()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-xs transition flex items-center justify-between">
                         <div class="text-left">
                             <div class="text-sm font-extrabold">ベンチメンバーと交代する</div>
@@ -2908,6 +2922,30 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             入力した新規選手と交代する
                         </button>
                     </div>
+                </div>
+
+                <!-- ステップ3: ポジション編集（選手選択・打順登録・投打の左右） -->
+                <div id="field-modal-step-edit" class="hidden space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <span id="field-edit-title" class="text-xs font-extrabold text-slate-800">ポジションを編集</span>
+                        <button type="button" onclick="backToFieldModalChoice()" class="text-xs text-slate-500 hover:text-slate-800 underline">← 戻る</button>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1" for="field-edit-player">選手</label>
+                        <select id="field-edit-player" onchange="onFieldEditPlayerChange()" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs font-bold bg-white text-slate-800"></select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1">打順</label>
+                        <div id="field-edit-order-wrap"></div>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-500 mb-1">利き手（投・打）― 選手名の横で選ぶのと同じ内容です</span>
+                        <div id="field-edit-hand-wrap" class="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2"></div>
+                    </div>
+                    <p id="field-edit-note" class="text-[11px] text-slate-500 leading-relaxed"></p>
+                    <button type="button" onclick="saveFieldLineupEdit()" class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-extrabold transition">
+                        この内容で登録する
+                    </button>
                 </div>
             </div>
         </div>
@@ -4161,6 +4199,37 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
     </div>
 
+    <!-- 試合中スタメン編集モーダル -->
+    <div id="modal-lineup-edit" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs hidden items-center justify-center z-50 p-3 sm:p-5 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden my-auto max-h-[92vh] flex flex-col">
+            <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between shrink-0">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i data-lucide="clipboard-list" class="w-5 h-5 text-emerald-400"></i>スタメン編集（試合中）
+                </h3>
+                <button onclick="closeModal('modal-lineup-edit')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="px-5 pt-4 shrink-0">
+                <div class="grid grid-cols-2 gap-2" role="tablist" aria-label="編集するチーム">
+                    <button type="button" id="lineup-edit-tab-away" onclick="switchLineupEditTeam('away')" class="px-3 py-2.5 rounded-lg text-sm font-extrabold transition bg-slate-900 text-white shadow-sm">先攻チーム</button>
+                    <button type="button" id="lineup-edit-tab-home" onclick="switchLineupEditTeam('home')" class="px-3 py-2.5 rounded-lg text-sm font-extrabold transition bg-slate-100 text-slate-600 hover:bg-slate-200">後攻チーム</button>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">試合の途中でも、守備位置・選手名・背番号・利き手（投／打）を直せます。打順はプルダウンではなく、現在の数字がそのまま入った固定表示です（打順の変更は「オーダー・選手交代」タブのグラウンド図でポジションをタップして行えます）。記録済みの成績・走者・カウントはそのまま引き継がれます。</p>
+            </div>
+            <div class="p-5 space-y-4 overflow-y-auto text-sm flex-1">
+                <div id="lineup-edit-list" class="space-y-1.5"></div>
+                <div id="lineup-edit-pitcher-area"></div>
+                <div id="lineup-edit-bench-area"></div>
+            </div>
+            <div class="bg-slate-100 px-5 py-3.5 border-t border-slate-200 shrink-0 space-y-2.5">
+                <div id="lineup-edit-error" class="hidden bg-rose-50 border border-rose-300 text-rose-800 rounded-lg px-3 py-2 text-xs font-bold leading-relaxed"></div>
+                <div class="flex items-center justify-end space-x-2">
+                    <button onclick="closeModal('modal-lineup-edit')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
+                    <button onclick="saveLineupEdit()" class="px-4 py-2 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">スタメンを保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 完全版JavaScriptロジック -->
     <script>
         const STORAGE_KEY = 'baseball_official_scorebook_v2';
@@ -4308,7 +4377,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         let pendingMultiRunnerEvent = null;
         let pendingPickoffAttempt = null;
         let pendingFoulDetail = null; // ファウル入力中の一時状態: { pitchType: 'foul_hitting'|'foul_bunt', quality: 'fly'|'liner'|'grounder'|null, direction: 'catcher'|'first_side'|'third_side'|'right_field'|'left_field'|null }
-        let wizardState = { category: null, subResult: null, airBaseType: null, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false };
+        let wizardState = { category: null, subResult: null, airBaseType: null, airDpShown: false, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false };
         let currentSettingsTeam = 'away';
         let pendingInningChangeMode = null;
         let selectedKType = 'K_ADVANCE';
@@ -4472,27 +4541,69 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return (!isNaN(n) && n >= 1 && n <= 25 && String(n) === String(value).trim()) ? String(n) : '';
         }
 
+        // ================= 利き手（投・打）チェック =================
+        // 投げる手・打つ手は「右」「左」のチェックボックスで選ぶ。
+        // 両方にチェックを付けると両投げ・両打ち（スイッチ）になる。
+        // 保存値は従来どおり '右' / '左' / '両'（両方チェック）/ ''（未選択）の文字列。
+        function handChecksHtml(idBase, throwsVal, batsVal) {
+            const t = throwsVal || '', b = batsVal || '';
+            const chk = (v, side) => (v === side || v === '両') ? 'checked' : '';
+            // 氏名（選手名入力欄）の横に並べて表示する。行全体を占有しないよう
+            // flex-basis:100% は付けず、インラインで名前の隣に置く。
+            return `<span class="inline-flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] font-bold text-slate-600 shrink-0" title="投・打とも右と左の両方にチェックすると両投げ・両打ちになります">
+                <span class="text-slate-500">投:</span>
+                <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="${idBase}-thr" ${chk(t, '右')} class="w-3.5 h-3.5 accent-indigo-600">右</label>
+                <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="${idBase}-thl" ${chk(t, '左')} class="w-3.5 h-3.5 accent-indigo-600">左</label>
+                <span class="text-slate-500 ml-1">打:</span>
+                <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="${idBase}-bar" ${chk(b, '右')} class="w-3.5 h-3.5 accent-indigo-600">右</label>
+                <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="${idBase}-bal" ${chk(b, '左')} class="w-3.5 h-3.5 accent-indigo-600">左</label>
+            </span>`;
+        }
+        function readHandChecks(idBase, kind) {
+            const rEl = document.getElementById(`${idBase}-${kind}r`);
+            const lEl = document.getElementById(`${idBase}-${kind}l`);
+            if (!rEl && !lEl) return null;
+            const r = !!(rEl && rEl.checked), l = !!(lEl && lEl.checked);
+            if (r && l) return '両';
+            if (l) return '左';
+            if (r) return '右';
+            return '';
+        }
+        function setHandChecks(idBase, throwsVal, batsVal) {
+            const set = (kind, v) => {
+                const rEl = document.getElementById(`${idBase}-${kind}r`);
+                const lEl = document.getElementById(`${idBase}-${kind}l`);
+                if (rEl) rEl.checked = (v === '右' || v === '両');
+                if (lEl) lEl.checked = (v === '左' || v === '両');
+            };
+            if (throwsVal !== undefined && throwsVal !== null) set('th', throwsVal);
+            if (batsVal !== undefined && batsVal !== null) set('ba', batsVal);
+        }
+
         // スタメン選択で選手を選び直したら、その行の背番号プルダウンの
         // 初期値を、選んだ選手の既存データの背番号に合わせる
         function onSetupMyPlayerChange(idx) {
             const playerSel = document.getElementById(`setup-my-player-${idx}`);
             const numSel = document.getElementById(`setup-my-num-${idx}`);
-            if (!playerSel || !numSel) return;
+            if (!playerSel) return;
             const rosterSel = document.getElementById('setup-my-team-roster');
             const roster = rosterSel ? globalTeamRosters[rosterSel.value] : null;
             const p = roster ? roster.players.find(x => x.id === playerSel.value) : null;
-            numSel.value = p ? uniformNumberDefault(p.number) : '';
+            if (numSel) numSel.value = p ? uniformNumberDefault(p.number) : '';
+            // 利き手チェックも選んだ選手の登録内容に合わせる（この試合用に変更もできる）
+            setHandChecks(`setup-my-hand-${idx}`, p ? (p.throws || '右') : '右', p ? (p.bats || '右') : '右');
         }
 
         // DH使用時の投手欄で投手を選び直した場合も同様に合わせる
         function onSetupMyPitcherChange() {
             const playerSel = document.getElementById('setup-my-pitcher-player');
             const numSel = document.getElementById('setup-my-pitcher-num');
-            if (!playerSel || !numSel) return;
+            if (!playerSel) return;
             const rosterSel = document.getElementById('setup-my-team-roster');
             const roster = rosterSel ? globalTeamRosters[rosterSel.value] : null;
             const p = roster ? roster.players.find(x => x.id === playerSel.value) : null;
-            numSel.value = p ? uniformNumberDefault(p.number) : '';
+            if (numSel) numSel.value = p ? uniformNumberDefault(p.number) : '';
+            setHandChecks('setup-my-pitcher-hand', p ? (p.throws || '右') : '右', p ? (p.bats || '右') : '右');
         }
 
         // ===== 偵察対応：両チームとも「登録チーム／手入力」を選べる =====
@@ -4529,18 +4640,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function onSetupOppPlayerChange(idx) {
             const playerSel = document.getElementById('setup-opp-player-' + idx);
             const numSel = document.getElementById('setup-opp-num-' + idx);
-            if (!playerSel || !numSel) return;
+            if (!playerSel) return;
             const roster = getSetupRoster('opp');
             const p = roster.players ? roster.players.find(x => x.id === playerSel.value) : null;
-            numSel.value = p ? uniformNumberDefault(p.number) : '';
+            if (numSel) numSel.value = p ? uniformNumberDefault(p.number) : '';
+            setHandChecks(`setup-opp-hand-${idx}`, p ? (p.throws || '右') : '右', p ? (p.bats || '右') : '右');
         }
         function onSetupOppPitcherChange() {
             const playerSel = document.getElementById('setup-opp-pitcher-player');
             const numSel = document.getElementById('setup-opp-pitcher-num');
-            if (!playerSel || !numSel) return;
+            if (!playerSel) return;
             const roster = getSetupRoster('opp');
             const p = roster.players ? roster.players.find(x => x.id === playerSel.value) : null;
-            numSel.value = p ? uniformNumberDefault(p.number) : '';
+            if (numSel) numSel.value = p ? uniformNumberDefault(p.number) : '';
+            setHandChecks('setup-opp-pitcher-hand', p ? (p.throws || '右') : '右', p ? (p.bats || '右') : '右');
         }
         function hasCurrentGame() {
             return !!(gameState && gameState.teams && gameState.teams.away && gameState.teams.home);
@@ -8008,7 +8121,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const oppTwoWay = oppDHVal === '2';
 
             // 再描画（DH切り替え・チーム切替）前に、入力済みの値を保持する
-            const snap = { myPlayer: [], myPos: [], myNum: [], myName: [], oppPos: [], oppNum: [], oppName: [], oppPlayer: [], myPitcher: '', myPitcherNum: '', myPitcherName: '', oppPitcher: '', oppPitcherNum: '', oppPitcherName: '', myBench: [], oppBench: [] };
+            const snap = { myPlayer: [], myPos: [], myNum: [], myName: [], oppPos: [], oppNum: [], oppName: [], oppPlayer: [], myPitcher: '', myPitcherNum: '', myPitcherName: '', oppPitcher: '', oppPitcherNum: '', oppPitcherName: '', myBench: [], oppBench: [], myThrows: [], myBats: [], oppThrows: [], oppBats: [], myPitcherThrows: null, myPitcherBats: null, oppPitcherThrows: null, oppPitcherBats: null };
             for (let i = 0; i < 9; i++) {
                 const mp = document.getElementById(`setup-my-player-${i}`);
                 if (mp) snap.myPlayer[i] = mp.value;
@@ -8026,6 +8139,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (oname) snap.oppName[i] = oname.value;
                 const oplayer = document.getElementById(`setup-opp-player-${i}`);
                 if (oplayer) snap.oppPlayer[i] = oplayer.value;
+                const mth = readHandChecks(`setup-my-hand-${i}`, 'th');
+                if (mth !== null) { snap.myThrows[i] = mth; snap.myBats[i] = readHandChecks(`setup-my-hand-${i}`, 'ba'); }
+                const oth = readHandChecks(`setup-opp-hand-${i}`, 'th');
+                if (oth !== null) { snap.oppThrows[i] = oth; snap.oppBats[i] = readHandChecks(`setup-opp-hand-${i}`, 'ba'); }
             }
             for (let b = 0; b < 3; b++) {
                 const mb = document.getElementById(`setup-my-bench-name-${b}`);
@@ -8045,6 +8162,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (snapOppPName) snap.oppPitcherName = snapOppPName.value;
             const snapOppPPlayer = document.getElementById('setup-opp-pitcher-player');
             if (snapOppPPlayer) snap.oppPitcher = snapOppPPlayer.value;
+            snap.myPitcherThrows = readHandChecks('setup-my-pitcher-hand', 'th');
+            snap.myPitcherBats = readHandChecks('setup-my-pitcher-hand', 'ba');
+            snap.oppPitcherThrows = readHandChecks('setup-opp-pitcher-hand', 'th');
+            snap.oppPitcherBats = readHandChecks('setup-opp-pitcher-hand', 'ba');
             const hasSnap = snap.myPlayer.some(v => v) || snap.oppName.some(v => v) || snap.myName.some(v => v) || snap.oppPlayer.some(v => v) || snap.myPos.some(v => v) || snap.oppPos.some(v => v);
             // DH切り替え／チーム切替のときは、対象チームの打順を作り直す（投手の付け替えを反映するため保持しない）
             const hasSnapMy = hasSnap && resetScope !== 'myDH' && resetScope !== 'roster' && resetScope !== 'mySource';
@@ -8080,13 +8201,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     let numSelM = '';
                     if (hasSnapMy && snap.myNum[i] !== undefined) numSelM = uniformNumberDefault(snap.myNum[i]);
                     const nameValM = hasSnapMy && snap.myName[i] ? snap.myName[i] : '';
+                    const thValM = (hasSnapMy && snap.myThrows[i] !== undefined && snap.myThrows[i] !== null) ? snap.myThrows[i] : '右';
+                    const batValM = (hasSnapMy && snap.myBats[i] !== undefined && snap.myBats[i] !== null) ? snap.myBats[i] : '右';
                     const rowM = document.createElement('div');
-                    rowM.className = 'flex items-center gap-1.5 text-xs';
+                    rowM.className = 'flex flex-wrap items-center gap-1.5 text-xs';
                     rowM.innerHTML = `
                     <span class="w-6 text-center font-extrabold text-indigo-900">${i + 1}番</span>
                     <select id="setup-my-pos-${i}" onchange="refreshSetupLineupFeedback(false)" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptionsM}</select>
                     <select id="setup-my-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNumM ? '' : 'hidden'}">${uniformNumberOptionsHtml(numSelM)}</select>
                     <input type="text" id="setup-my-name-${i}" value="${nameValM}" oninput="refreshSetupLineupFeedback(false)" placeholder="選手名を入力" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white">
+                    ${handChecksHtml(`setup-my-hand-${i}`, thValM, batValM)}
                     `;
                     myContainer.appendChild(rowM);
                     continue;
@@ -8108,12 +8232,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 let selectedNum = selectedPlayer ? uniformNumberDefault(selectedPlayer.number) : '';
                 if (hasSnapMy && snap.myNum[i] !== undefined) selectedNum = snap.myNum[i];
 
+                const thValR = (hasSnapMy && snap.myThrows[i] !== undefined && snap.myThrows[i] !== null) ? snap.myThrows[i] : (selectedPlayer ? (selectedPlayer.throws || '右') : '右');
+                const batValR = (hasSnapMy && snap.myBats[i] !== undefined && snap.myBats[i] !== null) ? snap.myBats[i] : (selectedPlayer ? (selectedPlayer.bats || '右') : '右');
                 const row = document.createElement('div');
-                row.className = 'flex items-center gap-1.5 text-xs';
+                row.className = 'flex flex-wrap items-center gap-1.5 text-xs';
                 row.innerHTML = `
                     <span class="w-6 text-center font-extrabold text-indigo-900">${i + 1}番</span>
                     <select id="setup-my-pos-${i}" onchange="refreshSetupLineupFeedback(false)" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptions}</select>
                     <select id="setup-my-player-${i}" onchange="onSetupMyPlayerChange(${i})" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${playerOptions}</select>
+                    ${handChecksHtml(`setup-my-hand-${i}`, thValR, batValR)}
                     <select id="setup-my-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNum ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedNum)}</select>
                 `;
                 myContainer.appendChild(row);
@@ -8131,11 +8258,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     myPitcherArea.classList.remove('hidden');
                 } else if (myDH && mySource === 'manual') {
                     myPitcherArea.innerHTML = `
-                        <div class="flex items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
+                        <div class="flex flex-wrap items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
                             <span class="shrink-0 text-center font-extrabold text-amber-900 leading-tight">10人目<br><span class="text-[9px] font-bold">打順なし</span></span>
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
                             <select id="setup-my-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.myPitcherNum))}</select>
                             <input type="text" id="setup-my-pitcher-name" value="${snap.myPitcherName || ''}" placeholder="投手名を入力" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white">
+                            ${handChecksHtml('setup-my-pitcher-hand', snap.myPitcherThrows !== null && snap.myPitcherThrows !== undefined ? snap.myPitcherThrows : '右', snap.myPitcherBats !== null && snap.myPitcherBats !== undefined ? snap.myPitcherBats : '右')}
                         </div>
                         <p class="text-[10px] text-amber-800 font-bold mt-1">DH使用のため打順に入りません。打順に指名打者（指）を1人入れてください。</p>
                     `;
@@ -8152,11 +8280,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     let selectedPitcherNum = selectedPitcher ? uniformNumberDefault(selectedPitcher.number) : '';
                     if (snap.myPitcherNum) selectedPitcherNum = snap.myPitcherNum;
                     myPitcherArea.innerHTML = `
-                        <div class="flex items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
+                        <div class="flex flex-wrap items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
                             <span class="shrink-0 text-center font-extrabold text-amber-900 leading-tight">10人目<br><span class="text-[9px] font-bold">打順なし</span></span>
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
                             <select id="setup-my-pitcher-player" onchange="onSetupMyPitcherChange()" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${pitcherOptions}</select>
                             <select id="setup-my-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${showNumP ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedPitcherNum)}</select>
+                            ${handChecksHtml('setup-my-pitcher-hand', snap.myPitcherThrows !== null && snap.myPitcherThrows !== undefined ? snap.myPitcherThrows : (selectedPitcher ? (selectedPitcher.throws || '右') : '右'), snap.myPitcherBats !== null && snap.myPitcherBats !== undefined ? snap.myPitcherBats : (selectedPitcher ? (selectedPitcher.bats || '右') : '右'))}
                         </div>
                         <p class="text-[10px] text-amber-800 font-bold mt-1">DH使用のため打順に入りません。打順に指名打者（指）を1人入れてください。</p>
                     `;
@@ -8204,12 +8333,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     const showNumO = isSetupTournamentOfficial();
                     let selectedNumO = selectedPlayerO ? uniformNumberDefault(selectedPlayerO.number) : '';
                     if (hasSnapOpp && snap.oppNum[i] !== undefined && snap.oppNum[i] !== '') selectedNumO = snap.oppNum[i];
+                    const thValO = (hasSnapOpp && snap.oppThrows[i] !== undefined && snap.oppThrows[i] !== null) ? snap.oppThrows[i] : (selectedPlayerO ? (selectedPlayerO.throws || '右') : '右');
+                    const batValO = (hasSnapOpp && snap.oppBats[i] !== undefined && snap.oppBats[i] !== null) ? snap.oppBats[i] : (selectedPlayerO ? (selectedPlayerO.bats || '右') : '右');
                     const rowO = document.createElement('div');
-                    rowO.className = 'flex items-center gap-1.5 text-xs';
+                    rowO.className = 'flex flex-wrap items-center gap-1.5 text-xs';
                     rowO.innerHTML = `
                     <span class="w-6 text-center font-extrabold text-slate-700">${i + 1}番</span>
                     <select id="setup-opp-pos-${i}" onchange="refreshSetupLineupFeedback(false)" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptionsO}</select>
                     <select id="setup-opp-player-${i}" onchange="onSetupOppPlayerChange(${i})" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${playerOptionsO}</select>
+                    ${handChecksHtml(`setup-opp-hand-${i}`, thValO, batValO)}
                     <select id="setup-opp-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNumO ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedNumO)}</select>
                     `;
                     oppContainer.appendChild(rowO);
@@ -8226,13 +8358,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (hasSnapOpp && snap.oppNum[i] !== undefined) oppNumSel = uniformNumberDefault(snap.oppNum[i]);
                 const oppNameVal = hasSnapOpp && snap.oppName[i] ? snap.oppName[i] : '';
 
+                const thValOM = (hasSnapOpp && snap.oppThrows[i] !== undefined && snap.oppThrows[i] !== null) ? snap.oppThrows[i] : '右';
+                const batValOM = (hasSnapOpp && snap.oppBats[i] !== undefined && snap.oppBats[i] !== null) ? snap.oppBats[i] : '右';
                 const row = document.createElement('div');
-                row.className = 'flex items-center gap-1.5 text-xs';
+                row.className = 'flex flex-wrap items-center gap-1.5 text-xs';
                 row.innerHTML = `
                     <span class="w-6 text-center font-extrabold text-slate-700">${i + 1}番</span>
                     <select id="setup-opp-pos-${i}" onchange="refreshSetupLineupFeedback(false)" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptions}</select>
                     <select id="setup-opp-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showOppNum ? '' : 'hidden'}">${uniformNumberOptionsHtml(oppNumSel)}</select>
                     <input type="text" id="setup-opp-name-${i}" value="${oppNameVal}" oninput="refreshSetupLineupFeedback(false)" placeholder="選手名を入力" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white">
+                    ${handChecksHtml(`setup-opp-hand-${i}`, thValOM, batValOM)}
                 `;
                 oppContainer.appendChild(row);
             }
@@ -8255,22 +8390,24 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     let selPitcherNumO = selPitcherO ? uniformNumberDefault(selPitcherO.number) : '';
                     if (snap.oppPitcherNum) selPitcherNumO = snap.oppPitcherNum;
                     oppPitcherArea.innerHTML = `
-                        <div class="flex items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
+                        <div class="flex flex-wrap items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
                             <span class="shrink-0 text-center font-extrabold text-amber-900 leading-tight">10人目<br><span class="text-[9px] font-bold">打順なし</span></span>
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
                             <select id="setup-opp-pitcher-player" onchange="onSetupOppPitcherChange()" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${pitcherOptionsO}</select>
                             <select id="setup-opp-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(selPitcherNumO)}</select>
+                            ${handChecksHtml('setup-opp-pitcher-hand', snap.oppPitcherThrows !== null && snap.oppPitcherThrows !== undefined ? snap.oppPitcherThrows : (selPitcherO ? (selPitcherO.throws || '右') : '右'), snap.oppPitcherBats !== null && snap.oppPitcherBats !== undefined ? snap.oppPitcherBats : (selPitcherO ? (selPitcherO.bats || '右') : '右'))}
                         </div>
                         <p class="text-[10px] text-amber-800 font-bold mt-1">DH使用のため打順に入りません。打順に指名打者（指）を1人入れてください。</p>
                     `;
                     oppPitcherArea.classList.remove('hidden');
                 } else if (oppDH) {
                     oppPitcherArea.innerHTML = `
-                        <div class="flex items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
+                        <div class="flex flex-wrap items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
                             <span class="shrink-0 text-center font-extrabold text-amber-900 leading-tight">10人目<br><span class="text-[9px] font-bold">打順なし</span></span>
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
                             <select id="setup-opp-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.oppPitcherNum))}</select>
                             <input type="text" id="setup-opp-pitcher-name" value="${snap.oppPitcherName || ''}" placeholder="投手名を入力" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white">
+                            ${handChecksHtml('setup-opp-pitcher-hand', snap.oppPitcherThrows !== null && snap.oppPitcherThrows !== undefined ? snap.oppPitcherThrows : '右', snap.oppPitcherBats !== null && snap.oppPitcherBats !== undefined ? snap.oppPitcherBats : '右')}
                         </div>
                         <p class="text-[10px] text-amber-800 font-bold mt-1">DH使用のため打順に入りません。打順に指名打者（指）を1人入れてください。</p>
                     `;
@@ -8354,7 +8491,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         // ポジション重複をその場で知らせる：重複したプルダウンを赤くし、
-        // エラー表示欄にどのポジションが重複しているかを示して開始ボタンを押せなくする。
+        // エラー表示欄にどのポジションが重複しているかを示す。
+        // ボタンは無効化しない：「スタメンのみ一旦登録」は不備があっても保存でき、
+        // チェックで止めるのは「スコア入力開始」のときだけ。
         // showAll=true のときは未入力など他の問題もすべて表示する（開始ボタン押下時）。
         function refreshSetupLineupFeedback(showAll) {
             const banner = document.getElementById('setup-lineup-error');
@@ -8375,16 +8514,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         const el = document.getElementById(`setup-${key}-pos-${i}`);
                         if (el && el.value === p) orders.push(i + 1);
                     }
-                    dupMsgs.push(`${label}：ポジション「${p}」が重複しています（${orders.join('番・')}番）。重複があると試合を開始できません`);
+                    dupMsgs.push(`${label}：ポジション「${p}」が重複しています（${orders.join('番・')}番）。重複があると試合を開始できません（「スタメンのみ一旦登録」はできます）`);
                 });
             });
             const hasDup = dupMsgs.length > 0;
+            // 「スタメンのみ一旦登録」は、ポジション重複や未入力があっても押せて保存できる。
+            // 重複・未入力で止めるのは「スコア入力開始」のときだけ（confirmNewGameSetup側でチェックする）。
+            // そのため、ここではどちらのボタンも無効化しない（重複の赤表示とメッセージだけ出す）。
             ['setup-btn-save-only', 'setup-btn-start'].forEach(id => {
                 const btn = document.getElementById(id);
                 if (!btn) return;
-                btn.disabled = hasDup;
-                btn.classList.toggle('opacity-40', hasDup);
-                btn.classList.toggle('pointer-events-none', hasDup);
+                btn.disabled = false;
+                btn.classList.remove('opacity-40');
+                btn.classList.remove('pointer-events-none');
             });
             if (!banner) return;
             if (hasDup) {
@@ -8426,21 +8568,25 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const officialSetup = isSetupTournamentOfficial();
 
             // スタメン未入力・ポジション重複チェック（両チーム）。
-            // ポジションが重複していたり未入力があったりする場合は試合を開始しない
-            const lineupProblems = collectSetupLineupProblems();
-            if (lineupProblems.length > 0) {
-                refreshSetupLineupFeedback(true);
-                showToast(lineupProblems[0], 'warning');
-                const setupErrEl = document.getElementById('setup-lineup-error');
-                if (setupErrEl) setupErrEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                return;
+            // チェックで止めるのは試合開始（スコア入力開始）のときだけ。
+            // 「スタメンのみ一旦登録」は重複・未入力があってもそのまま保存できる
+            // （試合開始後にスコア入力画面の「スタメン編集」から直せる）。
+            if (startImmediately) {
+                const lineupProblems = collectSetupLineupProblems();
+                if (lineupProblems.length > 0) {
+                    refreshSetupLineupFeedback(true);
+                    showToast(lineupProblems[0], 'warning');
+                    const setupErrEl = document.getElementById('setup-lineup-error');
+                    if (setupErrEl) setupErrEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    return;
+                }
             }
 
             // DH使用時の入力チェック（先攻）：打順に「指」が1人いること、
             // 投手欄の選手が打順と重複していないこと、打順に投手が入っていないこと
             let myPitcherMaster = null;
             let oppPitcherMaster = null;
-            if (myDH || myTwoWay) {
+            if (startImmediately && (myDH || myTwoWay)) {
                 const battingPosList = [];
                 const battingIdList = [];
                 for (let i = 0; i < 9; i++) {
@@ -8485,7 +8631,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 // 二刀流の場合は「指」の選手がそのまま先発投手になるため、重複チェックは不要
             }
             // DH使用時の入力チェック（後攻チーム）
-            if (oppDH || oppTwoWay) {
+            if (startImmediately && (oppDH || oppTwoWay)) {
                 const oppPosList = [];
                 const oppIdList = [];
                 for (let i = 0; i < 9; i++) {
@@ -8529,6 +8675,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 }
             }
 
+            // 一旦登録の場合はDHチェックを通らないため、投手欄で選択済みの投手がいればここで拾う
+            // （未選択のままなら、選手リスト作成時に仮の投手を10人目として登録する）
+            if (myDH && mySource === 'roster' && !myPitcherMaster) {
+                const pel = document.getElementById('setup-my-pitcher-player');
+                myPitcherMaster = myRoster.players.find(p => p.id === (pel ? pel.value : '')) || null;
+            }
+            if (oppDH && oppSource === 'roster' && !oppPitcherMaster) {
+                const pel = document.getElementById('setup-opp-pitcher-player');
+                oppPitcherMaster = oppRoster.players.find(p => p.id === (pel ? pel.value : '')) || null;
+            }
+            // 一旦登録時のみ：不備（未入力・重複）が残っているかを控えておく（保存自体は止めない）
+            const setupHasProblems = !startImmediately && collectSetupLineupProblems().length > 0;
+
             const emptyBatting = () => ({ pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} });
             const myPlayers = [];
             const selectedMasterIds = new Set();
@@ -8539,12 +8698,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     const num = officialSetup && numEl ? (numEl.value || String(i + 1)) : String(i + 1);
                     const nameEl = document.getElementById(`setup-my-name-${i}`);
                     const name = nameEl && nameEl.value.trim() ? nameEl.value.trim() : `選手${i + 1}`;
-                    myPlayers.push({ id: `${mySide}_p_${i + 1}_${Date.now()}`, order: i + 1, pos: pos, number: num, name: name, isActive: true, batting: emptyBatting() });
+                    const thM = readHandChecks(`setup-my-hand-${i}`, 'th');
+                    const baM = readHandChecks(`setup-my-hand-${i}`, 'ba');
+                    myPlayers.push({ id: `${mySide}_p_${i + 1}_${Date.now()}`, order: i + 1, pos: pos, number: num, name: name, throws: thM !== null ? thM : '右', bats: baM !== null ? baM : '右', isActive: true, batting: emptyBatting() });
                 }
                 if (myDH) {
                     const pNumEl = document.getElementById('setup-my-pitcher-num');
                     const pNameEl = document.getElementById('setup-my-pitcher-name');
-                    myPlayers.push({ id: `${mySide}_p_10_${Date.now()}`, order: 10, pos: '投', number: officialSetup && pNumEl ? (pNumEl.value || '') : '', name: pNameEl ? (pNameEl.value.trim() || '投手') : '投手', isActive: true, dhPitcher: true, batting: emptyBatting() });
+                    const thPM = readHandChecks('setup-my-pitcher-hand', 'th');
+                    const baPM = readHandChecks('setup-my-pitcher-hand', 'ba');
+                    myPlayers.push({ id: `${mySide}_p_10_${Date.now()}`, order: 10, pos: '投', number: officialSetup && pNumEl ? (pNumEl.value || '') : '', name: pNameEl ? (pNameEl.value.trim() || '投手') : '投手', throws: thPM !== null ? thPM : '右', bats: baPM !== null ? baPM : '右', isActive: true, dhPitcher: true, batting: emptyBatting() });
                 }
                 for (let b = 0; b < 3; b++) {
                     const benchEl = document.getElementById(`setup-my-bench-name-${b}`);
@@ -8555,16 +8718,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             for (let i = 0; i < 9; i++) {
                 const selectedId = document.getElementById(`setup-my-player-${i}`).value;
                 const pos = document.getElementById(`setup-my-pos-${i}`).value;
-                const masterP = myRoster.players.find(p => p.id === selectedId) || myRoster.players[0];
+                const masterP = myRoster.players.find(p => p.id === selectedId) || null;
                 if (masterP) selectedMasterIds.add(masterP.id);
                 const numSelEl = document.getElementById(`setup-my-num-${i}`);
                 const chosenNum = officialSetup && numSelEl ? numSelEl.value : '';
+                const thR = readHandChecks(`setup-my-hand-${i}`, 'th');
+                const baR = readHandChecks(`setup-my-hand-${i}`, 'ba');
                 myPlayers.push({
                     id: `${mySide}_p_${i + 1}_${Date.now()}`,
                     order: i + 1,
                     pos: pos,
                     number: chosenNum || (masterP ? masterP.number : String(i + 1)),
                     name: masterP ? masterP.name : `選手${i + 1}`,
+                    throws: thR !== null ? thR : (masterP && masterP.throws ? masterP.throws : '右'),
+                    bats: baR !== null ? baR : (masterP && masterP.bats ? masterP.bats : '右'),
                     cohort: masterP && masterP.cohort != null ? masterP.cohort : '',
                     gradeColor: masterP ? normalizeGradeColor(masterP.gradeColor) : '',
                     isActive: true,
@@ -8575,18 +8742,28 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 selectedMasterIds.add(myPitcherMaster.id);
                 const pitcherNumSelEl = document.getElementById('setup-my-pitcher-num');
                 const chosenPitcherNum = officialSetup && pitcherNumSelEl ? pitcherNumSelEl.value : '';
+                const thPR = readHandChecks('setup-my-pitcher-hand', 'th');
+                const baPR = readHandChecks('setup-my-pitcher-hand', 'ba');
                 myPlayers.push({
                     id: `${mySide}_p_10_${Date.now()}`,
                     order: 10,
                     pos: '投',
                     number: chosenPitcherNum || myPitcherMaster.number || '',
                     name: myPitcherMaster.name,
+                    throws: thPR !== null ? thPR : (myPitcherMaster.throws || '右'),
+                    bats: baPR !== null ? baPR : (myPitcherMaster.bats || '右'),
                     cohort: myPitcherMaster.cohort != null ? myPitcherMaster.cohort : '',
                     gradeColor: normalizeGradeColor(myPitcherMaster.gradeColor),
                     isActive: true,
                     dhPitcher: true,
                     batting: emptyBatting()
                 });
+            } else if (myDH) {
+                // 一旦登録で投手が未選択のまま保存された場合の仮登録（試合中のスタメン編集で直せる）
+                const pNumEl2 = document.getElementById('setup-my-pitcher-num');
+                const thP2 = readHandChecks('setup-my-pitcher-hand', 'th');
+                const baP2 = readHandChecks('setup-my-pitcher-hand', 'ba');
+                myPlayers.push({ id: `${mySide}_p_10_${Date.now()}`, order: 10, pos: '投', number: officialSetup && pNumEl2 ? (pNumEl2.value || '') : '', name: '投手', throws: thP2 !== null ? thP2 : '右', bats: baP2 !== null ? baP2 : '右', isActive: true, dhPitcher: true, batting: emptyBatting() });
             }
             myRoster.players.forEach((mp, idx) => {
                 if (!selectedMasterIds.has(mp.id)) {
@@ -8596,6 +8773,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         pos: mp.pos || '控',
                         number: mp.number || '',
                         name: mp.name,
+                        throws: mp.throws || '右',
+                        bats: mp.bats || '右',
                         cohort: mp.cohort != null ? mp.cohort : '',
                         gradeColor: normalizeGradeColor(mp.gradeColor),
                         isActive: false,
@@ -8616,21 +8795,31 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 for (let i = 0; i < 9; i++) {
                     const selectedId = document.getElementById(`setup-opp-player-${i}`).value;
                     const pos = document.getElementById(`setup-opp-pos-${i}`).value;
-                    const masterP = oppRoster.players.find(p => p.id === selectedId) || oppRoster.players[0];
+                    const masterP = oppRoster.players.find(p => p.id === selectedId) || null;
                     if (masterP) selectedOppMasterIds.add(masterP.id);
                     const numSelEl = document.getElementById(`setup-opp-num-${i}`);
                     const chosenNum = officialSetup && numSelEl ? numSelEl.value : '';
-                    oppPlayers.push({ id: `${oppSide}_p_${i + 1}_${Date.now()}`, order: i + 1, pos: pos, number: chosenNum || (masterP ? masterP.number : String(i + 1)), name: masterP ? masterP.name : `選手${i + 1}`, cohort: masterP && masterP.cohort != null ? masterP.cohort : '', gradeColor: masterP ? normalizeGradeColor(masterP.gradeColor) : '', isActive: true, batting: emptyBatting() });
+                    const thOR = readHandChecks(`setup-opp-hand-${i}`, 'th');
+                    const baOR = readHandChecks(`setup-opp-hand-${i}`, 'ba');
+                    oppPlayers.push({ id: `${oppSide}_p_${i + 1}_${Date.now()}`, order: i + 1, pos: pos, number: chosenNum || (masterP ? masterP.number : String(i + 1)), name: masterP ? masterP.name : `選手${i + 1}`, throws: thOR !== null ? thOR : (masterP && masterP.throws ? masterP.throws : '右'), bats: baOR !== null ? baOR : (masterP && masterP.bats ? masterP.bats : '右'), cohort: masterP && masterP.cohort != null ? masterP.cohort : '', gradeColor: masterP ? normalizeGradeColor(masterP.gradeColor) : '', isActive: true, batting: emptyBatting() });
                 }
                 if (oppDH && oppPitcherMaster) {
                     selectedOppMasterIds.add(oppPitcherMaster.id);
                     const pitcherNumSelEl = document.getElementById('setup-opp-pitcher-num');
                     const chosenPitcherNum = officialSetup && pitcherNumSelEl ? pitcherNumSelEl.value : '';
-                    oppPlayers.push({ id: `${oppSide}_p_10_${Date.now()}`, order: 10, pos: '投', number: chosenPitcherNum || oppPitcherMaster.number || '', name: oppPitcherMaster.name, cohort: oppPitcherMaster.cohort != null ? oppPitcherMaster.cohort : '', gradeColor: normalizeGradeColor(oppPitcherMaster.gradeColor), isActive: true, dhPitcher: true, batting: emptyBatting() });
+                    const thOPR = readHandChecks('setup-opp-pitcher-hand', 'th');
+                    const baOPR = readHandChecks('setup-opp-pitcher-hand', 'ba');
+                    oppPlayers.push({ id: `${oppSide}_p_10_${Date.now()}`, order: 10, pos: '投', number: chosenPitcherNum || oppPitcherMaster.number || '', name: oppPitcherMaster.name, throws: thOPR !== null ? thOPR : (oppPitcherMaster.throws || '右'), bats: baOPR !== null ? baOPR : (oppPitcherMaster.bats || '右'), cohort: oppPitcherMaster.cohort != null ? oppPitcherMaster.cohort : '', gradeColor: normalizeGradeColor(oppPitcherMaster.gradeColor), isActive: true, dhPitcher: true, batting: emptyBatting() });
+                } else if (oppDH) {
+                    // 一旦登録で投手が未選択のまま保存された場合の仮登録（試合中のスタメン編集で直せる）
+                    const pNumElO2 = document.getElementById('setup-opp-pitcher-num');
+                    const thOP2 = readHandChecks('setup-opp-pitcher-hand', 'th');
+                    const baOP2 = readHandChecks('setup-opp-pitcher-hand', 'ba');
+                    oppPlayers.push({ id: `${oppSide}_p_10_${Date.now()}`, order: 10, pos: '投', number: officialSetup && pNumElO2 ? (pNumElO2.value || '') : '', name: '相手投手', throws: thOP2 !== null ? thOP2 : '右', bats: baOP2 !== null ? baOP2 : '右', isActive: true, dhPitcher: true, batting: emptyBatting() });
                 }
                 oppRoster.players.forEach((mp, idx) => {
                     if (!selectedOppMasterIds.has(mp.id)) {
-                        oppPlayers.push({ id: `${oppSide}_bench_${idx}_${Date.now()}`, order: 0, pos: mp.pos || '控', number: mp.number || '', name: mp.name, cohort: mp.cohort != null ? mp.cohort : '', gradeColor: normalizeGradeColor(mp.gradeColor), isActive: false, batting: emptyBatting() });
+                        oppPlayers.push({ id: `${oppSide}_bench_${idx}_${Date.now()}`, order: 0, pos: mp.pos || '控', number: mp.number || '', name: mp.name, throws: mp.throws || '右', bats: mp.bats || '右', cohort: mp.cohort != null ? mp.cohort : '', gradeColor: normalizeGradeColor(mp.gradeColor), isActive: false, batting: emptyBatting() });
                     }
                 });
             } else {
@@ -8639,12 +8828,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const oppNumEl = document.getElementById(`setup-opp-num-${i}`);
                 const num = officialSetup && oppNumEl ? (oppNumEl.value || String(i + 1)) : String(i + 1);
                 const name = document.getElementById(`setup-opp-name-${i}`).value.trim() || `相手選手${i + 1}`;
+                const thOM2 = readHandChecks(`setup-opp-hand-${i}`, 'th');
+                const baOM2 = readHandChecks(`setup-opp-hand-${i}`, 'ba');
                 oppPlayers.push({
                     id: `${oppSide}_p_${i + 1}_${Date.now()}`,
                     order: i + 1,
                     pos: pos,
                     number: num,
                     name: name,
+                    throws: thOM2 !== null ? thOM2 : '右',
+                    bats: baOM2 !== null ? baOM2 : '右',
                     isActive: true,
                     batting: emptyBatting()
                 });
@@ -8652,12 +8845,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (oppDH) {
                 const pNumEl = document.getElementById('setup-opp-pitcher-num');
                 const pNameEl = document.getElementById('setup-opp-pitcher-name');
+                const thOPM = readHandChecks('setup-opp-pitcher-hand', 'th');
+                const baOPM = readHandChecks('setup-opp-pitcher-hand', 'ba');
                 oppPlayers.push({
                     id: `${oppSide}_p_10_${Date.now()}`,
                     order: 10,
                     pos: '投',
                     number: officialSetup && pNumEl ? (pNumEl.value || '') : '',
                     name: pNameEl ? (pNameEl.value.trim() || '相手投手') : '相手投手',
+                    throws: thOPM !== null ? thOPM : '右',
+                    bats: baOPM !== null ? baOPM : '右',
                     isActive: true,
                     dhPitcher: true,
                     batting: emptyBatting()
@@ -8760,8 +8957,201 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 showToast('スタメン情報を保存し、スコア入力を開始しました', 'success');
             } else {
                 navigateApp('home');
-                showToast('スタメン情報を「現在進行中の試合」として保存しました', 'success');
+                if (setupHasProblems) {
+                    showToast('スタメンを一旦登録しました（未入力・重複が残っています。試合中にスコア入力画面の「スタメン編集」から直せます）', 'success');
+                } else {
+                    showToast('スタメン情報を「現在進行中の試合」として保存しました', 'success');
+                }
             }
+        }
+
+        // ================= 試合中のスタメン編集 =================
+        // 試合開始後でも、スタメン（打順・守備位置・選手名・背番号・利き手）を
+        // 直せるようにする。選手IDは変えないため、記録済みの成績・走者・
+        // 投球履歴はそのまま引き継がれる。打順を入れ替えた場合は、
+        // 現在の打者が同じ選手を指し続けるよう打順インデックスを付け直す。
+        let lineupEditTeamKey = 'away';
+        let lineupEditStarterIds = [];
+        let lineupEditPitcherId = null;
+        let lineupEditBenchIds = [];
+
+        function isCurrentGameOfficial() {
+            return !!gameState && ((gameState.meta && gameState.meta.tournament) || '') !== '練習試合';
+        }
+
+        function openLineupEditModal(teamKey) {
+            if (!hasCurrentGame()) { showToast('進行中の試合がありません', 'warning'); return; }
+            const toggle = document.getElementById('lineup-team-toggle');
+            lineupEditTeamKey = (teamKey === 'away' || teamKey === 'home') ? teamKey : (toggle && toggle.value === 'home' ? 'home' : 'away');
+            renderLineupEditModal();
+            openModal('modal-lineup-edit');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function switchLineupEditTeam(teamKey) {
+            lineupEditTeamKey = teamKey;
+            renderLineupEditModal();
+        }
+
+        function renderLineupEditModal() {
+            if (!hasCurrentGame()) return;
+            ['away', 'home'].forEach(k => {
+                const btn = document.getElementById(`lineup-edit-tab-${k}`);
+                if (!btn) return;
+                const t = gameState.teams[k];
+                btn.textContent = `${k === 'away' ? '先攻' : '後攻'}：${t ? t.name : ''}`;
+                const active = k === lineupEditTeamKey;
+                btn.className = `px-3 py-2.5 rounded-lg text-sm font-extrabold transition ${active ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+            });
+            const errEl = document.getElementById('lineup-edit-error');
+            if (errEl) errEl.classList.add('hidden');
+            const team = gameState.teams[lineupEditTeamKey];
+            const positions = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'];
+            const official = isCurrentGameOfficial();
+            const starters = getActiveLineup(lineupEditTeamKey);
+            lineupEditStarterIds = starters.map(p => p.id);
+            const listEl = document.getElementById('lineup-edit-list');
+            listEl.innerHTML = '';
+            starters.forEach((p, idx) => {
+                const posOptions = `<option value="" ${!p.pos ? 'selected' : ''}>選択</option>` + positions.map(pos => `<option value="${pos}" ${pos === p.pos ? 'selected' : ''}>${pos}</option>`).join('');
+                const row = document.createElement('div');
+                row.className = 'flex flex-wrap items-center gap-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-2';
+                row.innerHTML = `
+                    <span class="w-12 shrink-0 text-center font-extrabold text-slate-800 bg-slate-100 border border-slate-200 rounded px-1 py-1" title="打順（固定表示）">${p.order}番</span>
+                    <select id="edit-pos-${idx}" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptions}</select>
+                    <input type="text" id="edit-name-${idx}" value="${physicalEscapeHtml(p.name || '')}" placeholder="選手名を入力" class="flex-1 min-w-[7rem] border border-slate-300 rounded px-2 py-1 font-bold bg-white">
+                    <select id="edit-num-${idx}" title="背番号（公式戦のみ）" class="w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${official ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(p.number))}</select>
+                    ${handChecksHtml(`edit-hand-${idx}`, p.throws || '右', p.bats || '右')}
+                `;
+                listEl.appendChild(row);
+            });
+            if (starters.length === 0) {
+                listEl.innerHTML = '<p class="text-xs text-slate-400 italic py-2">出場中の選手が登録されていません。</p>';
+            }
+            const pitcherArea = document.getElementById('lineup-edit-pitcher-area');
+            const dhPitcher = (typeof findDHPitcherRecord === 'function') ? findDHPitcherRecord(lineupEditTeamKey) : null;
+            lineupEditPitcherId = dhPitcher ? dhPitcher.id : null;
+            if (pitcherArea) {
+                if (dhPitcher) {
+                    pitcherArea.innerHTML = `
+                        <div class="flex flex-wrap items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
+                            <span class="shrink-0 text-center font-extrabold text-amber-900 leading-tight">10人目<br><span class="text-[9px] font-bold">打順なし・投手</span></span>
+                            <input type="text" id="edit-pitcher-name" value="${physicalEscapeHtml(dhPitcher.name || '')}" placeholder="投手名を入力" class="flex-1 min-w-[7rem] border border-amber-300 rounded px-2 py-1 font-bold bg-white">
+                            <select id="edit-pitcher-num" title="背番号（公式戦のみ）" class="w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${official ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(dhPitcher.number))}</select>
+                            ${handChecksHtml('edit-pitcher-hand', dhPitcher.throws || '右', dhPitcher.bats || '右')}
+                        </div>`;
+                } else {
+                    pitcherArea.innerHTML = '';
+                }
+            }
+            const benchArea = document.getElementById('lineup-edit-bench-area');
+            const bench = team.players.filter(p => p.id !== lineupEditPitcherId && (!p.isActive || !(p.order >= 1 && p.order <= 9)));
+            lineupEditBenchIds = bench.map(p => p.id);
+            if (benchArea) {
+                if (bench.length) {
+                    let html = '<div class="text-[11px] font-extrabold text-slate-600 mb-1">ベンチ選手（名前・利き手を直せます）</div><div class="space-y-1.5">';
+                    bench.forEach((p, j) => {
+                        html += `<div class="flex flex-wrap items-center gap-1.5 text-xs bg-white border border-slate-200 rounded-lg px-2 py-2">
+                            <span class="w-10 text-center font-bold text-slate-500">${physicalEscapeHtml(p.pos || '控')}</span>
+                            <input type="text" id="edit-bench-name-${j}" value="${physicalEscapeHtml(p.name || '')}" placeholder="選手名を入力" class="flex-1 min-w-[7rem] border border-slate-300 rounded px-2 py-1 font-bold bg-white">
+                            ${handChecksHtml(`edit-bench-hand-${j}`, p.throws || '右', p.bats || '右')}
+                        </div>`;
+                    });
+                    html += '</div>';
+                    benchArea.innerHTML = html;
+                } else {
+                    benchArea.innerHTML = '';
+                }
+            }
+        }
+
+        function saveLineupEdit() {
+            if (!hasCurrentGame()) return;
+            const team = gameState.teams[lineupEditTeamKey];
+            const problems = [];
+            const edits = [];
+            const posSeen = {};
+            const orderSeen = {};
+            lineupEditStarterIds.forEach((pid, idx) => {
+                const posEl = document.getElementById(`edit-pos-${idx}`);
+                const nameEl = document.getElementById(`edit-name-${idx}`);
+                const numEl = document.getElementById(`edit-num-${idx}`);
+                // 打順はプルダウンにせず固定表示のため、現在の打順をそのまま使う
+                const curPlayer = team.players.find(x => x.id === pid);
+                const order = curPlayer ? curPlayer.order : (idx + 1);
+                const pos = posEl ? posEl.value : '';
+                const name = nameEl ? nameEl.value.trim() : '';
+                if (!name) problems.push(`${idx + 1}行目：選手名が未入力です`);
+                if (!pos) problems.push(`${idx + 1}行目（${name || '選手名未入力'}）：ポジションが未選択です`);
+                if (pos) { if (posSeen[pos]) problems.push(`ポジション「${pos}」が重複しています`); posSeen[pos] = true; }
+                orderSeen[order] = true;
+                edits.push({ id: pid, order: order, pos: pos, name: name, number: numEl ? numEl.value : undefined, throws: readHandChecks(`edit-hand-${idx}`, 'th'), bats: readHandChecks(`edit-hand-${idx}`, 'ba') });
+            });
+            if (typeof getTeamUseDH === 'function' && getTeamUseDH(lineupEditTeamKey)) {
+                const poss = edits.map(e => e.pos);
+                if (poss.length && !poss.includes('指')) problems.push('DH使用中のため、打順に指名打者（指）を1人入れてください');
+                if (poss.includes('投')) problems.push('DH使用中のため、投手は打順に入れられません（投手は10人目欄で編集してください）');
+            }
+            const uniqProblems = [...new Set(problems)];
+            const errEl = document.getElementById('lineup-edit-error');
+            if (uniqProblems.length) {
+                if (errEl) { errEl.innerHTML = uniqProblems.map(m => `<div>${physicalEscapeHtml(m)}</div>`).join(''); errEl.classList.remove('hidden'); }
+                showToast(uniqProblems[0], 'warning');
+                return;
+            }
+            if (errEl) errEl.classList.add('hidden');
+            const prevBatterIds = {};
+            ['away', 'home'].forEach(k => {
+                const lu = getActiveLineup(k);
+                const ix = k === 'away' ? gameState.live.awayBatterIdx : gameState.live.homeBatterIdx;
+                prevBatterIds[k] = lu.length ? lu[ix % lu.length].id : null;
+            });
+            pushUndoState();
+            edits.forEach(e => {
+                const p = team.players.find(x => x.id === e.id);
+                if (!p) return;
+                p.order = e.order;
+                p.pos = e.pos;
+                if (e.name) p.name = e.name;
+                if (e.number !== undefined && e.number !== null && isCurrentGameOfficial()) p.number = e.number;
+                if (e.throws !== null && e.throws !== undefined) p.throws = e.throws;
+                if (e.bats !== null && e.bats !== undefined) p.bats = e.bats;
+            });
+            if (lineupEditPitcherId) {
+                const pp = team.players.find(x => x.id === lineupEditPitcherId);
+                if (pp) {
+                    const nEl = document.getElementById('edit-pitcher-name');
+                    const numEl = document.getElementById('edit-pitcher-num');
+                    if (nEl && nEl.value.trim()) pp.name = nEl.value.trim();
+                    if (numEl && isCurrentGameOfficial()) pp.number = numEl.value;
+                    const th = readHandChecks('edit-pitcher-hand', 'th');
+                    if (th !== null) pp.throws = th;
+                    const ba = readHandChecks('edit-pitcher-hand', 'ba');
+                    if (ba !== null) pp.bats = ba;
+                }
+            }
+            lineupEditBenchIds.forEach((pid, j) => {
+                const p = team.players.find(x => x.id === pid);
+                if (!p) return;
+                const nEl = document.getElementById(`edit-bench-name-${j}`);
+                if (nEl && nEl.value.trim()) p.name = nEl.value.trim();
+                const th = readHandChecks(`edit-bench-hand-${j}`, 'th');
+                if (th !== null) p.throws = th;
+                const ba = readHandChecks(`edit-bench-hand-${j}`, 'ba');
+                if (ba !== null) p.bats = ba;
+            });
+            ['away', 'home'].forEach(k => {
+                const lu = getActiveLineup(k);
+                const ix = lu.findIndex(p => p.id === prevBatterIds[k]);
+                if (ix >= 0) {
+                    if (k === 'away') gameState.live.awayBatterIdx = ix;
+                    else gameState.live.homeBatterIdx = ix;
+                }
+            });
+            addLog(`スタメンを試合中に編集（${team.name}）：打順・守備位置・利き手などを更新`);
+            saveAndRender();
+            closeModal('modal-lineup-edit');
+            showToast('スタメンを保存しました', 'success');
         }
 
         function resumeCurrentGameFromHome() {
@@ -8834,18 +9224,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 tr.innerHTML = `
                     <td class="py-2 px-3"><span class="flex items-center">${gradeColorDotHtml(p.gradeColor)}<input type="text" value="${p.name}" onchange="updateMasterPlayer(${idx}, 'name', this.value)" class="flex-1 min-w-0 border border-slate-200 rounded px-2 py-1 font-bold text-xs"></span></td>
                     <td class="py-2 px-3 text-center">
-                        <select onchange="updateMasterPlayer(${idx}, 'throws', this.value)" class="border border-slate-200 rounded px-2 py-1 text-xs">
-                            <option value="右" ${p.throws === '右' ? 'selected' : ''}>右投</option>
-                            <option value="左" ${p.throws === '左' ? 'selected' : ''}>左投</option>
-                            <option value="両" ${p.throws === '両' ? 'selected' : ''}>両投</option>
-                        </select>
+                        <span class="inline-flex items-center gap-2 justify-center text-xs font-bold text-slate-700">
+                            <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="settings-thr-${idx}" ${p.throws === '右' || p.throws === '両' ? 'checked' : ''} onchange="toggleMasterHand(${idx}, 'throws')" class="w-4 h-4 accent-indigo-600">右</label>
+                            <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="settings-thl-${idx}" ${p.throws === '左' || p.throws === '両' ? 'checked' : ''} onchange="toggleMasterHand(${idx}, 'throws')" class="w-4 h-4 accent-indigo-600">左</label>
+                        </span>
                     </td>
                     <td class="py-2 px-3 text-center">
-                        <select onchange="updateMasterPlayer(${idx}, 'bats', this.value)" class="border border-slate-200 rounded px-2 py-1 text-xs">
-                            <option value="右" ${p.bats === '右' ? 'selected' : ''}>右打</option>
-                            <option value="左" ${p.bats === '左' ? 'selected' : ''}>左打</option>
-                            <option value="両" ${p.bats === '両' ? 'selected' : ''}>両打</option>
-                        </select>
+                        <span class="inline-flex items-center gap-2 justify-center text-xs font-bold text-slate-700">
+                            <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="settings-bar-${idx}" ${p.bats === '右' || p.bats === '両' ? 'checked' : ''} onchange="toggleMasterHand(${idx}, 'bats')" class="w-4 h-4 accent-indigo-600">右</label>
+                            <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="checkbox" id="settings-bal-${idx}" ${p.bats === '左' || p.bats === '両' ? 'checked' : ''} onchange="toggleMasterHand(${idx}, 'bats')" class="w-4 h-4 accent-indigo-600">左</label>
+                        </span>
                     </td>
                     <td class="py-2 px-3 text-center">
                         <select onchange="updateMasterPlayer(${idx}, 'grade', this.value)" class="border border-slate-200 rounded px-2 py-1 text-xs">
@@ -8910,6 +9298,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     savePhysicalData();
                 }
             } catch (e) { /* 体力測定の記録が無い場合は何もしない */ }
+        }
+
+        // 利き手チェック（右・左の両方にチェック可＝両投げ・両打ち）の変更を保存する
+        function toggleMasterHand(idx, field) {
+            const base = field === 'throws' ? 'settings-th' : 'settings-ba';
+            const rEl = document.getElementById(`${base}r-${idx}`);
+            const lEl = document.getElementById(`${base}l-${idx}`);
+            const r = !!(rEl && rEl.checked), l = !!(lEl && lEl.checked);
+            const value = (r && l) ? '両' : (l ? '左' : (r ? '右' : ''));
+            updateMasterPlayer(idx, field, value);
         }
 
         function updateMasterPlayer(idx, field, value) {
@@ -11207,6 +11605,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         // ================= 打者イベント入力ウィザード =================
+        // 併殺（ダブルプレー）が成立しうる場面か：走者がいて、かつ2アウトでないこと。
+        // 走者なし・2アウトの場面では併殺はあり得ないため、選択肢自体を提示しない。
+        function canRecordDoublePlay() {
+            if (!gameState || !gameState.live) return false;
+            const hasRunner = (gameState.live.bases || []).some(Boolean);
+            return hasRunner && (gameState.live.outs || 0) < 2;
+        }
+
         function selectWizardCategory(cat) {
             wizardState.category = cat;
             const subContainer = document.getElementById('wizard-sub-buttons');
@@ -11249,6 +11655,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ];
             }
 
+            // 併殺が成立しない場面（走者なし・2アウト）では併殺の選択肢を提示しない
+            if (!canRecordDoublePlay()) {
+                items = items.filter(it => ['DP', 'FO_DP', 'LO_DP'].indexOf(it.type) === -1);
+            }
+
             document.getElementById('wizard-selected-cat-title').textContent = titleText;
             document.getElementById('wizard-step-indicator').textContent = 'ステップ 2: 詳細を選択';
 
@@ -11275,8 +11686,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 return;
             }
 
-            if (subType === 'FO' || subType === 'LO') {
+            if ((subType === 'FO' || subType === 'LO') && canRecordDoublePlay()) {
                 wizardState.airBaseType = subType;
+                wizardState.airDpShown = true;
                 const labelName = subType === 'FO' ? 'フライ' : 'ライナー';
                 document.getElementById('wizard-step-indicator').textContent = `ステップ 2.2: ${labelName}の形態`;
                 document.getElementById('wizard-air-dp-title').textContent = `${labelName}アウトの形態を選択`;
@@ -11358,7 +11770,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const isErrorTypeVisible = !document.getElementById('wizard-step-error-type').classList.contains('hidden');
             const isStep3Visible = !document.getElementById('wizard-step-3').classList.contains('hidden');
 
-            if ((wizardState.subResult === 'FO' || wizardState.subResult === 'LO' || wizardState.subResult === 'FO_DP' || wizardState.subResult === 'LO_DP') && isStep3Visible) {
+            if ((wizardState.subResult === 'FO' || wizardState.subResult === 'LO' || wizardState.subResult === 'FO_DP' || wizardState.subResult === 'LO_DP') && isStep3Visible && wizardState.airDpShown) {
                 document.getElementById('wizard-step-3').classList.add('hidden');
                 document.getElementById('wizard-step-air-dp').classList.remove('hidden');
                 const labelName = wizardState.airBaseType === 'LO' ? 'ライナー' : 'フライ';
@@ -11410,7 +11822,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function resetWizard() {
-            wizardState = { category: null, subResult: null, airBaseType: null, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false };
+            wizardState = { category: null, subResult: null, airBaseType: null, airDpShown: false, isBuntError: false, errorCategory: null, assistPos: null, requiresPos: false };
             document.getElementById('wizard-step-2').classList.add('hidden');
             document.getElementById('wizard-step-air-dp').classList.add('hidden');
             document.getElementById('wizard-step-error-bunt').classList.add('hidden');
@@ -14699,8 +15111,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const posNames = { '1': '投手', '2': '捕手', '3': '一塁手', '4': '二塁手', '5': '三塁手', '6': '遊撃手', '7': '左翼手', '8': '中堅手', '9': '右翼手' };
             document.getElementById('field-modal-title').textContent = `${posNames[posNum]} の選手交代・守備変更`;
             document.getElementById('field-modal-player-info').innerHTML = player
-                ? `現在の守備選手: <span class="text-indigo-700 font-extrabold text-sm">${player.order}番 ${player.name}</span> (#${player.number})`
-                : '現在の守備選手: なし';
+                ? `現在の守備選手: <span class="text-indigo-700 font-extrabold text-sm">${player.order >= 1 && player.order <= 9 ? player.order + '番 ' : ''}${player.name}</span> (#${player.number || '-'}) ／ ${player.throws || '右'}投・${player.bats || '右'}打`
+                : '現在の守備選手: なし（「このポジションを編集する」から選手を登録できます）';
 
             backToFieldModalChoice();
             openModal('modal-field-pos-action');
@@ -14710,8 +15122,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function backToFieldModalChoice() {
             const choiceEl = document.getElementById('field-modal-step-choice');
             const benchEl = document.getElementById('field-modal-step-bench');
+            const editEl = document.getElementById('field-modal-step-edit');
             if (choiceEl) choiceEl.classList.remove('hidden');
             if (benchEl) benchEl.classList.add('hidden');
+            if (editEl) editEl.classList.add('hidden');
         }
 
         function showFieldBenchMemberList() {
@@ -14731,6 +15145,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
 
             document.getElementById('field-modal-step-choice').classList.add('hidden');
+            document.getElementById('field-modal-step-edit').classList.add('hidden');
             document.getElementById('field-modal-step-bench').classList.remove('hidden');
         }
 
@@ -14794,6 +15209,206 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 renderInteractiveFieldMap();
                 showToast('入れ替え先のポジションをグラウンド上でタップしてください', 'info');
             }
+        }
+
+        // ================= グラウンド図タップでのポジション編集 =================
+        // 「オーダー・選手交代」タブのグラウンド図でポジションをタップし、
+        // そのポジションの選手選択・打順登録・投打の左右選択を行う。
+        // 選手IDは変えないため、記録済みの成績・走者・カウントは引き継がれる。
+        // 保存データ形式（order / pos / throws / bats / isActive / dhPitcher）は従来どおり。
+        let fieldEditContext = null;
+
+        function fieldEditPosSymbol(posNum) {
+            return { '1': '投', '2': '捕', '3': '一', '4': '二', '5': '三', '6': '遊', '7': '左', '8': '中', '9': '右' }[posNum] || '';
+        }
+
+        function showFieldLineupEdit() {
+            if (!hasCurrentGame()) { showToast('進行中の試合がありません', 'warning'); return; }
+            const teamKey = document.getElementById('lineup-team-toggle').value;
+            const team = gameState.teams[teamKey];
+            const posNum = selectedFieldActionPos;
+            const posSymbol = fieldEditPosSymbol(posNum);
+            const posNames = { '1': '投手', '2': '捕手', '3': '一塁手', '4': '二塁手', '5': '三塁手', '6': '遊撃手', '7': '左翼手', '8': '中堅手', '9': '右翼手' };
+            const dhPitcher = (typeof findDHPitcherRecord === 'function') ? findDHPitcherRecord(teamKey) : null;
+            const pitcher = getTeamPitcher(teamKey);
+            const isPitcherPos = posSymbol === '投';
+            // DH使用時、打順に入らない専用投手がマウンドにいる状態
+            const dhPitcherMode = !!(isPitcherPos && dhPitcher && pitcher && pitcher.id === dhPitcher.id);
+            // 二刀流：打順に入ったまま投手を務めている状態
+            const twoWayPitcher = !!(isPitcherPos && !dhPitcherMode && pitcher && pitcher.pos === '指');
+            const occupant = isPitcherPos ? pitcher : team.players.find(p => p.isActive && p.pos === posSymbol);
+
+            let candidates;
+            if (dhPitcherMode) {
+                // 打順の選手と投手を入れ替えると打順が壊れるため、候補はベンチ＋現在の投手のみ
+                candidates = team.players.filter(p => !(p.isActive && p.order >= 1 && p.order <= 9));
+            } else if (twoWayPitcher) {
+                candidates = team.players.filter(p => p.id === pitcher.id || !(p.isActive && p.order >= 1 && p.order <= 9));
+            } else {
+                // DH専用投手は打順のポジションには入れない
+                candidates = team.players.filter(p => !(dhPitcher && p.id === dhPitcher.id));
+            }
+            if (!candidates.length) { showToast('選択できる選手がいません', 'warning'); return; }
+
+            fieldEditContext = { teamKey: teamKey, posNum: posNum, posSymbol: posSymbol, dhPitcherMode: dhPitcherMode, twoWayPitcher: twoWayPitcher };
+            document.getElementById('field-edit-title').textContent = `${posNames[posNum] || posSymbol} を編集（${team.name}）`;
+            const sel = document.getElementById('field-edit-player');
+            sel.innerHTML = candidates.map(p => {
+                const tag = (p.isActive && p.order >= 1 && p.order <= 9)
+                    ? `${p.order}番・${p.pos || ''}`
+                    : (dhPitcher && p.id === dhPitcher.id ? '投手（打順なし）' : 'ベンチ');
+                return `<option value="${p.id}" ${occupant && p.id === occupant.id ? 'selected' : ''}>${physicalEscapeHtml(p.name)}（${tag}）</option>`;
+            }).join('');
+            const noteEl = document.getElementById('field-edit-note');
+            if (noteEl) {
+                noteEl.textContent = dhPitcherMode
+                    ? 'DH使用中のため、この投手は打順に入りません。別の選手を選ぶと投手が交代します。'
+                    : (twoWayPitcher
+                        ? '二刀流の投手です。別の選手を選ぶと、その選手が投手になり、現在の投手は指名打者として出場を続けます。'
+                        : '別の出場中選手を選ぶとポジションを入れ替えます。ベンチの選手を選ぶと、現在の選手と入れ替わります。打順が重なる場合は、空いた打順へ自動で移します。');
+            }
+            document.getElementById('field-modal-step-choice').classList.add('hidden');
+            document.getElementById('field-modal-step-bench').classList.add('hidden');
+            document.getElementById('field-modal-step-edit').classList.remove('hidden');
+            onFieldEditPlayerChange();
+        }
+
+        function onFieldEditPlayerChange() {
+            if (!fieldEditContext) return;
+            const team = gameState.teams[fieldEditContext.teamKey];
+            const sel = document.getElementById('field-edit-player');
+            const p = team ? team.players.find(x => x.id === (sel ? sel.value : '')) : null;
+            const orderWrap = document.getElementById('field-edit-order-wrap');
+            const handWrap = document.getElementById('field-edit-hand-wrap');
+            if (!p || !orderWrap || !handWrap) return;
+            if (fieldEditContext.dhPitcherMode) {
+                orderWrap.innerHTML = '<span class="inline-block border border-amber-300 bg-amber-50 text-amber-900 rounded-lg px-3 py-2 text-xs font-extrabold">打順なし（DHの投手）</span>';
+            } else {
+                let cur = (p.isActive && p.order >= 1 && p.order <= 9) ? p.order : null;
+                if (!cur) {
+                    const occupant = fieldEditContext.posSymbol === '投'
+                        ? getTeamPitcher(fieldEditContext.teamKey)
+                        : team.players.find(x => x.isActive && x.pos === fieldEditContext.posSymbol);
+                    if (occupant && occupant.order >= 1 && occupant.order <= 9) cur = occupant.order;
+                }
+                if (!cur) {
+                    const used = new Set(getActiveLineup(fieldEditContext.teamKey).map(x => x.order));
+                    cur = [1, 2, 3, 4, 5, 6, 7, 8, 9].find(n => !used.has(n)) || 9;
+                }
+                orderWrap.innerHTML = `<select id="field-edit-order" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs font-bold bg-white">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<option value="${n}" ${n === cur ? 'selected' : ''}>${n}番</option>`).join('')}</select>`;
+            }
+            handWrap.innerHTML = handChecksHtml('field-edit-hand', p.throws || '右', p.bats || '右');
+        }
+
+        // 打順の付け替え：指定した打順を使っている選手がいたら、空いた打順へ移す
+        function assignFieldEditOrder(team, target, newOrder) {
+            const holder = team.players.find(p => p.id !== target.id && p.isActive && p.order === newOrder);
+            if (holder) {
+                const used = new Set(team.players.filter(p => p.isActive && p.id !== holder.id && p.id !== target.id).map(p => p.order));
+                let free = null;
+                if (target.order >= 1 && target.order <= 9 && target.order !== newOrder && !used.has(target.order)) free = target.order;
+                if (!free) { for (let n = 1; n <= 9; n++) { if (n !== newOrder && !used.has(n)) { free = n; break; } } }
+                if (free) holder.order = free;
+            }
+            target.order = newOrder;
+        }
+
+        function saveFieldLineupEdit() {
+            if (!fieldEditContext || !hasCurrentGame()) return;
+            const teamKey = fieldEditContext.teamKey;
+            const posSymbol = fieldEditContext.posSymbol;
+            const team = gameState.teams[teamKey];
+            const sel = document.getElementById('field-edit-player');
+            const target = team.players.find(p => p.id === (sel ? sel.value : ''));
+            if (!target) { showToast('選手を選択してください', 'warning'); return; }
+            const th = readHandChecks('field-edit-hand', 'th');
+            const ba = readHandChecks('field-edit-hand', 'ba');
+            const orderEl = document.getElementById('field-edit-order');
+            const newOrder = orderEl ? parseInt(orderEl.value, 10) : null;
+            const applyHands = (p) => {
+                if (th !== null && th !== undefined) p.throws = th;
+                if (ba !== null && ba !== undefined) p.bats = ba;
+            };
+            // 打順を入れ替えても現在の打者が同じ選手を指し続けるよう控える
+            const prevBatterIds = {};
+            ['away', 'home'].forEach(k => {
+                const lu = getActiveLineup(k);
+                const ix = k === 'away' ? gameState.live.awayBatterIdx : gameState.live.homeBatterIdx;
+                prevBatterIds[k] = lu.length ? lu[ix % lu.length].id : null;
+            });
+            pushUndoState();
+            if (fieldEditContext.dhPitcherMode) {
+                const dhPitcher = findDHPitcherRecord(teamKey);
+                if (dhPitcher && dhPitcher.id !== target.id) {
+                    dhPitcher.dhPitcher = false;
+                    dhPitcher.isActive = false;
+                    dhPitcher.order = 0;
+                    dhPitcher.pos = '控';
+                    target.dhPitcher = true;
+                    target.order = 10;
+                    target.pos = '投';
+                    target.isActive = true;
+                    addLog(`投手を変更（グラウンド図から編集・${team.name}）: ${dhPitcher.name} → ${target.name}（DH投手・打順なし）`);
+                } else {
+                    addLog(`スタメン編集（グラウンド図・${team.name}）: 投手 ${target.name} の利き手を更新`);
+                }
+                applyHands(target);
+            } else if (fieldEditContext.twoWayPitcher) {
+                const pitcher = getTeamPitcher(teamKey);
+                if (pitcher && target.id !== pitcher.id) {
+                    target.order = 10;
+                    target.dhPitcher = true;
+                    target.pos = '投';
+                    target.isActive = true;
+                    pitcher.isTwoWay = false;
+                    pitcher.twoWayPitcher = false;
+                    pitcher.pos = '指';
+                    if (!Array.isArray(team.cannotPitchIds)) team.cannotPitchIds = [];
+                    if (!team.cannotPitchIds.includes(pitcher.id)) team.cannotPitchIds.push(pitcher.id);
+                    team.dhMode = 'standard';
+                    applyHands(target);
+                    addLog(`投手交代（グラウンド図から編集・${team.name}）: ${pitcher.name} → ${target.name}（${pitcher.name} は指名打者として出場を継続〔規則5.11(b)〕）`);
+                } else {
+                    if (newOrder) assignFieldEditOrder(team, target, newOrder);
+                    applyHands(target);
+                    addLog(`スタメン編集（グラウンド図・${team.name}）: 投手 ${target.name}（${target.order}番）の打順・利き手を更新`);
+                }
+            } else {
+                const occupant = posSymbol === '投'
+                    ? getTeamPitcher(teamKey)
+                    : team.players.find(p => p.isActive && p.pos === posSymbol);
+                const targetWasStarter = !!(target.isActive && target.order >= 1 && target.order <= 9);
+                const oldTargetPos = target.pos;
+                if (occupant && occupant.id !== target.id) {
+                    if (targetWasStarter && oldTargetPos) {
+                        occupant.pos = oldTargetPos;
+                    } else {
+                        occupant.isActive = false;
+                        if (Array.isArray(gameState.live.bases)) {
+                            gameState.live.bases = gameState.live.bases.map(rId => (rId === occupant.id ? target.id : rId));
+                        }
+                    }
+                }
+                target.pos = posSymbol;
+                target.isActive = true;
+                if (target.dhPitcher) target.dhPitcher = false;
+                if (newOrder) assignFieldEditOrder(team, target, newOrder);
+                applyHands(target);
+                addLog(`スタメン編集（グラウンド図・${team.name}）: ${posSymbol} に ${target.name}（${target.order}番・${target.throws || ''}投${target.bats || ''}打）を登録`);
+            }
+            ['away', 'home'].forEach(k => {
+                const lu = getActiveLineup(k);
+                const ix = lu.findIndex(p => p.id === prevBatterIds[k]);
+                if (ix >= 0) {
+                    if (k === 'away') gameState.live.awayBatterIdx = ix;
+                    else gameState.live.homeBatterIdx = ix;
+                }
+            });
+            fieldEditContext = null;
+            closeModal('modal-field-pos-action');
+            saveAndRender();
+            renderInteractiveFieldMap();
+            showToast('グラウンド図からスタメンを登録しました', 'success');
         }
 
         function cancelFieldSwap() {
@@ -17741,6 +18356,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             executeFieldModalAction, executePlateAppearanceLogic,
             executeWizardFinalize, finalizeRunnerEvent, finalizeSubConfirmation,
             forceChangeHalfInning, handleFieldPositionClick,
+            openLineupEditModal, switchLineupEditTeam, saveLineupEdit,
+            showFieldLineupEdit, onFieldEditPlayerChange, saveFieldLineupEdit,
             handlePickoffButtonClick, loadArchivedGameToScorebook, navigateApp, goBackScreen,
             openBallModal, openBatterEventModal, openCalledStrikeModal,
             openDataIoModal, openDefenseSubOnField, openEndGameModal,
