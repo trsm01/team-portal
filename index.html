@@ -2578,7 +2578,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                         <text x="12" y="73" text-anchor="end" font-size="9" font-weight="bold" fill="#047857">3B</text>
                                     </g>
                                 </svg>
-                                <span class="tv-diamond-hint">走者イベント・代走は下の「走者イベント」ボタンから</span>
                             </div>
                         </div>
 
@@ -12410,6 +12409,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             // 発生しないため、3塁走者がいなければ犠飛の選択肢を提示しない
             if (!(gameState.live.bases && gameState.live.bases[2])) {
                 items = items.filter(it => it.type !== 'SF');
+            }
+
+            // フィルダースチョイス（野選）は既に走者が出塁している場面でのみ発生する
+            // イベントであり、走者がいない場面では発生しないため、走者がいなければ
+            // フィルダースチョイスの選択肢を提示しない
+            if (!((gameState.live.bases || []).some(Boolean))) {
+                items = items.filter(it => it.type !== 'FC');
             }
 
             document.getElementById('wizard-selected-cat-title').textContent = titleText;
