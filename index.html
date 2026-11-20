@@ -555,6 +555,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         /* --- タブ：下線式からピル型セグメントへ --- */
         #screen-scorebook nav { border-radius: 18px; padding-top: 6px; padding-bottom: 6px; gap: 4px; }
+        /* === スコアを元にした分析画面：内蔵Tailwindに無いユーティリティの補完 === */
+        .bg-teal-600 { --tw-bg-opacity: 1; background-color: rgb(13 148 136 / var(--tw-bg-opacity, 1)); }
+        .bg-teal-800 { --tw-bg-opacity: 1; background-color: rgb(17 94 89 / var(--tw-bg-opacity, 1)); }
+        .bg-teal-50 { --tw-bg-opacity: 1; background-color: rgb(240 253 250 / var(--tw-bg-opacity, 1)); }
+        .text-teal-300 { --tw-text-opacity: 1; color: rgb(94 234 212 / var(--tw-text-opacity, 1)); }
+        .text-teal-700 { --tw-text-opacity: 1; color: rgb(15 118 110 / var(--tw-text-opacity, 1)); }
+        .text-teal-800 { --tw-text-opacity: 1; color: rgb(17 94 89 / var(--tw-text-opacity, 1)); }
+        #screen-score-analysis table.min-w-\[560px\] { min-width: 560px; }
+        #screen-score-analysis table.min-w-\[860px\] { min-width: 860px; }
+        #screen-score-analysis table.min-w-\[880px\] { min-width: 880px; }
+        #screen-score-analysis table.min-w-\[900px\] { min-width: 900px; }
+        #screen-score-analysis table.min-w-\[920px\] { min-width: 920px; }
+        #screen-score-analysis table.min-w-\[980px\] { min-width: 980px; }
+        #screen-score-analysis table.min-w-\[1020px\] { min-width: 1020px; }
+        #screen-score-analysis table.min-w-\[1080px\] { min-width: 1080px; }
+        #screen-score-analysis .divide-x > :not([hidden]) ~ :not([hidden]) { border-left: 1px solid #f1f5f9; }
+        @media (min-width: 1280px) {
+            .xl\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+            .xl\:grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+        }
         #screen-scorebook nav button { border-radius: 999px; padding-top: 9px; padding-bottom: 9px; }
         #screen-scorebook nav button:hover { background-color: #f1f5f9; }
         .tab-active {
@@ -894,7 +914,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>トップに戻る
                 </button>
             </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
             <!-- スコア入力 -->
             <div onclick="openScoreEntryMenu()" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-200 hover:border-emerald-500 p-6 cursor-pointer transition flex flex-col justify-between">
                 <div class="space-y-4">
@@ -908,6 +928,23 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
                 <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700">
                     <span>新規 / 蓄積一覧</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+                </div>
+            </div>
+
+            <!-- スコアを元にした分析 -->
+            <div onclick="navigateApp('score-analysis')" class="group bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-200 hover:border-emerald-500 p-6 cursor-pointer transition flex flex-col justify-between">
+                <div class="space-y-4">
+                    <div class="w-12 h-12 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                        <i data-lucide="chart-scatter" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-900 group-hover:text-emerald-700 transition">スコアを元にした分析</h3>
+                        <p class="text-[13px] text-slate-600 mt-2 leading-[1.9]">バント・バスター傾向と盗塁タイミングを集計。</p>
+                    </div>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700">
+                    <span>傾向分析を見る</span>
                     <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
                 </div>
             </div>
@@ -1769,6 +1806,487 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
 
     <!-- ================= APP SCREEN 5: メインコンテンツ（スコア入力画面） ================= -->
+    <!-- ================= APP SCREEN: スコアを元にした分析 ================= -->
+    <div id="screen-score-analysis" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <div class="min-w-0">
+                <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="chart-scatter" class="w-5 h-5 text-teal-600"></i>スコアを元にした分析
+                </h2>
+                <p class="text-[13px] text-slate-600 mt-1 leading-relaxed">進行中の試合と蓄積された試合のスコア記録から集計します。<span id="analysis-data-summary" class="font-bold text-slate-700"></span></p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <label for="analysis-team-filter" class="text-xs font-bold text-slate-600">対象チーム</label>
+                <select id="analysis-team-filter" onchange="onScoreAnalysisTeamChange(this.value)" class="border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-50">
+                    <option value="ALL">全チーム</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 分析の切り替え：バント・バスター ／ 盗塁 ／ 打球傾向 ／ 牽制 ／ 投手配球 ／ 打者アプローチ -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-2 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2" role="tablist" aria-label="分析の種類">
+            <button type="button" id="btn-analysis-tab-bunt" onclick="switchScoreAnalysisTab('bunt')" role="tab" aria-selected="true" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition bg-teal-600 text-white shadow-sm">
+                <i data-lucide="target" class="w-4 h-4 shrink-0"></i>
+                <span class="text-left leading-tight">バント・バスター<span class="block text-[11px] font-bold opacity-80">見逃し・犠打・セーフティ／構えのみ・打つか</span></span>
+            </button>
+            <button type="button" id="btn-analysis-tab-steal" onclick="switchScoreAnalysisTab('steal')" role="tab" aria-selected="false" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="timer" class="w-4 h-4 shrink-0"></i>
+                <span class="text-left leading-tight">盗塁タイミング<span class="block text-[11px] font-bold opacity-80">アウト数・カウント別の企図と成功率</span></span>
+            </button>
+            <button type="button" id="btn-analysis-tab-batted" onclick="switchScoreAnalysisTab('batted')" role="tab" aria-selected="false" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="compass" class="w-4 h-4 shrink-0"></i>
+                <span class="text-left leading-tight">打球傾向<span class="block text-[11px] font-bold opacity-80">方向×質・引っ張り・ゴロ／フライ率</span></span>
+            </button>
+            <button type="button" id="btn-analysis-tab-pickoff" onclick="switchScoreAnalysisTab('pickoff')" role="tab" aria-selected="false" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="repeat" class="w-4 h-4 shrink-0"></i>
+                <span class="text-left leading-tight">牽制の傾向<span class="block text-[11px] font-bold opacity-80">カウント・塁・投手別・連続牽制</span></span>
+            </button>
+            <button type="button" id="btn-analysis-tab-pitcher" onclick="switchScoreAnalysisTab('pitcher')" role="tab" aria-selected="false" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="crosshair" class="w-4 h-4 shrink-0"></i>
+                <span class="text-left leading-tight">投手の配球・ストライク率<span class="block text-[11px] font-bold opacity-80">初球・カウント別の投球内訳</span></span>
+            </button>
+            <button type="button" id="btn-analysis-tab-approach" onclick="switchScoreAnalysisTab('approach')" role="tab" aria-selected="false" class="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="list-ordered" class="w-4 h-4 shrink-0"></i>
+                <span class="text-left leading-tight">打者のカウント別アプローチ<span class="block text-[11px] font-bold opacity-80">初球打ち・粘り・カウント別打率</span></span>
+            </button>
+        </div>
+
+        <!-- ===== パネル① バント・バスター分析 ===== -->
+        <div id="analysis-panel-bunt" class="space-y-4">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-teal-300"></i>チーム別サマリー</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[980px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">チーム名</th>
+                                <th class="py-2.5 px-2 text-center">打席</th>
+                                <th class="py-2.5 px-2 text-center">バント打席</th>
+                                <th class="py-2.5 px-2 text-center">犠打</th>
+                                <th class="py-2.5 px-2 text-center">犠打失敗</th>
+                                <th class="py-2.5 px-2 text-center">バント安打</th>
+                                <th class="py-2.5 px-2 text-center">バント見逃し割合</th>
+                                <th class="py-2.5 px-2 text-center">バスター打席</th>
+                                <th class="py-2.5 px-2 text-center">バスターで打った</th>
+                                <th class="py-2.5 px-2 text-center">構えのみ</th>
+                                <th class="py-2.5 px-3">主な傾向</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-bunt-team-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 text-teal-300"></i>バント分析（選手別）</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1080px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">選手名</th>
+                                <th class="py-2.5 px-3">所属チーム</th>
+                                <th class="py-2.5 px-2 text-center">打席</th>
+                                <th class="py-2.5 px-2 text-center">バント打席</th>
+                                <th class="py-2.5 px-2 text-center">バント関連球</th>
+                                <th class="py-2.5 px-2 text-center">見逃し球</th>
+                                <th class="py-2.5 px-2 text-center">見逃し割合</th>
+                                <th class="py-2.5 px-2 text-center">空振り</th>
+                                <th class="py-2.5 px-2 text-center">ファウル</th>
+                                <th class="py-2.5 px-2 text-center">犠打</th>
+                                <th class="py-2.5 px-2 text-center">犠打失敗</th>
+                                <th class="py-2.5 px-2 text-center">バント安打</th>
+                                <th class="py-2.5 px-2 text-center">スリーバント失敗</th>
+                                <th class="py-2.5 px-3">判定</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-bunt-player-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+                <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">見逃し球＝バント構えのまま見送ったボール＋見逃しストライク。バント安打はセーフティバント成功として数えます。</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-teal-300"></i>バスター分析（選手別）</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[980px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">選手名</th>
+                                <th class="py-2.5 px-3">所属チーム</th>
+                                <th class="py-2.5 px-2 text-center">打席</th>
+                                <th class="py-2.5 px-2 text-center">バスター打席</th>
+                                <th class="py-2.5 px-2 text-center">バスター関連球</th>
+                                <th class="py-2.5 px-2 text-center">見逃し球</th>
+                                <th class="py-2.5 px-2 text-center">空振り</th>
+                                <th class="py-2.5 px-2 text-center">打った打席</th>
+                                <th class="py-2.5 px-2 text-center">構えのみの打席</th>
+                                <th class="py-2.5 px-3">判定</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-buster-player-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+                <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">「打った打席」はバスターの構えを見せた後に空振り・ファウル・打球結果があった打席、「構えのみ」はバスター関連球を見逃しただけで終わった打席です。</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="user-check" class="w-4 h-4 text-teal-300"></i>選手別の詳細</h3>
+                    <select id="analysis-player-select" onchange="onScoreAnalysisPlayerChange(this.value)" class="border border-white/30 bg-white/10 rounded-lg px-3 py-1.5 text-xs font-bold text-white [&>option]:text-slate-800"></select>
+                </div>
+                <div id="analysis-player-detail" class="p-4"></div>
+            </div>
+        </div>
+
+        <!-- ===== パネル② 盗塁タイミング分析 ===== -->
+        <div id="analysis-panel-steal" class="hidden space-y-4">
+            <div id="analysis-steal-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-teal-300"></i>チーム別サマリー</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[860px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">チーム名</th>
+                                <th class="py-2.5 px-2 text-center">盗塁</th>
+                                <th class="py-2.5 px-2 text-center">盗塁死</th>
+                                <th class="py-2.5 px-2 text-center">成功率</th>
+                                <th class="py-2.5 px-2 text-center">タイミング記録のある企図</th>
+                                <th class="py-2.5 px-2 text-center">その成功</th>
+                                <th class="py-2.5 px-2 text-center">その失敗</th>
+                                <th class="py-2.5 px-3">最も多いタイミング</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-steal-team-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+                <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">盗塁・盗塁死・成功率は選手成績と同じ集計（全試合の合計）です。タイミングは打席記録に残った盗塁企図から集計するため、件数が合計と異なる場合があります。</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4 text-teal-300"></i>タイミング分布（アウト数 × カウント）</h3>
+                </div>
+                <div id="analysis-steal-matrix" class="overflow-x-auto"></div>
+                <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">セルは「企図数（成功数）」です。カウントは盗塁を記録した時点のボールーストライク、アウト数はその時点のアウト数です。</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-teal-800 text-white px-4 py-2.5">
+                        <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="list-ordered" class="w-4 h-4 text-teal-300"></i>カウント別</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                    <th class="py-2.5 px-3 text-center">カウント (B-S)</th>
+                                    <th class="py-2.5 px-2 text-center">企図</th>
+                                    <th class="py-2.5 px-2 text-center">成功</th>
+                                    <th class="py-2.5 px-2 text-center">失敗</th>
+                                    <th class="py-2.5 px-3 text-center">成功率</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analysis-steal-count-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-teal-800 text-white px-4 py-2.5">
+                        <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="list-ordered" class="w-4 h-4 text-teal-300"></i>アウト数別</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                    <th class="py-2.5 px-3 text-center">アウト数</th>
+                                    <th class="py-2.5 px-2 text-center">企図</th>
+                                    <th class="py-2.5 px-2 text-center">成功</th>
+                                    <th class="py-2.5 px-2 text-center">失敗</th>
+                                    <th class="py-2.5 px-3 text-center">成功率</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analysis-steal-outs-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="user-check" class="w-4 h-4 text-teal-300"></i>選手別（盗塁の多い選手とそのタイミング）</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[880px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">選手名</th>
+                                <th class="py-2.5 px-3">所属チーム</th>
+                                <th class="py-2.5 px-2 text-center">盗塁</th>
+                                <th class="py-2.5 px-2 text-center">盗塁死</th>
+                                <th class="py-2.5 px-2 text-center">成功率</th>
+                                <th class="py-2.5 px-2 text-center">タイミング記録のある企図</th>
+                                <th class="py-2.5 px-3">最も多いタイミング</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-steal-player-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+                <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">選手別のタイミングは、試合経過ログの走者名と打席記録を突き合わせて特定できた企図だけを数えます。特定できない企図はチーム別の集計にのみ含まれます。</p>
+            </div>
+        </div>
+
+        <!-- ===== パネル③ 打球傾向 ===== -->
+        <div id="analysis-panel-batted" class="hidden space-y-4">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-teal-300"></i>チーム別サマリー</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1020px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">チーム名</th>
+                                <th class="py-2.5 px-2 text-center">打球数</th>
+                                <th class="py-2.5 px-2 text-center">左側</th>
+                                <th class="py-2.5 px-2 text-center">中央</th>
+                                <th class="py-2.5 px-2 text-center">右側</th>
+                                <th class="py-2.5 px-2 text-center">引っ張り率</th>
+                                <th class="py-2.5 px-2 text-center">逆方向率</th>
+                                <th class="py-2.5 px-2 text-center">ゴロ</th>
+                                <th class="py-2.5 px-2 text-center">フライ</th>
+                                <th class="py-2.5 px-2 text-center">ライナー</th>
+                                <th class="py-2.5 px-2 text-center">ゴロ率</th>
+                                <th class="py-2.5 px-2 text-center">フライ率</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-batted-team-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+                <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">方向は打球を処理した野手の位置から判定します（左側＝三・遊・左・左中間／中央＝投・捕・中／右側＝一・二・右・右中間）。引っ張り・逆方向は打者の打席（左打者／右打者）が分かる打球だけを対象にします。ゴロ率・フライ率は質が分かる打球（ゴロ・フライ・ライナー系の結果）の割合です。</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-teal-800 text-white px-4 py-2.5">
+                        <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="compass" class="w-4 h-4 text-teal-300"></i>打球方向 × 打球の質（フェア）</h3>
+                    </div>
+                    <div id="analysis-batted-matrix" class="overflow-x-auto"></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-teal-800 text-white px-4 py-2.5">
+                        <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="compass" class="w-4 h-4 text-teal-300"></i>ファウルの方向 × 打球の質</h3>
+                    </div>
+                    <div id="analysis-foul-matrix" class="overflow-x-auto"></div>
+                    <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">ファウル記録で打球の質・方向を選んだ分だけを集計します（未選択のファウルは「不明」に入ります）。</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="user-check" class="w-4 h-4 text-teal-300"></i>選手別</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1020px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">選手名</th>
+                                <th class="py-2.5 px-3">所属チーム</th>
+                                <th class="py-2.5 px-2 text-center">打球数</th>
+                                <th class="py-2.5 px-2 text-center">左側</th>
+                                <th class="py-2.5 px-2 text-center">中央</th>
+                                <th class="py-2.5 px-2 text-center">右側</th>
+                                <th class="py-2.5 px-2 text-center">引っ張り率</th>
+                                <th class="py-2.5 px-2 text-center">逆方向率</th>
+                                <th class="py-2.5 px-2 text-center">ゴロ率</th>
+                                <th class="py-2.5 px-2 text-center">フライ率</th>
+                                <th class="py-2.5 px-2 text-center">ライナー率</th>
+                                <th class="py-2.5 px-2 text-center">ファウル数</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-batted-player-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== パネル④ 牽制の傾向 ===== -->
+        <div id="analysis-panel-pickoff" class="hidden space-y-4">
+            <div id="analysis-pickoff-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="repeat" class="w-4 h-4 text-teal-300"></i>投手別</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[920px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">投手名</th>
+                                <th class="py-2.5 px-3">所属チーム（守備）</th>
+                                <th class="py-2.5 px-2 text-center">総牽制</th>
+                                <th class="py-2.5 px-2 text-center">1塁へ</th>
+                                <th class="py-2.5 px-2 text-center">2塁へ</th>
+                                <th class="py-2.5 px-2 text-center">3塁へ</th>
+                                <th class="py-2.5 px-2 text-center">最も多いカウント</th>
+                                <th class="py-2.5 px-2 text-center">同一塁への最大連続</th>
+                                <th class="py-2.5 px-3">最長連続の打席</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-pickoff-pitcher-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+                <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">さらに詳しいカウント別牽制率や打席シーケンスは、スコア入力画面の牽制分析レポートでも確認できます。</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="list-ordered" class="w-4 h-4 text-teal-300"></i>カウント別（対象チーム・投手の合計）</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[560px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3 text-center">カウント (B-S)</th>
+                                <th class="py-2.5 px-2 text-center">牽制合計</th>
+                                <th class="py-2.5 px-2 text-center">1塁へ</th>
+                                <th class="py-2.5 px-2 text-center">2塁へ</th>
+                                <th class="py-2.5 px-2 text-center">3塁へ</th>
+                                <th class="py-2.5 px-3 text-center">全体に占める割合</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-pickoff-count-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== パネル⑤ 投手の配球・カウント別ストライク率 ===== -->
+        <div id="analysis-panel-pitcher" class="hidden space-y-4">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="crosshair" class="w-4 h-4 text-teal-300"></i>投手別サマリー</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1020px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">投手名</th>
+                                <th class="py-2.5 px-3">所属チーム（守備）</th>
+                                <th class="py-2.5 px-2 text-center">投球数</th>
+                                <th class="py-2.5 px-2 text-center">ストライク率</th>
+                                <th class="py-2.5 px-2 text-center">初球ストライク率</th>
+                                <th class="py-2.5 px-2 text-center">ボール割合</th>
+                                <th class="py-2.5 px-2 text-center">見逃し割合</th>
+                                <th class="py-2.5 px-2 text-center">空振り割合</th>
+                                <th class="py-2.5 px-2 text-center">ファウル割合</th>
+                                <th class="py-2.5 px-2 text-center">打者有利カウントのストライク率</th>
+                                <th class="py-2.5 px-2 text-center">投手有利カウントのストライク率</th>
+                                <th class="py-2.5 px-3">初球で最も多い結果</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-pitcher-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+                <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">球種そのものは記録していないため、配球は投球結果（ボール／見逃し／空振り／ファウル）の内訳で表します。ストライクには見逃し・空振り・ファウルを含みます。打者有利＝ボール先行のカウント、投手有利＝ストライク先行のカウントです。</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="user-check" class="w-4 h-4 text-teal-300"></i>投手別のカウント別内訳</h3>
+                    <select id="analysis-pitcher-select" onchange="onScoreAnalysisPitcherChange(this.value)" class="border border-white/30 bg-white/10 rounded-lg px-3 py-1.5 text-xs font-bold text-white [&>option]:text-slate-800"></select>
+                </div>
+                <div id="analysis-pitcher-detail" class="p-4"></div>
+            </div>
+        </div>
+
+        <!-- ===== パネル⑥ 打者のカウント別アプローチ ===== -->
+        <div id="analysis-panel-approach" class="hidden space-y-4">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-teal-300"></i>チーム別サマリー</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[880px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">チーム名</th>
+                                <th class="py-2.5 px-2 text-center">打席</th>
+                                <th class="py-2.5 px-2 text-center">平均球数／打席</th>
+                                <th class="py-2.5 px-2 text-center">初球スイング率</th>
+                                <th class="py-2.5 px-2 text-center">初球打ち率</th>
+                                <th class="py-2.5 px-2 text-center">ファウル／打席</th>
+                                <th class="py-2.5 px-2 text-center">2ストライク到達率</th>
+                                <th class="py-2.5 px-2 text-center">追い込まれてからの打率</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-approach-team-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="list-ordered" class="w-4 h-4 text-teal-300"></i>カウント別打率（チーム・到達した打席ベース）</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[640px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3 text-center">カウント (B-S)</th>
+                                <th class="py-2.5 px-2 text-center">到達した打席</th>
+                                <th class="py-2.5 px-2 text-center">安打</th>
+                                <th class="py-2.5 px-2 text-center">打数</th>
+                                <th class="py-2.5 px-2 text-center">打率</th>
+                                <th class="py-2.5 px-3 text-center">三振</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-approach-count-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+                <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">各カウントに到達した打席について、その打席の最終結果から打率を集計しています（1打席が複数のカウントに重複して数えられます）。</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-teal-800 text-white px-4 py-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="user-check" class="w-4 h-4 text-teal-300"></i>選手別</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[1180px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-200 font-semibold">
+                                <th class="py-2.5 px-3">選手名</th>
+                                <th class="py-2.5 px-3">所属チーム</th>
+                                <th class="py-2.5 px-2 text-center">打席</th>
+                                <th class="py-2.5 px-2 text-center">平均球数</th>
+                                <th class="py-2.5 px-2 text-center">初球スイング率</th>
+                                <th class="py-2.5 px-2 text-center">初球打ち</th>
+                                <th class="py-2.5 px-2 text-center">見逃しストライク</th>
+                                <th class="py-2.5 px-2 text-center">空振り</th>
+                                <th class="py-2.5 px-2 text-center">ファウル</th>
+                                <th class="py-2.5 px-2 text-center">ファウル／打席</th>
+                                <th class="py-2.5 px-2 text-center">2ストライク後のファウル</th>
+                                <th class="py-2.5 px-2 text-center">追い込まれ打席</th>
+                                <th class="py-2.5 px-2 text-center">追い込まれてからの打率</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysis-approach-player-tbody" class="divide-y divide-slate-200 font-mono"></tbody>
+                    </table>
+                </div>
+                <p class="px-4 py-2.5 text-[11px] text-slate-500 border-t border-slate-100">初球スイング率＝初球にスイング（空振り・ファウル）した割合。初球打ち＝初球を打って打席が終わった打席数。「2ストライク後のファウル」が多い選手は追い込まれてから粘るタイプです。</p>
+            </div>
+        </div>
+    </div>
+
     <main id="screen-scorebook" class="hidden flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 space-y-4">
 
         <!-- 1. イニングスコアボード＆試合情報バー -->
@@ -4488,7 +5006,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             navCurrentScreen = screenName;
             if (screenName === 'home') navHomeSubView = 'hub';
-            ['screen-home', 'screen-scorebook', 'screen-player-stats', 'screen-team-stats', 'screen-team-settings', 'screen-physical', 'screen-opponents'].forEach(id => {
+            ['screen-home', 'screen-scorebook', 'screen-player-stats', 'screen-team-stats', 'screen-team-settings', 'screen-physical', 'screen-opponents', 'screen-score-analysis'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.add('hidden');
             });
@@ -4542,6 +5060,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (headerControls) headerControls.classList.add('hidden');
                 if (selectedOpponentTeam) renderOpponentDetail();
                 else renderOpponentList();
+            } else if (screenName === 'score-analysis') {
+                document.getElementById('screen-score-analysis').classList.remove('hidden');
+                if (headerControls) headerControls.classList.add('hidden');
+                renderScoreAnalysis();
             }
             if (typeof lucide !== 'undefined') lucide.createIcons();
             scrollAppToTop();
@@ -14918,6 +15440,1193 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const idx = selectEl ? (parseInt(selectEl.value, 10) || 0) : 0;
                 const st = strikeRows[Math.min(Math.max(idx, 0), Math.max(strikeRows.length - 1, 0))];
                 detailEl.innerHTML = st ? buildPitcherCountOnlyHtml(st) : '';
+            }
+        }
+
+        // ================= スコアを元にした分析（読み取り専用集計） =================
+        // 進行中の試合＋アーカイブのスコア記録（atBatRecords の投球シーケンスと
+        // 成績ライン）だけから集計する。保存データ形式・既存の計算ロジックは変更しない。
+        // 記録が無い項目は 0 または「―」で表示し、欠けたフィールドがあっても
+        // 例外にならないよう、すべての参照を防御的に行う。
+        let scoreAnalysisTab = 'bunt';
+        let scoreAnalysisTeam = 'ALL';
+        let scoreAnalysisPlayerKey = '';
+        let scoreAnalysisPitcherKey = '';
+        let scoreAnalysisCache = null;
+        const ANALYSIS_TABS = ['bunt', 'steal', 'batted', 'pickoff', 'pitcher', 'approach'];
+        const ANALYSIS_COUNT_KEYS = ['0-0', '1-0', '2-0', '3-0', '0-1', '1-1', '2-1', '3-1', '0-2', '1-2', '2-2', '3-2'];
+
+        function escAnalysis(s) {
+            return (typeof physicalEscapeHtml === 'function')
+                ? physicalEscapeHtml(s === null || s === undefined ? '' : s)
+                : String(s === null || s === undefined ? '' : s);
+        }
+        function fmtAnalysisPct(num, den) {
+            return (den && den > 0) ? (Math.round((num / den) * 1000) / 10).toFixed(1) + '%' : '―';
+        }
+        function fmtAnalysisRate(h, ab) {
+            return (ab && ab > 0 && typeof fmtRate3 === 'function') ? fmtRate3(h / ab) : '―';
+        }
+        function analysisEmptyRow(colspan, msg) {
+            return `<tr><td colspan="${colspan}" class="py-8 text-center text-slate-400 font-sans">${msg}</td></tr>`;
+        }
+
+        // 集計対象の試合（進行中の試合→アーカイブの順。牽制分析と同じ並び）
+        function getGamesForScoreAnalysis() {
+            const games = [];
+            if (typeof hasCurrentGame === 'function' && hasCurrentGame()) {
+                const cur = (typeof getCurrentGameWithLiveAtBat === 'function') ? getCurrentGameWithLiveAtBat() : null;
+                if (cur && cur.teams) {
+                    games.push({ teams: cur.teams, atBatRecords: cur.atBatRecords || [], logs: (typeof gameState !== 'undefined' && gameState && gameState.logs) || [], meta: (typeof gameState !== 'undefined' && gameState && gameState.meta) || {} });
+                } else if (typeof gameState !== 'undefined' && gameState) {
+                    games.push(gameState);
+                }
+            }
+            getArchivedGames().forEach(a => { if (a && a.data && a.data.teams) games.push(a.data); });
+            return games;
+        }
+
+        function analysisTeamNames(games) {
+            const names = [];
+            (games || []).forEach(g => {
+                if (!g || !g.teams) return;
+                ['away', 'home'].forEach(k => {
+                    const nm = g.teams[k] && g.teams[k].name;
+                    if (nm && names.indexOf(nm) === -1) names.push(nm);
+                });
+            });
+            return names;
+        }
+        function analysisOffenseTeam(g, ab) {
+            if (!g || !g.teams) return '';
+            return ab && ab.half === 'top'
+                ? (g.teams.away ? g.teams.away.name : '')
+                : (g.teams.home ? g.teams.home.name : '');
+        }
+        function analysisDefenseTeam(g, ab) {
+            if (!g || !g.teams) return '';
+            return ab && ab.half === 'top'
+                ? (g.teams.home ? g.teams.home.name : '')
+                : (g.teams.away ? g.teams.away.name : '');
+        }
+        // 試合内の選手ルックアップ（打席の左右など、記録に無い属性の参照用）
+        function analysisPlayerLookup(g) {
+            const byId = {}, byName = {};
+            if (g && g.teams) {
+                ['away', 'home'].forEach(k => {
+                    const t = g.teams[k];
+                    if (!t || !Array.isArray(t.players)) return;
+                    t.players.forEach(p => {
+                        if (!p) return;
+                        if (p.id) byId[p.id] = p;
+                        if (p.name && !byName[p.name]) byName[p.name] = p;
+                    });
+                });
+            }
+            return { byId: byId, byName: byName };
+        }
+        // 投球結果の分類（ボール／見逃し／空振り／ファウル）。牽制・走者イベントは null
+        function analysisPitchKind(type) {
+            if (!type || typeof type !== 'string') return null;
+            if (type.indexOf('ball') === 0) return 'ball';
+            if (type === 'strike_called' || type === 'strike_called_bunt' || type === 'strike_called_buster') return 'called';
+            if (type.indexOf('strike_swing') === 0) return 'swing';
+            if (type.indexOf('foul') === 0) return 'foul';
+            return null;
+        }
+        function analysisIsStrikeKind(kind) { return kind === 'called' || kind === 'swing' || kind === 'foul'; }
+
+        // ---------- ① バント・バスター集計 ----------
+        const ANALYSIS_BUNT_KIND = { ball_bunt: 'takeBall', strike_called_bunt: 'takeStrike', strike_swing_bunt: 'swing', foul_bunt: 'foul' };
+        const ANALYSIS_BUSTER_KIND = { ball_buster: 'takeBall', strike_called_buster: 'takeStrike', strike_swing_buster: 'swing' };
+        function newBuntBusterStats(name, team) {
+            return {
+                name: name, team: team, pa: 0,
+                buntPA: 0, buntPitches: 0, buntTakeBall: 0, buntTakeStrike: 0, buntSwing: 0, buntFoul: 0,
+                sac: 0, sacFail: 0, buntHit: 0, buntSO: 0,
+                busterPA: 0, busterPitches: 0, busterTakeBall: 0, busterTakeStrike: 0, busterSwing: 0,
+                busterHitPA: 0, busterShowOnlyPA: 0,
+                pas: []
+            };
+        }
+        function analyzeBuntBuster(games) {
+            const playerMap = {}, teamMap = {};
+            const getP = (name, team) => { const k = statsAggKey(team, name); if (!playerMap[k]) playerMap[k] = newBuntBusterStats(name, team); return playerMap[k]; };
+            const getT = (team) => { if (!teamMap[team]) teamMap[team] = newBuntBusterStats(team, team); return teamMap[team]; };
+            const BATTED = ['1B', '2B', '3B', 'HR', 'GO', 'FO', 'LO', 'DP', 'FO_DP', 'LO_DP', 'E', 'FC'];
+            (games || []).forEach(g => {
+                if (!g || !g.teams || !Array.isArray(g.atBatRecords)) return;
+                g.atBatRecords.forEach(ab => {
+                    if (!ab) return;
+                    const team = analysisOffenseTeam(g, ab);
+                    const name = ab.batterName || '打者名不明';
+                    const seq = Array.isArray(ab.sequence) ? ab.sequence : [];
+                    const result = ab.result || '';
+                    const bunt = { pitches: 0, takeBall: 0, takeStrike: 0, swing: 0, foul: 0 };
+                    const buster = { pitches: 0, takeBall: 0, takeStrike: 0, swing: 0 };
+                    let firstBusterIdx = -1, foulAfterBuster = false, pitchAfterBuster = false;
+                    seq.forEach((ev, idx) => {
+                        if (!ev || !ev.type) return;
+                        if (ANALYSIS_BUNT_KIND[ev.type]) { bunt.pitches += 1; bunt[ANALYSIS_BUNT_KIND[ev.type]] += 1; }
+                        else if (ANALYSIS_BUSTER_KIND[ev.type]) {
+                            buster.pitches += 1; buster[ANALYSIS_BUSTER_KIND[ev.type]] += 1;
+                            if (firstBusterIdx < 0) firstBusterIdx = idx;
+                        } else if (firstBusterIdx >= 0) {
+                            if (ev.type === 'foul_hitting') { foulAfterBuster = true; pitchAfterBuster = true; }
+                            else if (analysisPitchKind(ev.type)) pitchAfterBuster = true;
+                        }
+                    });
+                    const hasBunt = bunt.pitches > 0 || ['SAC', 'SAC_FAIL', 'BUNT_HIT', 'BUNT_SO'].indexOf(result) !== -1;
+                    const hasBuster = buster.pitches > 0;
+                    let busterHit = false;
+                    if (hasBuster) {
+                        busterHit = buster.swing > 0 || foulAfterBuster || (BATTED.indexOf(result) !== -1 && pitchAfterBuster);
+                    }
+                    const targets = [getP(name, team), getT(team)];
+                    targets.forEach(st => {
+                        st.pa += 1;
+                        if (hasBunt) {
+                            st.buntPA += 1; st.buntPitches += bunt.pitches;
+                            st.buntTakeBall += bunt.takeBall; st.buntTakeStrike += bunt.takeStrike;
+                            st.buntSwing += bunt.swing; st.buntFoul += bunt.foul;
+                            if (result === 'SAC') st.sac += 1;
+                            else if (result === 'SAC_FAIL') st.sacFail += 1;
+                            else if (result === 'BUNT_HIT') st.buntHit += 1;
+                            else if (result === 'BUNT_SO') st.buntSO += 1;
+                        }
+                        if (hasBuster) {
+                            st.busterPA += 1; st.busterPitches += buster.pitches;
+                            st.busterTakeBall += buster.takeBall; st.busterTakeStrike += buster.takeStrike; st.busterSwing += buster.swing;
+                            if (busterHit) st.busterHitPA += 1; else st.busterShowOnlyPA += 1;
+                        }
+                    });
+                    if (hasBunt || hasBuster) {
+                        getP(name, team).pas.push({
+                            date: (g.meta && g.meta.date) || '', tournament: (g.meta && g.meta.tournament) || '',
+                            inning: ab.inning, half: ab.half, result: result, resultLabel: ab.resultLabel || result || '―',
+                            hasBunt: hasBunt, hasBuster: hasBuster, bunt: bunt, buster: buster, busterHit: busterHit
+                        });
+                    }
+                });
+            });
+            return { players: Object.values(playerMap), teams: Object.values(teamMap) };
+        }
+        function buntVerdictText(st) {
+            if (!st || st.buntPA === 0) return '―';
+            const parts = [];
+            const sacTry = st.sac + st.sacFail;
+            if (sacTry > 0 && sacTry / st.buntPA >= 0.4) parts.push('犠打（送りバント）中心');
+            if (st.buntHit > 0 && st.buntHit >= sacTry) parts.push('セーフティバントあり');
+            const takeRate = st.buntPitches > 0 ? (st.buntTakeBall + st.buntTakeStrike) / st.buntPitches : 0;
+            if (st.buntPitches >= 3 && takeRate >= 0.5) parts.push('バント構えで見逃しが多い');
+            if (parts.length === 0) parts.push('バントを使う');
+            return parts.join('／');
+        }
+        function busterVerdictText(st) {
+            if (!st || st.busterPA === 0) return '―';
+            if (st.busterHitPA > 0 && st.busterShowOnlyPA === 0) return 'バスターで打ってくる';
+            if (st.busterShowOnlyPA > 0 && st.busterHitPA === 0) return '構えのみ（見逃し中心）';
+            return (st.busterHitPA / st.busterPA) >= 0.5 ? 'バスターで打ってくることが多い' : '構えのみが多い';
+        }
+        function buntBusterMainTendency(st) {
+            if (!st || (st.buntPA === 0 && st.busterPA === 0)) return '―';
+            return st.buntPA >= st.busterPA ? 'バント多用型' : 'バスター型';
+        }
+
+        // ---------- ② 盗塁タイミング集計 ----------
+        function newStealTimingStats(name, team) {
+            const byCount = {}, byCountOuts = {};
+            ANALYSIS_COUNT_KEYS.forEach(c => { byCount[c] = { att: 0, ok: 0, ng: 0 }; });
+            return {
+                name: name, team: team, sbTotal: 0, csTotal: 0,
+                att: 0, ok: 0, ng: 0, byCount: byCount,
+                byOuts: { 0: { att: 0, ok: 0, ng: 0 }, 1: { att: 0, ok: 0, ng: 0 }, 2: { att: 0, ok: 0, ng: 0 } },
+                byCountOuts: byCountOuts, events: []
+            };
+        }
+        function stealResultOuts(result) {
+            if (['SO', 'BUNT_SO', 'GO', 'FO', 'LO', 'SAC', 'SF', 'SAC_FAIL'].indexOf(result) !== -1) return 1;
+            if (['DP', 'FO_DP', 'LO_DP'].indexOf(result) !== -1) return 2;
+            return 0;
+        }
+        function parseStealLogs(g) {
+            const logs = (g && Array.isArray(g.logs)) ? g.logs.slice().reverse() : [];
+            const out = [];
+            logs.forEach(l => {
+                const text = (l && l.text) || '';
+                let m = text.match(/^(.*?) 盗塁成功/);
+                if (m) { out.push({ name: m[1], success: true }); return; }
+                m = text.match(/^(.*?) 本盗成功/);
+                if (m) { out.push({ name: m[1], success: true }); return; }
+                m = text.match(/^(.*?) \(.+?塁\) 盗塁死/);
+                if (m) { out.push({ name: m[1], success: false }); return; }
+            });
+            return out;
+        }
+        function addStealTiming(st, ev) {
+            st.att += 1;
+            if (ev.success) st.ok += 1; else st.ng += 1;
+            const c = st.byCount[ev.countKey];
+            if (c) { c.att += 1; if (ev.success) c.ok += 1; else c.ng += 1; }
+            const o = st.byOuts[ev.outs];
+            if (o) { o.att += 1; if (ev.success) o.ok += 1; else o.ng += 1; }
+            const k = ev.outs + '|' + ev.countKey;
+            if (!st.byCountOuts[k]) st.byCountOuts[k] = { att: 0, ok: 0, ng: 0, outs: ev.outs, countKey: ev.countKey };
+            st.byCountOuts[k].att += 1;
+            if (ev.success) st.byCountOuts[k].ok += 1; else st.byCountOuts[k].ng += 1;
+        }
+        function analyzeSteals(games) {
+            const playerMap = {}, teamMap = {};
+            const all = newStealTimingStats('全チーム', '');
+            const getP = (name, team) => { const k = statsAggKey(team, name); if (!playerMap[k]) playerMap[k] = newStealTimingStats(name, team); return playerMap[k]; };
+            const getT = (team) => { if (!teamMap[team]) teamMap[team] = newStealTimingStats(team, team); return teamMap[team]; };
+            // 合計（盗塁・盗塁死）は成績ラインから集計（選手成績と同じ母数）
+            (games || []).forEach(g => {
+                if (!g || !g.teams) return;
+                ['away', 'home'].forEach(tk => {
+                    const team = g.teams[tk];
+                    if (!team || !Array.isArray(team.players)) return;
+                    const t = getT(team.name);
+                    team.players.forEach(p => {
+                        if (!p || !p.batting) return;
+                        const sb = p.batting.sb || 0, cs = p.batting.cs || 0;
+                        if (sb === 0 && cs === 0) return;
+                        const ps = getP(p.name, team.name);
+                        ps.sbTotal += sb; ps.csTotal += cs;
+                        t.sbTotal += sb; t.csTotal += cs;
+                        all.sbTotal += sb; all.csTotal += cs;
+                    });
+                });
+            });
+            // タイミングは打席記録のシーケンスから復元する
+            (games || []).forEach(g => {
+                if (!g || !g.teams || !Array.isArray(g.atBatRecords)) return;
+                const seqSteals = [];
+                let curHalfKey = null, outs = 0;
+                g.atBatRecords.forEach(ab => {
+                    if (!ab) return;
+                    const hk = (ab.inning || 0) + '_' + (ab.half || '');
+                    if (hk !== curHalfKey) { curHalfKey = hk; outs = 0; }
+                    const team = analysisOffenseTeam(g, ab);
+                    let b = 0, s = 0, outsInPA = outs;
+                    const seq = Array.isArray(ab.sequence) ? ab.sequence : [];
+                    seq.forEach(ev => {
+                        if (!ev || !ev.type) return;
+                        if (ev.type === 'runner_event') {
+                            const lbl = ev.label || '';
+                            if (lbl === '盗塁' || lbl === '盗塁死') {
+                                seqSteals.push({ success: lbl === '盗塁', countKey: b + '-' + s, outs: Math.min(Math.max(outsInPA, 0), 2), team: team, inning: ab.inning, half: ab.half, date: (g.meta && g.meta.date) || '' });
+                            }
+                            if (lbl.indexOf('盗塁死') !== -1 || lbl.indexOf('牽制死') !== -1) outsInPA += 1;
+                            return;
+                        }
+                        const kind = analysisPitchKind(ev.type);
+                        if (kind === 'ball') b = Math.min(3, b + 1);
+                        else if (kind === 'called' || kind === 'swing') s = Math.min(2, s + 1);
+                        else if (kind === 'foul' && s < 2) s += 1;
+                    });
+                    outs = Math.min(3, outsInPA + stealResultOuts(ab.result || ''));
+                });
+                // 走者名は経過ログと突き合わせ（件数と成否の並びが一致した試合だけ特定する）
+                const logSteals = parseStealLogs(g);
+                let matched = logSteals.length === seqSteals.length;
+                if (matched) {
+                    for (let i = 0; i < seqSteals.length; i++) {
+                        if (logSteals[i].success !== seqSteals[i].success) { matched = false; break; }
+                    }
+                }
+                seqSteals.forEach((ev, i) => {
+                    addStealTiming(getT(ev.team), ev);
+                    addStealTiming(all, ev);
+                    if (matched && logSteals[i] && logSteals[i].name) {
+                        const ps = getP(logSteals[i].name, ev.team);
+                        addStealTiming(ps, ev);
+                        ps.events.push(ev);
+                    }
+                });
+            });
+            return { players: Object.values(playerMap), teams: Object.values(teamMap), all: all };
+        }
+        function bestStealTimingText(st) {
+            if (!st || !st.byCountOuts) return '―';
+            let best = null;
+            Object.values(st.byCountOuts).forEach(v => { if (!best || v.att > best.att) best = v; });
+            if (!best || best.att === 0) return '―';
+            return `${best.outs}アウト ${best.countKey}（${best.att}回・成功${best.ok}）`;
+        }
+        // ---------- ③ 打球傾向集計 ----------
+        const ANALYSIS_BATTED_RESULTS = ['1B', '2B', '3B', 'HR', 'BUNT_HIT', 'GO', 'FO', 'LO', 'DP', 'FO_DP', 'LO_DP', 'E', 'SAC', 'SAC_FAIL', 'SF'];
+        const ANALYSIS_FOUL_DIRS = ['catcher', 'first_side', 'third_side', 'right_field', 'left_field'];
+        const ANALYSIS_FOUL_DIR_LABELS = { catcher: '捕手周辺', first_side: '一塁側', third_side: '三塁側', right_field: '右翼側', left_field: '左翼側', unknown: '不明' };
+        function newBattedStats(name, team) {
+            return {
+                name: name, team: team, total: 0,
+                zones: { left: 0, center: 0, right: 0, unknown: 0 },
+                quality: { grounder: 0, fly: 0, liner: 0, hit: 0, bunt: 0, other: 0 },
+                matrix: {
+                    grounder: { left: 0, center: 0, right: 0, unknown: 0 },
+                    fly: { left: 0, center: 0, right: 0, unknown: 0 },
+                    liner: { left: 0, center: 0, right: 0, unknown: 0 },
+                    hit: { left: 0, center: 0, right: 0, unknown: 0 },
+                    bunt: { left: 0, center: 0, right: 0, unknown: 0 },
+                    other: { left: 0, center: 0, right: 0, unknown: 0 }
+                },
+                pull: 0, oppo: 0,
+                foulTotal: 0,
+                foulByQuality: { fly: 0, liner: 0, grounder: 0, unknown: 0 },
+                foulMatrix: {
+                    fly: { catcher: 0, first_side: 0, third_side: 0, right_field: 0, left_field: 0, unknown: 0 },
+                    liner: { catcher: 0, first_side: 0, third_side: 0, right_field: 0, left_field: 0, unknown: 0 },
+                    grounder: { catcher: 0, first_side: 0, third_side: 0, right_field: 0, left_field: 0, unknown: 0 },
+                    unknown: { catcher: 0, first_side: 0, third_side: 0, right_field: 0, left_field: 0, unknown: 0 }
+                }
+            };
+        }
+        function analysisBattedZone(result, resultLabel) {
+            if (result === 'E') return 'unknown'; // 失策は補殺側が先頭に付く場合があり方向を特定しない
+            const label = resultLabel || '';
+            if (label.indexOf('左中間') === 0) return 'left';
+            if (label.indexOf('右中間') === 0) return 'right';
+            const c = label.charAt(0);
+            if (c === '左' || c === '三' || c === '遊') return 'left';
+            if (c === '右' || c === '一' || c === '二') return 'right';
+            if (c === '中' || c === '投' || c === '捕') return 'center';
+            return 'unknown';
+        }
+        function analysisBattedQuality(result) {
+            if (result === 'GO' || result === 'DP') return 'grounder';
+            if (result === 'FO' || result === 'FO_DP' || result === 'SF') return 'fly';
+            if (result === 'LO' || result === 'LO_DP') return 'liner';
+            if (['1B', '2B', '3B', 'HR', 'BUNT_HIT'].indexOf(result) !== -1) return 'hit';
+            if (result === 'SAC' || result === 'SAC_FAIL') return 'bunt';
+            return 'other';
+        }
+        function analyzeBattedBalls(games) {
+            const playerMap = {}, teamMap = {};
+            const all = newBattedStats('全チーム', '');
+            const getP = (name, team) => { const k = statsAggKey(team, name); if (!playerMap[k]) playerMap[k] = newBattedStats(name, team); return playerMap[k]; };
+            const getT = (team) => { if (!teamMap[team]) teamMap[team] = newBattedStats(team, team); return teamMap[team]; };
+            (games || []).forEach(g => {
+                if (!g || !g.teams || !Array.isArray(g.atBatRecords)) return;
+                const lookup = analysisPlayerLookup(g);
+                g.atBatRecords.forEach(ab => {
+                    if (!ab) return;
+                    const team = analysisOffenseTeam(g, ab);
+                    const name = ab.batterName || '打者名不明';
+                    const targets = [getP(name, team), getT(team), all];
+                    const result = ab.result || '';
+                    if (ANALYSIS_BATTED_RESULTS.indexOf(result) !== -1) {
+                        const zone = analysisBattedZone(result, ab.resultLabel || '');
+                        const quality = analysisBattedQuality(result);
+                        const batter = (ab.batterId && lookup.byId[ab.batterId]) || lookup.byName[name] || null;
+                        const bats = batter ? String(batter.bats || '') : '';
+                        targets.forEach(st => {
+                            st.total += 1;
+                            st.zones[zone] += 1;
+                            st.quality[quality] += 1;
+                            st.matrix[quality][zone] += 1;
+                            if ((zone === 'left' || zone === 'right') && quality !== 'bunt') {
+                                if (bats.indexOf('右') !== -1) { if (zone === 'left') st.pull += 1; else st.oppo += 1; }
+                                else if (bats.indexOf('左') !== -1) { if (zone === 'right') st.pull += 1; else st.oppo += 1; }
+                            }
+                        });
+                    }
+                    const seq = Array.isArray(ab.sequence) ? ab.sequence : [];
+                    seq.forEach(ev => {
+                        if (!ev || ev.type !== 'foul_hitting') return;
+                        const q = (ev.foulQuality === 'fly' || ev.foulQuality === 'liner' || ev.foulQuality === 'grounder') ? ev.foulQuality : 'unknown';
+                        const d = ANALYSIS_FOUL_DIRS.indexOf(ev.foulDirection) !== -1 ? ev.foulDirection : 'unknown';
+                        targets.forEach(st => {
+                            st.foulTotal += 1;
+                            st.foulByQuality[q] += 1;
+                            st.foulMatrix[q][d] += 1;
+                        });
+                    });
+                });
+            });
+            return { players: Object.values(playerMap), teams: Object.values(teamMap), all: all };
+        }
+
+        // ---------- ④ 牽制集計 ----------
+        function newPickoffAnalysisStats(name, team) {
+            const byCount = {};
+            ANALYSIS_COUNT_KEYS.forEach(c => { byCount[c] = { pickoffs: 0, base1: 0, base2: 0, base3: 0 }; });
+            return {
+                name: name, team: team, total: 0, baseTotals: { 1: 0, 2: 0, 3: 0 }, byCount: byCount,
+                maxSameBaseStreak: 0, maxSameBaseStreakBase: null, maxSameBaseStreakDetail: '',
+                maxStreakByBase: { 1: 0, 2: 0, 3: 0 }, atBatCount: 0
+            };
+        }
+        function analyzePickoffs(games) {
+            const pitcherMap = {};
+            const getS = (name, team) => { const k = statsAggKey(team, name); if (!pitcherMap[k]) pitcherMap[k] = newPickoffAnalysisStats(name, team); return pitcherMap[k]; };
+            (games || []).forEach(g => {
+                if (!g || !g.teams || !Array.isArray(g.atBatRecords)) return;
+                g.atBatRecords.forEach(ab => {
+                    if (!ab) return;
+                    const defenseTeam = analysisDefenseTeam(g, ab);
+                    const seq = Array.isArray(ab.sequence) ? ab.sequence : [];
+                    let curB = 0, curS = 0;
+                    let streakBase = null, streakLen = 0, streakPitcher = null;
+                    const seenPitchers = new Set();
+                    seq.forEach(ev => {
+                        if (!ev || !ev.type) return;
+                        const pName = ev.pitcherName || ab.pitcherName || '投手名不明';
+                        if (ev.type === 'pickoff') {
+                            const st = getS(pName, defenseTeam);
+                            st.total += 1;
+                            seenPitchers.add(pName);
+                            const cKey = ev.count || ev.countBefore || (curB + '-' + curS);
+                            const cs = st.byCount[cKey];
+                            if (cs) {
+                                cs.pickoffs += 1;
+                                if (ev.targetBase === 1) cs.base1 += 1;
+                                else if (ev.targetBase === 2) cs.base2 += 1;
+                                else if (ev.targetBase === 3) cs.base3 += 1;
+                            }
+                            if (ev.targetBase === 1 || ev.targetBase === 2 || ev.targetBase === 3) st.baseTotals[ev.targetBase] += 1;
+                            if (streakBase === ev.targetBase && streakPitcher === pName) streakLen += 1;
+                            else { streakBase = ev.targetBase; streakLen = 1; streakPitcher = pName; }
+                            if ((ev.targetBase === 1 || ev.targetBase === 2 || ev.targetBase === 3) && streakLen > st.maxStreakByBase[ev.targetBase]) st.maxStreakByBase[ev.targetBase] = streakLen;
+                            if (streakLen > st.maxSameBaseStreak) {
+                                st.maxSameBaseStreak = streakLen;
+                                st.maxSameBaseStreakBase = ev.targetBase;
+                                st.maxSameBaseStreakDetail = `${ab.inning || '―'}回${ab.half === 'top' ? '表' : '裏'} vs ${ab.batterName || '打者'}`;
+                            }
+                        } else {
+                            streakBase = null; streakLen = 0; streakPitcher = null;
+                            const kind = analysisPitchKind(ev.type);
+                            if (kind === 'ball') curB = Math.min(3, curB + 1);
+                            else if (kind === 'called' || kind === 'swing') curS = Math.min(2, curS + 1);
+                            else if (kind === 'foul' && curS < 2) curS += 1;
+                        }
+                    });
+                    seenPitchers.forEach(pName => { getS(pName, defenseTeam).atBatCount += 1; });
+                });
+            });
+            return Object.values(pitcherMap);
+        }
+        function pickoffTopCountText(st) {
+            if (!st) return '―';
+            let best = null, bestKey = '';
+            ANALYSIS_COUNT_KEYS.forEach(c => {
+                const d = st.byCount[c];
+                if (d && d.pickoffs > 0 && (!best || d.pickoffs > best.pickoffs)) { best = d; bestKey = c; }
+            });
+            return best ? `${bestKey}（${best.pickoffs}回）` : '―';
+        }
+
+        // ---------- ⑤ 投手の配球・ストライク率集計 ----------
+        function newPitcherAnalysisStats(name, team) {
+            const byCount = {};
+            ANALYSIS_COUNT_KEYS.forEach(c => { byCount[c] = { total: 0, strikes: 0, ball: 0, called: 0, swing: 0, foul: 0 }; });
+            return {
+                name: name, team: team, total: 0, ball: 0, called: 0, swing: 0, foul: 0,
+                firstTotal: 0, firstStrikes: 0, firstKinds: { ball: 0, called: 0, swing: 0, foul: 0 },
+                byCount: byCount
+            };
+        }
+        function analyzePitchers(games) {
+            const map = {};
+            const getS = (name, team) => { const k = statsAggKey(team, name); if (!map[k]) map[k] = newPitcherAnalysisStats(name, team); return map[k]; };
+            (games || []).forEach(g => {
+                if (!g || !g.teams || !Array.isArray(g.atBatRecords)) return;
+                g.atBatRecords.forEach(ab => {
+                    if (!ab) return;
+                    const defenseTeam = analysisDefenseTeam(g, ab);
+                    const seq = Array.isArray(ab.sequence) ? ab.sequence : [];
+                    let curB = 0, curS = 0, firstDone = false;
+                    seq.forEach(ev => {
+                        if (!ev || !ev.type) return;
+                        const kind = analysisPitchKind(ev.type);
+                        if (!kind) return;
+                        const pName = ev.pitcherName || ab.pitcherName || '投手名不明';
+                        const st = getS(pName, defenseTeam);
+                        const cKey = ev.countBefore || ev.count || (curB + '-' + curS);
+                        st.total += 1;
+                        st[kind] += 1;
+                        const bc = st.byCount[cKey];
+                        if (bc) {
+                            bc.total += 1;
+                            bc[kind] += 1;
+                            if (analysisIsStrikeKind(kind)) bc.strikes += 1;
+                        }
+                        if (!firstDone) {
+                            firstDone = true;
+                            st.firstTotal += 1;
+                            st.firstKinds[kind] += 1;
+                            if (analysisIsStrikeKind(kind)) st.firstStrikes += 1;
+                        }
+                        if (kind === 'ball') curB = Math.min(3, curB + 1);
+                        else if (kind === 'called' || kind === 'swing') curS = Math.min(2, curS + 1);
+                        else if (kind === 'foul' && curS < 2) curS += 1;
+                    });
+                });
+            });
+            return Object.values(map).filter(s => s.total > 0);
+        }
+        function pitcherCountGroupStrikeText(st, keys) {
+            let total = 0, strikes = 0;
+            (keys || []).forEach(c => { const d = st.byCount[c]; if (d) { total += d.total; strikes += d.strikes; } });
+            return fmtAnalysisPct(strikes, total);
+        }
+        function pitcherFirstKindText(st) {
+            if (!st || st.firstTotal === 0) return '―';
+            const labels = { ball: 'ボール', called: '見逃しストライク', swing: '空振りストライク', foul: 'ファウル' };
+            let best = null, bestN = 0;
+            ['ball', 'called', 'swing', 'foul'].forEach(k => { if (st.firstKinds[k] > bestN) { bestN = st.firstKinds[k]; best = k; } });
+            return best ? `${labels[best]}（${bestN}球）` : '―';
+        }
+
+        // ---------- ⑥ 打者のカウント別アプローチ集計 ----------
+        const ANALYSIS_AB_RESULTS = ['1B', '2B', '3B', 'HR', 'BUNT_HIT', 'SO', 'BUNT_SO', 'GO', 'FO', 'LO', 'DP', 'FO_DP', 'LO_DP', 'E', 'SAC_FAIL'];
+        const ANALYSIS_HIT_RESULTS = ['1B', '2B', '3B', 'HR', 'BUNT_HIT'];
+        function newApproachStats(name, team) {
+            const byCount = {};
+            ANALYSIS_COUNT_KEYS.forEach(c => { byCount[c] = { pa: 0, h: 0, ab: 0, so: 0 }; });
+            return {
+                name: name, team: team, pa: 0, pitches: 0,
+                firstTotal: 0, firstSwing: 0, firstPitchBIP: 0,
+                called: 0, swing: 0, fouls: 0, foulsAfter2S: 0,
+                twoStrikePA: 0, twoStrikeH: 0, twoStrikeAB: 0,
+                byCount: byCount
+            };
+        }
+        function analyzeApproach(games) {
+            const playerMap = {}, teamMap = {};
+            const getP = (name, team) => { const k = statsAggKey(team, name); if (!playerMap[k]) playerMap[k] = newApproachStats(name, team); return playerMap[k]; };
+            const getT = (team) => { if (!teamMap[team]) teamMap[team] = newApproachStats(team, team); return teamMap[team]; };
+            (games || []).forEach(g => {
+                if (!g || !g.teams || !Array.isArray(g.atBatRecords)) return;
+                g.atBatRecords.forEach(ab => {
+                    if (!ab) return;
+                    const team = analysisOffenseTeam(g, ab);
+                    const name = ab.batterName || '打者名不明';
+                    const seq = Array.isArray(ab.sequence) ? ab.sequence : [];
+                    const result = ab.result || '';
+                    const isAB = ANALYSIS_AB_RESULTS.indexOf(result) !== -1 || (typeof result === 'string' && result.indexOf('K_') === 0);
+                    const isHit = ANALYSIS_HIT_RESULTS.indexOf(result) !== -1;
+                    const isSO = result === 'SO' || result === 'BUNT_SO' || (typeof result === 'string' && result.indexOf('K_') === 0);
+                    const pitchEvents = [];
+                    let curB = 0, curS = 0;
+                    const reached = new Set();
+                    let fouls = 0, foulsAfter2S = 0, called = 0, swing = 0, reached2S = false;
+                    seq.forEach(ev => {
+                        if (!ev || !ev.type) return;
+                        const kind = analysisPitchKind(ev.type);
+                        if (!kind) return;
+                        const cKey = ev.countBefore || ev.count || (curB + '-' + curS);
+                        reached.add(cKey);
+                        if (curS >= 2) reached2S = true;
+                        pitchEvents.push({ kind: kind, countKey: cKey });
+                        if (kind === 'called') called += 1;
+                        else if (kind === 'swing') swing += 1;
+                        else if (kind === 'foul') { fouls += 1; if (curS >= 2) foulsAfter2S += 1; }
+                        if (kind === 'ball') curB = Math.min(3, curB + 1);
+                        else if (kind === 'called' || kind === 'swing') curS = Math.min(2, curS + 1);
+                        else if (kind === 'foul' && curS < 2) curS += 1;
+                    });
+                    if (curS >= 2) reached2S = true;
+                    const firstKind = pitchEvents.length ? pitchEvents[0].kind : null;
+                    const firstBIP = pitchEvents.length === 1 && ANALYSIS_BATTED_RESULTS.indexOf(result) !== -1;
+                    [getP(name, team), getT(team)].forEach(st => {
+                        st.pa += 1;
+                        st.pitches += pitchEvents.length;
+                        if (firstKind) {
+                            st.firstTotal += 1;
+                            if (firstKind === 'swing' || firstKind === 'foul') st.firstSwing += 1;
+                        }
+                        if (firstBIP) st.firstPitchBIP += 1;
+                        st.called += called; st.swing += swing; st.fouls += fouls; st.foulsAfter2S += foulsAfter2S;
+                        if (reached2S) {
+                            st.twoStrikePA += 1;
+                            if (isHit) st.twoStrikeH += 1;
+                            if (isAB) st.twoStrikeAB += 1;
+                        }
+                        reached.forEach(c => {
+                            const d = st.byCount[c];
+                            if (!d) return;
+                            d.pa += 1;
+                            if (isHit) d.h += 1;
+                            if (isAB) d.ab += 1;
+                            if (isSO) d.so += 1;
+                        });
+                    });
+                });
+            });
+            return { players: Object.values(playerMap), teams: Object.values(teamMap) };
+        }
+
+        // ---------- 描画 ----------
+        function switchScoreAnalysisTab(tab) {
+            if (ANALYSIS_TABS.indexOf(tab) === -1) tab = 'bunt';
+            scoreAnalysisTab = tab;
+            ANALYSIS_TABS.forEach(t => {
+                const btn = document.getElementById('btn-analysis-tab-' + t);
+                const panel = document.getElementById('analysis-panel-' + t);
+                const active = t === tab;
+                if (panel) panel.classList.toggle('hidden', !active);
+                if (btn) {
+                    btn.setAttribute('aria-selected', active ? 'true' : 'false');
+                    btn.className = 'flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-sm font-extrabold transition ' + (active ? 'bg-teal-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200');
+                }
+            });
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+        function onScoreAnalysisTeamChange(value) {
+            scoreAnalysisTeam = value || 'ALL';
+            renderScoreAnalysis();
+        }
+        function onScoreAnalysisPlayerChange(value) {
+            scoreAnalysisPlayerKey = value || '';
+            renderScoreAnalysisPlayerDetail();
+        }
+        function onScoreAnalysisPitcherChange(value) {
+            scoreAnalysisPitcherKey = value || '';
+            renderScoreAnalysisPitcherDetail();
+        }
+        function analysisFilterTeam(st) {
+            return scoreAnalysisTeam === 'ALL' || st.team === scoreAnalysisTeam;
+        }
+
+        function renderScoreAnalysis() {
+            const games = getGamesForScoreAnalysis();
+            const bunt = analyzeBuntBuster(games);
+            const steal = analyzeSteals(games);
+            const batted = analyzeBattedBalls(games);
+            const pickoffs = analyzePickoffs(games);
+            const pitchers = analyzePitchers(games);
+            const approach = analyzeApproach(games);
+            scoreAnalysisCache = { games: games, bunt: bunt, steal: steal, batted: batted, pickoffs: pickoffs, pitchers: pitchers, approach: approach };
+
+            const teamNames = analysisTeamNames(games);
+            if (scoreAnalysisTeam !== 'ALL' && teamNames.indexOf(scoreAnalysisTeam) === -1) scoreAnalysisTeam = 'ALL';
+            const teamSel = document.getElementById('analysis-team-filter');
+            if (teamSel) {
+                teamSel.innerHTML = '<option value="ALL">全チーム</option>' + teamNames.map(t => `<option value="${escAnalysis(t)}" ${t === scoreAnalysisTeam ? 'selected' : ''}>${escAnalysis(t)}</option>`).join('');
+                teamSel.value = scoreAnalysisTeam;
+            }
+            const summaryEl = document.getElementById('analysis-data-summary');
+            if (summaryEl) {
+                const totalPA = games.reduce((s, g) => s + (Array.isArray(g.atBatRecords) ? g.atBatRecords.length : 0), 0);
+                summaryEl.textContent = games.length ? `（対象：${games.length}試合・打席記録${totalPA}件）` : '（対象の試合データがまだありません）';
+            }
+
+            renderAnalysisBuntPanel();
+            renderAnalysisStealPanel();
+            renderAnalysisBattedPanel();
+            renderAnalysisPickoffPanel();
+            renderAnalysisPitcherPanel();
+            renderAnalysisApproachPanel();
+            switchScoreAnalysisTab(scoreAnalysisTab);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function renderAnalysisBuntPanel() {
+            const cache = scoreAnalysisCache;
+            if (!cache) return;
+            const teams = cache.bunt.teams.filter(t => scoreAnalysisTeam === 'ALL' || t.name === scoreAnalysisTeam);
+            const teamTbody = document.getElementById('analysis-bunt-team-tbody');
+            if (teamTbody) {
+                teamTbody.innerHTML = teams.length === 0
+                    ? analysisEmptyRow(11, '試合データがありません。')
+                    : teams.slice().sort((a, b) => b.pa - a.pa).map(t => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${escAnalysis(t.name)}</td>
+                            <td class="py-2.5 px-2 text-center">${t.pa}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${t.buntPA}</td>
+                            <td class="py-2.5 px-2 text-center">${t.sac}</td>
+                            <td class="py-2.5 px-2 text-center">${t.sacFail}</td>
+                            <td class="py-2.5 px-2 text-center">${t.buntHit}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(t.buntTakeBall + t.buntTakeStrike, t.buntPitches)}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${t.busterPA}</td>
+                            <td class="py-2.5 px-2 text-center">${t.busterHitPA}</td>
+                            <td class="py-2.5 px-2 text-center">${t.busterShowOnlyPA}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs font-bold text-teal-800">${escAnalysis(buntBusterMainTendency(t))}</td>
+                        </tr>`).join('');
+            }
+            const players = cache.bunt.players.filter(analysisFilterTeam);
+            const buntPlayers = players.filter(p => p.buntPA > 0).sort((a, b) => b.buntPA - a.buntPA || b.pa - a.pa);
+            const buntTbody = document.getElementById('analysis-bunt-player-tbody');
+            if (buntTbody) {
+                buntTbody.innerHTML = buntPlayers.length === 0
+                    ? analysisEmptyRow(14, 'バントの記録がある選手はいません。')
+                    : buntPlayers.map(p => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(p.name)}${escAnalysis(p.name)}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${escAnalysis(p.team)}</td>
+                            <td class="py-2.5 px-2 text-center">${p.pa}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${p.buntPA}</td>
+                            <td class="py-2.5 px-2 text-center">${p.buntPitches}</td>
+                            <td class="py-2.5 px-2 text-center">${p.buntTakeBall + p.buntTakeStrike}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.buntTakeBall + p.buntTakeStrike, p.buntPitches)}</td>
+                            <td class="py-2.5 px-2 text-center">${p.buntSwing}</td>
+                            <td class="py-2.5 px-2 text-center">${p.buntFoul}</td>
+                            <td class="py-2.5 px-2 text-center">${p.sac}</td>
+                            <td class="py-2.5 px-2 text-center">${p.sacFail}</td>
+                            <td class="py-2.5 px-2 text-center">${p.buntHit}</td>
+                            <td class="py-2.5 px-2 text-center">${p.buntSO}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs font-bold text-teal-800">${escAnalysis(buntVerdictText(p))}</td>
+                        </tr>`).join('');
+            }
+            const busterPlayers = players.filter(p => p.busterPA > 0).sort((a, b) => b.busterPA - a.busterPA || b.pa - a.pa);
+            const busterTbody = document.getElementById('analysis-buster-player-tbody');
+            if (busterTbody) {
+                busterTbody.innerHTML = busterPlayers.length === 0
+                    ? analysisEmptyRow(10, 'バスターの記録がある選手はいません。')
+                    : busterPlayers.map(p => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(p.name)}${escAnalysis(p.name)}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${escAnalysis(p.team)}</td>
+                            <td class="py-2.5 px-2 text-center">${p.pa}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${p.busterPA}</td>
+                            <td class="py-2.5 px-2 text-center">${p.busterPitches}</td>
+                            <td class="py-2.5 px-2 text-center">${p.busterTakeBall + p.busterTakeStrike}</td>
+                            <td class="py-2.5 px-2 text-center">${p.busterSwing}</td>
+                            <td class="py-2.5 px-2 text-center">${p.busterHitPA}</td>
+                            <td class="py-2.5 px-2 text-center">${p.busterShowOnlyPA}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs font-bold text-teal-800">${escAnalysis(busterVerdictText(p))}</td>
+                        </tr>`).join('');
+            }
+            // 選手別詳細のプルダウン（バント・バスター記録のある選手＋盗塁記録のある選手）
+            const sel = document.getElementById('analysis-player-select');
+            if (sel) {
+                const detailPlayers = players.filter(p => p.buntPA + p.busterPA > 0)
+                    .sort((a, b) => (b.buntPA + b.busterPA) - (a.buntPA + a.busterPA));
+                const currentVal = sel.value || scoreAnalysisPlayerKey;
+                sel.innerHTML = detailPlayers.length === 0
+                    ? '<option value="">（対象選手なし）</option>'
+                    : detailPlayers.map(p => {
+                        const k = statsAggKey(p.team, p.name);
+                        return `<option value="${escAnalysis(k)}" ${k === currentVal ? 'selected' : ''}>${escAnalysis(p.name)}（${escAnalysis(p.team)}）</option>`;
+                    }).join('');
+                if (detailPlayers.length) {
+                    if (!detailPlayers.some(p => statsAggKey(p.team, p.name) === sel.value)) sel.value = statsAggKey(detailPlayers[0].team, detailPlayers[0].name);
+                    scoreAnalysisPlayerKey = sel.value;
+                } else scoreAnalysisPlayerKey = '';
+            }
+            renderScoreAnalysisPlayerDetail();
+        }
+
+        function renderScoreAnalysisPlayerDetail() {
+            const el = document.getElementById('analysis-player-detail');
+            if (!el || !scoreAnalysisCache) return;
+            const key = scoreAnalysisPlayerKey;
+            const bp = scoreAnalysisCache.bunt.players.find(p => statsAggKey(p.team, p.name) === key);
+            if (!bp) {
+                el.innerHTML = '<p class="text-xs text-slate-400 italic py-3 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">バント・バスターの記録がある選手がいません。</p>';
+                return;
+            }
+            const sp = scoreAnalysisCache.steal.players.find(p => statsAggKey(p.team, p.name) === key);
+            const bt = scoreAnalysisCache.batted.players.find(p => statsAggKey(p.team, p.name) === key);
+            const ap = scoreAnalysisCache.approach.players.find(p => statsAggKey(p.team, p.name) === key);
+            const card = (label, value, sub) => `
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+                    <div class="text-[11px] font-bold text-slate-500">${label}</div>
+                    <div class="text-lg font-extrabold text-slate-900 font-mono mt-0.5">${value}</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">${sub || ''}</div>
+                </div>`;
+            const paRows = bp.pas.slice().reverse().map(r => {
+                const parts = [];
+                if (r.hasBunt) parts.push(`バント：見逃し球${r.bunt.takeBall + r.bunt.takeStrike}・空振り${r.bunt.swing}・ファウル${r.bunt.foul}`);
+                if (r.hasBuster) parts.push(`バスター：見逃し球${r.buster.takeBall + r.buster.takeStrike}・空振り${r.buster.swing}→${r.busterHit ? '打った' : '構えのみ'}`);
+                return `
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs">
+                        <span class="font-bold text-slate-700">${escAnalysis(r.date || '日付不明')}</span>
+                        <span class="text-slate-500">${r.inning || '―'}回${r.half === 'top' ? '表' : '裏'}</span>
+                        <span class="font-bold text-slate-800">結果：${escAnalysis(r.resultLabel)}</span>
+                        <span class="text-slate-600">${escAnalysis(parts.join(' ／ '))}</span>
+                    </div>`;
+            }).join('');
+            el.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                        <span class="text-base font-extrabold text-slate-900">${playerColorDotByName(bp.name)}${escAnalysis(bp.name)}</span>
+                        <span class="text-xs font-bold text-slate-500">${escAnalysis(bp.team)}</span>
+                        <span class="text-xs font-bold text-teal-700">主な傾向：${escAnalysis(buntBusterMainTendency(bp))}</span>
+                    </div>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        ${card('バント打席', bp.buntPA + '打席', `犠打${bp.sac}・犠打失敗${bp.sacFail}・バント安打${bp.buntHit}・スリーバント失敗${bp.buntSO}`)}
+                        ${card('バント見逃し割合', fmtAnalysisPct(bp.buntTakeBall + bp.buntTakeStrike, bp.buntPitches), `見逃し球${bp.buntTakeBall + bp.buntTakeStrike}／関連球${bp.buntPitches}（ボール${bp.buntTakeBall}・見逃しS${bp.buntTakeStrike}）`)}
+                        ${card('バスター打席', bp.busterPA + '打席', `打った${bp.busterHitPA}・構えのみ${bp.busterShowOnlyPA}`)}
+                        ${card('バスター判定', escAnalysis(busterVerdictText(bp)), `見逃し球${bp.busterTakeBall + bp.busterTakeStrike}・空振り${bp.busterSwing}`)}
+                        ${card('盗塁（成績合計）', sp ? (sp.sbTotal + '個') : '―', sp ? `盗塁死${sp.csTotal}・成功率${fmtAnalysisPct(sp.sbTotal, sp.sbTotal + sp.csTotal)}` : '記録なし')}
+                        ${card('盗塁の最多タイミング', sp ? escAnalysis(bestStealTimingText(sp)) : '―', sp && sp.att ? `タイミング記録${sp.att}件` : 'タイミング記録なし')}
+                        ${card('打球傾向', bt && bt.total ? `引っ張り${fmtAnalysisPct(bt.pull, bt.pull + bt.oppo)}` : '―', bt && bt.total ? `打球${bt.total}・ゴロ率${fmtAnalysisPct(bt.quality.grounder, bt.quality.grounder + bt.quality.fly + bt.quality.liner)}・フライ率${fmtAnalysisPct(bt.quality.fly, bt.quality.grounder + bt.quality.fly + bt.quality.liner)}` : '記録なし')}
+                        ${card('カウント別アプローチ', ap ? `平均${ap.pa ? (Math.round(ap.pitches / ap.pa * 10) / 10) : '―'}球／打席` : '―', ap ? `初球スイング率${fmtAnalysisPct(ap.firstSwing, ap.firstTotal)}・2ストライク後ファウル${ap.foulsAfter2S}` : '記録なし')}
+                    </div>
+                    <div class="space-y-2">
+                        <h4 class="text-xs font-bold text-slate-700">バント・バスターが出た打席（新しい順）</h4>
+                        ${paRows || '<p class="text-xs text-slate-400 italic">該当する打席記録はありません。</p>'}
+                    </div>
+                </div>`;
+        }
+
+        function renderAnalysisStealPanel() {
+            const cache = scoreAnalysisCache;
+            if (!cache) return;
+            const teams = cache.steal.teams.filter(t => scoreAnalysisTeam === 'ALL' || t.name === scoreAnalysisTeam);
+            const agg = scoreAnalysisTeam === 'ALL' ? cache.steal.all : (teams[0] || newStealTimingStats(scoreAnalysisTeam, scoreAnalysisTeam));
+            const sumSb = teams.reduce((s, t) => s + t.sbTotal, 0);
+            const sumCs = teams.reduce((s, t) => s + t.csTotal, 0);
+            let topTiming = null;
+            Object.values(agg.byCountOuts).forEach(v => { if (!topTiming || v.att > topTiming.att) topTiming = v; });
+            const summaryEl = document.getElementById('analysis-steal-summary');
+            if (summaryEl) {
+                const card = (label, value, sub, cls) => `
+                    <div class="${cls} border rounded-xl p-3.5 text-center">
+                        <div class="text-[11px] font-bold text-slate-600">${label}</div>
+                        <div class="text-2xl font-extrabold text-slate-900 font-mono mt-0.5">${value}</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">${sub || ''}</div>
+                    </div>`;
+                summaryEl.innerHTML =
+                    card('盗塁（成績合計）', sumSb + '個', `盗塁死${sumCs}・成功率${fmtAnalysisPct(sumSb, sumSb + sumCs)}`, 'bg-emerald-50 border-emerald-200') +
+                    card('タイミング記録のある企図', agg.att + '回', `成功${agg.ok}・失敗${agg.ng}`, 'bg-sky-50 border-sky-200') +
+                    card('タイミング記録での成功率', fmtAnalysisPct(agg.ok, agg.att), '打席記録に残った企図のみ', 'bg-amber-50 border-amber-200') +
+                    card('最も多いタイミング', topTiming ? `${topTiming.outs}アウト ${topTiming.countKey}` : '―', topTiming ? `${topTiming.att}回（成功${topTiming.ok}）` : '記録なし', 'bg-slate-50 border-slate-200');
+            }
+            const teamTbody = document.getElementById('analysis-steal-team-tbody');
+            if (teamTbody) {
+                teamTbody.innerHTML = teams.length === 0
+                    ? analysisEmptyRow(8, '試合データがありません。')
+                    : teams.slice().sort((a, b) => (b.sbTotal + b.csTotal) - (a.sbTotal + a.csTotal)).map(t => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${escAnalysis(t.name)}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${t.sbTotal}</td>
+                            <td class="py-2.5 px-2 text-center">${t.csTotal}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(t.sbTotal, t.sbTotal + t.csTotal)}</td>
+                            <td class="py-2.5 px-2 text-center">${t.att}</td>
+                            <td class="py-2.5 px-2 text-center">${t.ok}</td>
+                            <td class="py-2.5 px-2 text-center">${t.ng}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs font-bold text-teal-800">${escAnalysis(bestStealTimingText(t))}</td>
+                        </tr>`).join('');
+            }
+            const matrixEl = document.getElementById('analysis-steal-matrix');
+            if (matrixEl) {
+                const head = ANALYSIS_COUNT_KEYS.map(c => `<th class="py-2 px-2 text-center">${c}</th>`).join('');
+                const rowsHtml = [0, 1, 2].map(o => {
+                    const cells = ANALYSIS_COUNT_KEYS.map(c => {
+                        const v = agg.byCountOuts[o + '|' + c];
+                        const att = v ? v.att : 0, ok = v ? v.ok : 0;
+                        return `<td class="py-2 px-2 text-center font-mono ${att > 0 ? 'font-bold text-slate-900 bg-teal-50' : 'text-slate-400'}">${att > 0 ? `${att}（${ok}）` : '―'}</td>`;
+                    }).join('');
+                    const tot = agg.byOuts[o] || { att: 0, ok: 0 };
+                    return `<tr class="divide-x divide-slate-100"><td class="py-2 px-3 font-bold text-slate-800 bg-slate-50">${o}アウト</td>${cells}<td class="py-2 px-2 text-center font-mono font-bold">${tot.att}（${tot.ok}）</td></tr>`;
+                }).join('');
+                const footCells = ANALYSIS_COUNT_KEYS.map(c => {
+                    const d = agg.byCount[c] || { att: 0, ok: 0 };
+                    return `<td class="py-2 px-2 text-center font-mono font-bold">${d.att}（${d.ok}）</td>`;
+                }).join('');
+                matrixEl.innerHTML = `
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[900px]">
+                        <thead><tr class="bg-slate-900 text-slate-200 font-semibold"><th class="py-2 px-3">アウト＼カウント</th>${head}<th class="py-2 px-2 text-center">合計</th></tr></thead>
+                        <tbody class="divide-y divide-slate-200">${rowsHtml}</tbody>
+                        <tfoot><tr class="bg-slate-50 border-t border-slate-200"><td class="py-2 px-3 font-bold text-slate-800">合計</td>${footCells}<td class="py-2 px-2 text-center font-mono font-bold">${agg.att}（${agg.ok}）</td></tr></tfoot>
+                    </table>`;
+            }
+            const countTbody = document.getElementById('analysis-steal-count-tbody');
+            if (countTbody) {
+                countTbody.innerHTML = ANALYSIS_COUNT_KEYS.map(c => {
+                    const d = agg.byCount[c] || { att: 0, ok: 0, ng: 0 };
+                    return `<tr class="${d.att > 0 ? '' : 'text-slate-400'}"><td class="py-2 px-3 text-center font-bold">${c}</td><td class="py-2 px-2 text-center">${d.att}</td><td class="py-2 px-2 text-center">${d.ok}</td><td class="py-2 px-2 text-center">${d.ng}</td><td class="py-2 px-3 text-center">${fmtAnalysisPct(d.ok, d.att)}</td></tr>`;
+                }).join('');
+            }
+            const outsTbody = document.getElementById('analysis-steal-outs-tbody');
+            if (outsTbody) {
+                outsTbody.innerHTML = [0, 1, 2].map(o => {
+                    const d = agg.byOuts[o] || { att: 0, ok: 0, ng: 0 };
+                    return `<tr class="${d.att > 0 ? '' : 'text-slate-400'}"><td class="py-2 px-3 text-center font-bold">${o}アウト</td><td class="py-2 px-2 text-center">${d.att}</td><td class="py-2 px-2 text-center">${d.ok}</td><td class="py-2 px-2 text-center">${d.ng}</td><td class="py-2 px-3 text-center">${fmtAnalysisPct(d.ok, d.att)}</td></tr>`;
+                }).join('');
+            }
+            const playerTbody = document.getElementById('analysis-steal-player-tbody');
+            if (playerTbody) {
+                const rows = cache.steal.players.filter(analysisFilterTeam)
+                    .filter(p => p.sbTotal + p.csTotal > 0 || p.att > 0)
+                    .sort((a, b) => (b.sbTotal + b.csTotal) - (a.sbTotal + a.csTotal) || b.att - a.att);
+                playerTbody.innerHTML = rows.length === 0
+                    ? analysisEmptyRow(7, '盗塁の記録がある選手はいません。')
+                    : rows.map(p => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(p.name)}${escAnalysis(p.name)}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${escAnalysis(p.team)}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${p.sbTotal}</td>
+                            <td class="py-2.5 px-2 text-center">${p.csTotal}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.sbTotal, p.sbTotal + p.csTotal)}</td>
+                            <td class="py-2.5 px-2 text-center">${p.att}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs font-bold text-teal-800">${escAnalysis(bestStealTimingText(p))}</td>
+                        </tr>`).join('');
+            }
+        }
+
+        function renderAnalysisBattedPanel() {
+            const cache = scoreAnalysisCache;
+            if (!cache) return;
+            const teams = cache.batted.teams.filter(t => scoreAnalysisTeam === 'ALL' || t.name === scoreAnalysisTeam);
+            const agg = scoreAnalysisTeam === 'ALL' ? cache.batted.all : (teams[0] || newBattedStats(scoreAnalysisTeam, scoreAnalysisTeam));
+            const qualityDen = (st) => st.quality.grounder + st.quality.fly + st.quality.liner;
+            const teamTbody = document.getElementById('analysis-batted-team-tbody');
+            if (teamTbody) {
+                teamTbody.innerHTML = teams.length === 0
+                    ? analysisEmptyRow(12, '試合データがありません。')
+                    : teams.slice().sort((a, b) => b.total - a.total).map(t => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${escAnalysis(t.name)}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${t.total}</td>
+                            <td class="py-2.5 px-2 text-center">${t.zones.left}</td>
+                            <td class="py-2.5 px-2 text-center">${t.zones.center}</td>
+                            <td class="py-2.5 px-2 text-center">${t.zones.right}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(t.pull, t.pull + t.oppo)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(t.oppo, t.pull + t.oppo)}</td>
+                            <td class="py-2.5 px-2 text-center">${t.quality.grounder}</td>
+                            <td class="py-2.5 px-2 text-center">${t.quality.fly}</td>
+                            <td class="py-2.5 px-2 text-center">${t.quality.liner}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(t.quality.grounder, qualityDen(t))}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(t.quality.fly, qualityDen(t))}</td>
+                        </tr>`).join('');
+            }
+            const matrixEl = document.getElementById('analysis-batted-matrix');
+            if (matrixEl) {
+                const qRows = [['grounder', 'ゴロ'], ['fly', 'フライ'], ['liner', 'ライナー'], ['hit', '安打'], ['bunt', '犠打・バント'], ['other', 'その他']];
+                matrixEl.innerHTML = `
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead><tr class="bg-slate-900 text-slate-200 font-semibold"><th class="py-2 px-3">質＼方向</th><th class="py-2 px-2 text-center">左側</th><th class="py-2 px-2 text-center">中央</th><th class="py-2 px-2 text-center">右側</th><th class="py-2 px-2 text-center">不明</th><th class="py-2 px-2 text-center">合計</th></tr></thead>
+                        <tbody class="divide-y divide-slate-200">
+                            ${qRows.map(([k, label]) => {
+                                const m = agg.matrix[k];
+                                const tot = m.left + m.center + m.right + m.unknown;
+                                const cell = (v) => `<td class="py-2 px-2 text-center font-mono ${v > 0 ? 'font-bold text-slate-900 bg-teal-50' : 'text-slate-400'}">${v > 0 ? v : '―'}</td>`;
+                                return `<tr><td class="py-2 px-3 font-bold text-slate-800 bg-slate-50">${label}</td>${cell(m.left)}${cell(m.center)}${cell(m.right)}${cell(m.unknown)}<td class="py-2 px-2 text-center font-mono font-bold">${tot}</td></tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>`;
+            }
+            const foulEl = document.getElementById('analysis-foul-matrix');
+            if (foulEl) {
+                const qRows = [['fly', 'フライ'], ['liner', 'ライナー'], ['grounder', 'ゴロ'], ['unknown', '不明']];
+                const dirKeys = ['catcher', 'first_side', 'third_side', 'right_field', 'left_field', 'unknown'];
+                foulEl.innerHTML = `
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead><tr class="bg-slate-900 text-slate-200 font-semibold"><th class="py-2 px-3">質＼方向</th>${dirKeys.map(d => `<th class="py-2 px-2 text-center">${ANALYSIS_FOUL_DIR_LABELS[d]}</th>`).join('')}</tr></thead>
+                        <tbody class="divide-y divide-slate-200">
+                            ${qRows.map(([k, label]) => {
+                                const m = agg.foulMatrix[k];
+                                return `<tr><td class="py-2 px-3 font-bold text-slate-800 bg-slate-50">${label}</td>${dirKeys.map(d => `<td class="py-2 px-2 text-center font-mono ${m[d] > 0 ? 'font-bold text-slate-900 bg-teal-50' : 'text-slate-400'}">${m[d] > 0 ? m[d] : '―'}</td>`).join('')}</tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>`;
+            }
+            const playerTbody = document.getElementById('analysis-batted-player-tbody');
+            if (playerTbody) {
+                const rows = cache.batted.players.filter(analysisFilterTeam).filter(p => p.total > 0 || p.foulTotal > 0)
+                    .sort((a, b) => b.total - a.total);
+                playerTbody.innerHTML = rows.length === 0
+                    ? analysisEmptyRow(12, '打球の記録がある選手はいません。')
+                    : rows.map(p => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(p.name)}${escAnalysis(p.name)}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${escAnalysis(p.team)}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${p.total}</td>
+                            <td class="py-2.5 px-2 text-center">${p.zones.left}</td>
+                            <td class="py-2.5 px-2 text-center">${p.zones.center}</td>
+                            <td class="py-2.5 px-2 text-center">${p.zones.right}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.pull, p.pull + p.oppo)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.oppo, p.pull + p.oppo)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.quality.grounder, qualityDen(p))}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.quality.fly, qualityDen(p))}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.quality.liner, qualityDen(p))}</td>
+                            <td class="py-2.5 px-2 text-center">${p.foulTotal}</td>
+                        </tr>`).join('');
+            }
+        }
+
+        function renderAnalysisPickoffPanel() {
+            const cache = scoreAnalysisCache;
+            if (!cache) return;
+            const pitchers = cache.pickoffs.filter(p => p.total > 0 && (scoreAnalysisTeam === 'ALL' || p.team === scoreAnalysisTeam))
+                .sort((a, b) => b.total - a.total);
+            const totalAll = pitchers.reduce((s, p) => s + p.total, 0);
+            const atBats = pitchers.reduce((s, p) => s + p.atBatCount, 0);
+            let maxStreak = 0, maxStreakText = '記録なし';
+            pitchers.forEach(p => { if (p.maxSameBaseStreak > maxStreak) { maxStreak = p.maxSameBaseStreak; maxStreakText = `${p.name}（${p.maxSameBaseStreakBase || '―'}塁・${p.maxSameBaseStreakDetail || ''}）`; } });
+            let topCount = null;
+            const countAgg = {};
+            ANALYSIS_COUNT_KEYS.forEach(c => { countAgg[c] = { pickoffs: 0, base1: 0, base2: 0, base3: 0 }; });
+            pitchers.forEach(p => {
+                ANALYSIS_COUNT_KEYS.forEach(c => {
+                    const d = p.byCount[c];
+                    countAgg[c].pickoffs += d.pickoffs; countAgg[c].base1 += d.base1; countAgg[c].base2 += d.base2; countAgg[c].base3 += d.base3;
+                    if (!topCount || d.pickoffs > topCount.n) topCount = { c: c, n: d.pickoffs };
+                });
+            });
+            const summaryEl = document.getElementById('analysis-pickoff-summary');
+            if (summaryEl) {
+                const card = (label, value, sub, cls) => `
+                    <div class="${cls} border rounded-xl p-3.5 text-center">
+                        <div class="text-[11px] font-bold text-slate-600">${label}</div>
+                        <div class="text-2xl font-extrabold text-slate-900 font-mono mt-0.5">${value}</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">${sub || ''}</div>
+                    </div>`;
+                summaryEl.innerHTML =
+                    card('総牽制回数', totalAll + '回', `対象投手${pitchers.length}名`, 'bg-indigo-50 border-indigo-200') +
+                    card('牽制が入った打席', atBats + '打席', '打席記録ベース', 'bg-slate-50 border-slate-200') +
+                    card('最も多いカウント', topCount && topCount.n > 0 ? topCount.c : '―', topCount && topCount.n > 0 ? `${topCount.n}回` : '記録なし', 'bg-sky-50 border-sky-200') +
+                    card('同一塁への最大連続牽制', maxStreak + '連続', escAnalysis(maxStreakText), 'bg-amber-50 border-amber-200');
+            }
+            const tbody = document.getElementById('analysis-pickoff-pitcher-tbody');
+            if (tbody) {
+                tbody.innerHTML = pitchers.length === 0
+                    ? analysisEmptyRow(9, '牽制の記録がある投手はいません。')
+                    : pitchers.map(p => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(p.name)}${escAnalysis(p.name)}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${escAnalysis(p.team)}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${p.total}</td>
+                            <td class="py-2.5 px-2 text-center">${p.baseTotals[1]}</td>
+                            <td class="py-2.5 px-2 text-center">${p.baseTotals[2]}</td>
+                            <td class="py-2.5 px-2 text-center">${p.baseTotals[3]}</td>
+                            <td class="py-2.5 px-2 text-center">${escAnalysis(pickoffTopCountText(p))}</td>
+                            <td class="py-2.5 px-2 text-center">${p.maxSameBaseStreak}連続${p.maxSameBaseStreakBase ? `（${p.maxSameBaseStreakBase}塁）` : ''}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${escAnalysis(p.maxSameBaseStreakDetail || '―')}</td>
+                        </tr>`).join('');
+            }
+            const countTbody = document.getElementById('analysis-pickoff-count-tbody');
+            if (countTbody) {
+                countTbody.innerHTML = ANALYSIS_COUNT_KEYS.map(c => {
+                    const d = countAgg[c];
+                    return `<tr class="${d.pickoffs > 0 ? '' : 'text-slate-400'}"><td class="py-2 px-3 text-center font-bold">${c}</td><td class="py-2 px-2 text-center font-bold">${d.pickoffs}</td><td class="py-2 px-2 text-center">${d.base1}</td><td class="py-2 px-2 text-center">${d.base2}</td><td class="py-2 px-2 text-center">${d.base3}</td><td class="py-2 px-3 text-center">${fmtAnalysisPct(d.pickoffs, totalAll)}</td></tr>`;
+                }).join('');
+            }
+        }
+
+        function renderAnalysisPitcherPanel() {
+            const cache = scoreAnalysisCache;
+            if (!cache) return;
+            const pitchers = cache.pitchers.filter(p => scoreAnalysisTeam === 'ALL' || p.team === scoreAnalysisTeam)
+                .sort((a, b) => b.total - a.total);
+            const tbody = document.getElementById('analysis-pitcher-tbody');
+            if (tbody) {
+                tbody.innerHTML = pitchers.length === 0
+                    ? analysisEmptyRow(12, '投球記録がある投手はいません。')
+                    : pitchers.map(p => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(p.name)}${escAnalysis(p.name)}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${escAnalysis(p.team)}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${p.total}</td>
+                            <td class="py-2.5 px-2 text-center font-extrabold text-slate-900">${fmtAnalysisPct(p.called + p.swing + p.foul, p.total)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.firstStrikes, p.firstTotal)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.ball, p.total)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.called, p.total)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.swing, p.total)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.foul, p.total)}</td>
+                            <td class="py-2.5 px-2 text-center">${pitcherCountGroupStrikeText(p, ['1-0', '2-0', '3-0', '2-1', '3-1'])}</td>
+                            <td class="py-2.5 px-2 text-center">${pitcherCountGroupStrikeText(p, ['0-1', '0-2', '1-2'])}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs font-bold text-teal-800">${escAnalysis(pitcherFirstKindText(p))}</td>
+                        </tr>`).join('');
+            }
+            const sel = document.getElementById('analysis-pitcher-select');
+            if (sel) {
+                const currentVal = sel.value || scoreAnalysisPitcherKey;
+                sel.innerHTML = pitchers.length === 0
+                    ? '<option value="">（対象投手なし）</option>'
+                    : pitchers.map(p => {
+                        const k = statsAggKey(p.team, p.name);
+                        return `<option value="${escAnalysis(k)}" ${k === currentVal ? 'selected' : ''}>${escAnalysis(p.name)}（${escAnalysis(p.team)}）</option>`;
+                    }).join('');
+                if (pitchers.length) {
+                    if (!pitchers.some(p => statsAggKey(p.team, p.name) === sel.value)) sel.value = statsAggKey(pitchers[0].team, pitchers[0].name);
+                    scoreAnalysisPitcherKey = sel.value;
+                } else scoreAnalysisPitcherKey = '';
+            }
+            renderScoreAnalysisPitcherDetail();
+        }
+
+        function renderScoreAnalysisPitcherDetail() {
+            const el = document.getElementById('analysis-pitcher-detail');
+            if (!el || !scoreAnalysisCache) return;
+            const p = scoreAnalysisCache.pitchers.find(x => statsAggKey(x.team, x.name) === scoreAnalysisPitcherKey);
+            if (!p) {
+                el.innerHTML = '<p class="text-xs text-slate-400 italic py-3 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">投球記録がある投手がいません。</p>';
+                return;
+            }
+            const rows = ANALYSIS_COUNT_KEYS.map(c => {
+                const d = p.byCount[c];
+                return `<tr class="${d.total > 0 ? '' : 'text-slate-400'}"><td class="py-2 px-3 text-center font-bold">${c}</td><td class="py-2 px-2 text-center">${d.total}</td><td class="py-2 px-2 text-center">${d.ball}</td><td class="py-2 px-2 text-center">${d.called}</td><td class="py-2 px-2 text-center">${d.swing}</td><td class="py-2 px-2 text-center">${d.foul}</td><td class="py-2 px-3 text-center font-bold">${fmtAnalysisPct(d.strikes, d.total)}</td></tr>`;
+            }).join('');
+            el.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                        <span class="text-base font-extrabold text-slate-900">${playerColorDotByName(p.name)}${escAnalysis(p.name)}</span>
+                        <span class="text-xs font-bold text-slate-500">${escAnalysis(p.team)}</span>
+                        <span class="text-xs font-bold text-teal-700">投球${p.total}球・ストライク率${fmtAnalysisPct(p.called + p.swing + p.foul, p.total)}・初球ストライク率${fmtAnalysisPct(p.firstStrikes, p.firstTotal)}</span>
+                    </div>
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[640px]">
+                            <thead><tr class="bg-slate-900 text-slate-200 font-semibold"><th class="py-2 px-3 text-center">カウント (B-S)</th><th class="py-2 px-2 text-center">投球数</th><th class="py-2 px-2 text-center">ボール</th><th class="py-2 px-2 text-center">見逃し</th><th class="py-2 px-2 text-center">空振り</th><th class="py-2 px-2 text-center">ファウル</th><th class="py-2 px-3 text-center">ストライク率</th></tr></thead>
+                            <tbody class="divide-y divide-slate-200 font-mono">${rows}</tbody>
+                        </table>
+                    </div>
+                    <p class="text-[11px] text-slate-500">初球の内訳：ボール${p.firstKinds.ball}・見逃し${p.firstKinds.called}・空振り${p.firstKinds.swing}・ファウル${p.firstKinds.foul}（対象${p.firstTotal}打席）</p>
+                </div>`;
+        }
+
+        function renderAnalysisApproachPanel() {
+            const cache = scoreAnalysisCache;
+            if (!cache) return;
+            const teams = cache.approach.teams.filter(t => scoreAnalysisTeam === 'ALL' || t.name === scoreAnalysisTeam);
+            const avgPitches = (st) => st.pa > 0 ? (Math.round((st.pitches / st.pa) * 10) / 10) : '―';
+            const teamTbody = document.getElementById('analysis-approach-team-tbody');
+            if (teamTbody) {
+                teamTbody.innerHTML = teams.length === 0
+                    ? analysisEmptyRow(8, '試合データがありません。')
+                    : teams.slice().sort((a, b) => b.pa - a.pa).map(t => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${escAnalysis(t.name)}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${t.pa}</td>
+                            <td class="py-2.5 px-2 text-center">${avgPitches(t)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(t.firstSwing, t.firstTotal)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(t.firstPitchBIP, t.pa)}</td>
+                            <td class="py-2.5 px-2 text-center">${t.pa > 0 ? (Math.round((t.fouls / t.pa) * 100) / 100) : '―'}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(t.twoStrikePA, t.pa)}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${fmtAnalysisRate(t.twoStrikeH, t.twoStrikeAB)}</td>
+                        </tr>`).join('');
+            }
+            const countTbody = document.getElementById('analysis-approach-count-tbody');
+            if (countTbody) {
+                const agg = {};
+                ANALYSIS_COUNT_KEYS.forEach(c => { agg[c] = { pa: 0, h: 0, ab: 0, so: 0 }; });
+                teams.forEach(t => {
+                    ANALYSIS_COUNT_KEYS.forEach(c => {
+                        const d = t.byCount[c];
+                        agg[c].pa += d.pa; agg[c].h += d.h; agg[c].ab += d.ab; agg[c].so += d.so;
+                    });
+                });
+                countTbody.innerHTML = ANALYSIS_COUNT_KEYS.map(c => {
+                    const d = agg[c];
+                    return `<tr class="${d.pa > 0 ? '' : 'text-slate-400'}"><td class="py-2 px-3 text-center font-bold">${c}</td><td class="py-2 px-2 text-center">${d.pa}</td><td class="py-2 px-2 text-center">${d.h}</td><td class="py-2 px-2 text-center">${d.ab}</td><td class="py-2 px-2 text-center font-bold">${fmtAnalysisRate(d.h, d.ab)}</td><td class="py-2 px-3 text-center">${d.so}</td></tr>`;
+                }).join('');
+            }
+            const playerTbody = document.getElementById('analysis-approach-player-tbody');
+            if (playerTbody) {
+                const rows = cache.approach.players.filter(analysisFilterTeam).filter(p => p.pa > 0)
+                    .sort((a, b) => b.pa - a.pa);
+                playerTbody.innerHTML = rows.length === 0
+                    ? analysisEmptyRow(13, '打席記録がある選手はいません。')
+                    : rows.map(p => `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-sans font-bold text-slate-800">${playerColorDotByName(p.name)}${escAnalysis(p.name)}</td>
+                            <td class="py-2.5 px-3 font-sans text-xs text-slate-600">${escAnalysis(p.team)}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${p.pa}</td>
+                            <td class="py-2.5 px-2 text-center">${avgPitches(p)}</td>
+                            <td class="py-2.5 px-2 text-center">${fmtAnalysisPct(p.firstSwing, p.firstTotal)}</td>
+                            <td class="py-2.5 px-2 text-center">${p.firstPitchBIP}</td>
+                            <td class="py-2.5 px-2 text-center">${p.called}</td>
+                            <td class="py-2.5 px-2 text-center">${p.swing}</td>
+                            <td class="py-2.5 px-2 text-center">${p.fouls}</td>
+                            <td class="py-2.5 px-2 text-center">${p.pa > 0 ? (Math.round((p.fouls / p.pa) * 100) / 100) : '―'}</td>
+                            <td class="py-2.5 px-2 text-center">${p.foulsAfter2S}</td>
+                            <td class="py-2.5 px-2 text-center">${p.twoStrikePA}</td>
+                            <td class="py-2.5 px-2 text-center font-bold">${fmtAnalysisRate(p.twoStrikeH, p.twoStrikeAB)}</td>
+                        </tr>`).join('');
             }
         }
 
