@@ -125,6 +125,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         .res-hl-sac { color: #ca8a04 !important; font-weight: 800; }
         .res-hl-walk { color: #2563eb !important; font-weight: 800; }
         .res-hl-error { color: #16a34a !important; font-weight: 800; }
+        /* === 今回追加した要素の専用クラス（内蔵コンパイル済みTailwindに無いユーティリティの補完） === */
+        .bg-yellow-400 { background-color: #facc15; }
+        .hover\:bg-yellow-500:hover { background-color: #eab308; }
+        .border-yellow-600 { border-color: #ca8a04; }
+        .bg-rose-700 { background-color: #be123c; }
+        .hover\:bg-rose-700:hover { background-color: #be123c; }
+        .-top-2\.5 { top: -0.625rem; }
+        .bg-emerald-50\/60 { background-color: rgba(236, 253, 245, 0.6); }
+        .bg-rose-50\/60 { background-color: rgba(255, 241, 242, 0.6); }
+        .text-\[12px\] { font-size: 12px; }
+        .shadow { box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); }
         /* === 利き手スイッチ（カウント入力画面の投・打） ===
            左＝左利き／右＝右利きの位置にノブが寄る3ポジションスイッチ。
            選んだ側が色付き（ノブ＋白文字）、選んでいない側は白いまま。
@@ -1103,18 +1114,92 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                 </div>
 
-                <!-- 蓄積一覧 -->
+                <!-- 蓄積一覧（ボタン式：次のページで蓄積試合／削除された試合を別々に見る） -->
                 <div class="pt-2 border-t border-slate-100">
-                    <div class="flex items-center justify-between mb-2.5">
-                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                            <i data-lucide="archive" class="w-4 h-4 text-slate-500"></i>蓄積一覧（終了・保存済み試合）
-                        </h4>
-                        <span id="home-archive-count" class="text-xs font-bold text-slate-500">0試合</span>
-                    </div>
-                    <div id="home-archived-list" class="space-y-2 max-h-64 overflow-y-auto">
-                        <p class="text-xs text-slate-400 italic py-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">まだ試合データがありません。</p>
+                    <div class="relative">
+                        <button onclick="openArchiveListPage()" class="w-full flex items-center justify-between p-4 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold shadow-xs transition text-left">
+                            <div>
+                                <div class="text-sm font-extrabold flex items-center gap-1.5"><i data-lucide="archive" class="w-4 h-4 text-emerald-400"></i>蓄積一覧</div>
+                                <div class="text-[11px] text-slate-300 font-normal mt-0.5">蓄積試合と削除された試合を次のページで別々に見る</div>
+                            </div>
+                            <span class="flex items-center gap-2 shrink-0">
+                                <span id="home-archive-count" class="text-xs font-bold text-slate-200">0試合</span>
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </span>
+                        </button>
+                        <span id="home-archive-alert" class="hidden absolute -top-2.5 right-2 bg-rose-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow">試合が蓄積されています</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: 蓄積一覧ページ（蓄積試合／削除された試合を別々に表示） ================= -->
+    <div id="modal-archive-list" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden">
+            <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 class="font-extrabold text-base flex items-center gap-2">
+                    <i data-lucide="archive" class="w-5 h-5 text-emerald-400"></i>蓄積一覧
+                </h3>
+                <button onclick="closeModal('modal-archive-list'); openModal('modal-score-selector');" class="text-slate-300 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-5 max-h-[82vh] overflow-y-auto space-y-6">
+                <section>
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-sm font-extrabold text-slate-800 flex items-center gap-1.5"><i data-lucide="archive" class="w-4 h-4 text-emerald-500"></i>蓄積試合</h4>
+                        <span id="archive-section-count" class="text-xs font-bold text-slate-500">0試合</span>
+                    </div>
+                    <div id="archive-page-list" class="space-y-2">
+                        <p class="text-xs text-slate-400 italic py-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">まだ試合データがありません。</p>
+                    </div>
+                </section>
+                <section id="archive-trash-section" class="pt-5 border-t border-slate-200">
+                    <div class="relative flex items-center justify-between mb-2">
+                        <h4 class="text-sm font-extrabold text-slate-800 flex items-center gap-1.5"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i>削除された試合</h4>
+                        <span id="archive-trash-count" class="text-xs font-bold text-slate-500">0試合</span>
+                        <span id="archive-trash-alert" class="hidden absolute -top-3 right-0 bg-rose-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow">試合が蓄積されています</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">アーカイブから削除した試合のバックアップです。ここで「完全に削除」するとアプリ内から完全に消え、元に戻せません。</p>
+                    <div id="trash-page-list" class="space-y-2 mt-3">
+                        <p class="text-xs text-slate-400 italic py-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">削除された試合はありません。</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: アーカイブ削除の確認 ================= -->
+    <div id="modal-confirm-archive-delete" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4" style="z-index:60">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div class="bg-rose-700 text-white px-5 py-3.5">
+                <h3 class="font-extrabold text-base flex items-center gap-2"><i data-lucide="trash-2" class="w-5 h-5"></i>この試合を削除しますか？</h3>
+            </div>
+            <div class="p-5 space-y-3 text-sm">
+                <p id="confirm-archive-delete-text" class="font-bold text-slate-800"></p>
+                <p class="text-[12px] text-slate-600 leading-relaxed">削除した試合は「削除された試合」に移され、バックアップとして残ります。完全に消す場合は、削除された試合の一覧からさらに削除してください。</p>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closeModal('modal-confirm-archive-delete')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
+                <button onclick="confirmDeleteArchivedGame()" class="px-4 py-2 text-xs font-extrabold bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition">削除する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: ゴミ箱からの完全削除の確認 ================= -->
+    <div id="modal-confirm-trash-delete" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4" style="z-index:60">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div class="bg-rose-700 text-white px-5 py-3.5">
+                <h3 class="font-extrabold text-base flex items-center gap-2"><i data-lucide="alert-triangle" class="w-5 h-5"></i>完全に削除しますか？</h3>
+            </div>
+            <div class="p-5 space-y-3 text-sm">
+                <p id="confirm-trash-delete-text" class="font-bold text-slate-800"></p>
+                <p class="text-[12px] text-rose-700 font-bold leading-relaxed">この操作は取り消せません。試合データはアプリ内から完全に消えます。</p>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closeModal('modal-confirm-trash-delete')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
+                <button onclick="confirmPermanentDeleteTrashGame()" class="px-4 py-2 text-xs font-extrabold bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition">完全に削除する</button>
             </div>
         </div>
     </div>
@@ -2285,7 +2370,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="bg-teal-800 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
                     <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="user-check" class="w-4 h-4 text-teal-300"></i>投手別のカウント別内訳</h3>
-                    <select id="analysis-pitcher-select" onchange="onScoreAnalysisPitcherChange(this.value)" class="border border-white/30 bg-white/10 rounded-lg px-3 py-1.5 text-xs font-bold text-white [&>option]:text-slate-800"></select>
+                    <select id="analysis-pitcher-select" onchange="onScoreAnalysisPitcherChange(this.value)" class="border border-slate-300 bg-white rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900" style="color:#111827;background-color:#ffffff"></select>
                 </div>
                 <div id="analysis-pitcher-detail" class="p-4"></div>
             </div>
@@ -2448,58 +2533,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 <span id="live-inning-badge" class="bg-slate-900 text-white font-bold px-3 py-1 rounded-lg text-sm">1回表</span>
                                 <span id="live-attack-team" class="font-bold text-slate-800 text-sm">攻撃: 先攻チーム</span>
                             </div>
-                            <div class="flex flex-wrap items-center gap-1.5">
-                                <button onclick="openDefenseSubOnField()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2.5 py-1 rounded-md shadow-2xs transition flex items-center gap-1" title="守備側チームのグラウンド配置図を開き、交代・ポジション入れ替えを行います">
-                                    <i data-lucide="shield" class="w-3 h-3"></i>
-                                    <span>守備側選手交代</span>
-                                </button>
-                                <button onclick="openOffenseSubModal()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-md shadow-2xs transition flex items-center gap-1" title="攻撃側チームの代打・代走を記録します">
-                                    <i data-lucide="user-plus" class="w-3 h-3"></i>
-                                    <span>攻撃側選手交代</span>
-                                </button>
-                                <button onclick="openSubMarkCreateModal()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded-md shadow-2xs transition flex items-center gap-1" title="選手交代の入力が間に合わないとき、この場面にマークだけ付けておき、後から交代を入力できます">
-                                    <i data-lucide="flag" class="w-3 h-3"></i>
-                                    <span>交代マーク</span>
-                                    <span id="submark-unresolved-badge" class="hidden bg-white text-amber-700 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">0</span>
-                                </button>
-                                <button onclick="openTiebreakSetupModal()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-md border border-indigo-200 transition" title="タイブレークの走者配置を設定">
-                                    タイブレーク配置
-                                </button>
-                                <button onclick="openDHGuideModal()" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-md border border-amber-300 transition" title="指名打者ルール（規則5.11）の早見表と、この試合のDH状態を表示">
-                                    DHルール・状態
-                                </button>
-                                <button onclick="forceChangeHalfInning()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded-md border border-slate-200 transition">
-                                    攻守交代
-                                </button>
-                            </div>
                         </div>
 
-                        <!-- 打者名と投手名 -->
-                        <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-slate-500 pt-1">
-                            <div class="flex items-center space-x-1.5">
-                                <span class="text-[11px] font-bold text-emerald-700">打者</span>
-                                <span id="curr-batter-order" class="font-mono text-slate-600">1番</span>
-                                <span id="curr-batter-name" class="font-bold text-slate-800">選手名</span>
-                                <span id="curr-batter-hand" class="inline-flex items-center"></span>
-                            </div>
-                            <div class="flex items-center space-x-1.5">
-                                <span class="text-[11px] font-bold text-rose-700">投手</span>
-                                <span id="curr-pitcher-name" class="font-bold text-slate-800">投手名</span>
-                                <span id="curr-pitcher-hand" class="inline-flex items-center"></span>
-                            </div>
-                        </div>
-
-                        <!-- 打者の対戦成績 & 投手の球数表示 -->
-                        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[11px] bg-slate-50 rounded-lg px-2.5 py-1.5 border border-slate-200/70">
-                            <div class="flex items-center space-x-1.5 truncate max-w-full">
-                                <span class="font-bold text-slate-500 shrink-0">打者成績:</span>
-                                <span id="curr-batter-stats" class="font-mono text-slate-700 truncate">初打席</span>
-                            </div>
-                            <div class="flex items-center space-x-1.5 shrink-0 ml-auto">
-                                <span class="font-bold text-slate-500">球数(回/計):</span>
-                                <span id="curr-pitcher-pitches" class="font-mono font-bold text-slate-800">0 / 0球</span>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- テレビ中継風スコア表示：左にBSO（数字）／その上にダイヤモンド（中央にイニング）／下段に両チームのスコア -->
@@ -2652,6 +2687,73 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                     <div id="recent-logs-list" class="space-y-1.5 text-xs text-slate-700 max-h-96 overflow-y-auto">
                         <p class="text-slate-400 italic">まだ記録がありません。</p>
+                    </div>
+                </div>
+
+                <!-- 対戦中の打者・投手（最新の経過記録の下に左右並びで表示） -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">対戦中の打者・投手</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- 打者 -->
+                        <div class="bg-emerald-50/60 border border-emerald-200 rounded-xl p-3 space-y-2">
+                            <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                <span class="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">打者</span>
+                                <span id="curr-batter-order" class="font-mono text-[11px] text-slate-600">1番</span>
+                                <span id="curr-batter-name" class="font-extrabold text-slate-900 text-sm">選手名</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[10px] font-bold text-slate-500 shrink-0">利き手</span>
+                                <span id="curr-batter-hand" class="inline-flex items-center"></span>
+                            </div>
+                            <div class="text-[11px] text-slate-600 leading-relaxed">
+                                <div class="flex items-start gap-1.5"><span class="font-bold text-slate-500 shrink-0">今日:</span><span id="curr-batter-stats" class="font-mono text-slate-700">初打席</span></div>
+                                <div id="curr-batter-line" class="font-mono text-slate-600 mt-0.5">打率 -</div>
+                            </div>
+                        </div>
+                        <!-- 投手 -->
+                        <div class="bg-rose-50/60 border border-rose-200 rounded-xl p-3 space-y-2">
+                            <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                <span class="text-[11px] font-extrabold text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded">投手</span>
+                                <span id="curr-pitcher-name" class="font-extrabold text-slate-900 text-sm">投手名</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[10px] font-bold text-slate-500 shrink-0">利き手</span>
+                                <span id="curr-pitcher-hand" class="inline-flex items-center"></span>
+                            </div>
+                            <div class="text-[11px] text-slate-600 leading-relaxed">
+                                <div class="flex items-center gap-1.5"><span class="font-bold text-slate-500 shrink-0">球数(回/計):</span><span id="curr-pitcher-pitches" class="font-mono font-bold text-slate-800">0 / 0球</span></div>
+                                <div id="curr-pitcher-line" class="font-mono text-slate-600 mt-0.5">対戦打者 -</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 守備側選手交代などのボタン（対戦カードのさらに下） -->
+                    <div class="pt-2 border-t border-slate-100">
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <button onclick="openDefenseSubOnField()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2.5 py-1 rounded-md shadow-2xs transition flex items-center gap-1" title="守備側チームのグラウンド配置図を開き、交代・ポジション入れ替えを行います">
+                                    <i data-lucide="shield" class="w-3 h-3"></i>
+                                    <span>守備側選手交代</span>
+                                </button>
+                                <button onclick="openOffenseSubModal()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-md shadow-2xs transition flex items-center gap-1" title="攻撃側チームの代打・代走を記録します">
+                                    <i data-lucide="user-plus" class="w-3 h-3"></i>
+                                    <span>攻撃側選手交代</span>
+                                </button>
+                                <button onclick="openSubMarkCreateModal()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded-md shadow-2xs transition flex items-center gap-1" title="選手交代の入力が間に合わないとき、この場面にマークだけ付けておき、後から交代を入力できます">
+                                    <i data-lucide="flag" class="w-3 h-3"></i>
+                                    <span>交代マーク</span>
+                                    <span id="submark-unresolved-badge" class="hidden bg-white text-amber-700 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">0</span>
+                                </button>
+                                <button onclick="openTiebreakSetupModal()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-md border border-indigo-200 transition" title="タイブレークの走者配置を設定">
+                                    タイブレーク配置
+                                </button>
+                                <button onclick="openDHGuideModal()" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-md border border-amber-300 transition" title="指名打者ルール（規則5.11）の早見表と、この試合のDH状態を表示">
+                                    DHルール・状態
+                                </button>
+                                <button onclick="forceChangeHalfInning()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded-md border border-slate-200 transition">
+                                    攻守交代
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3279,9 +3381,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <span class="text-sm font-extrabold">走塁妨害</span>
                             <span class="text-[10px] text-teal-100 font-normal">守備側の妨害で進塁権付与（選択した走者が1つ進塁）</span>
                         </button>
-                        <button onclick="promptRunnerEventPitchLink('out_interference')" class="bg-rose-700 hover:bg-rose-800 text-white font-bold py-3 px-3 rounded-xl text-xs shadow-xs transition flex flex-col items-start gap-0.5">
+                        <button onclick="promptRunnerEventPitchLink('out_interference')" class="bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold py-3 px-3 rounded-xl text-xs shadow-sm border-2 border-yellow-600 transition flex flex-col items-start gap-0.5">
                             <span class="text-sm font-extrabold">守備妨害</span>
-                            <span class="text-[10px] text-rose-100 font-normal">走者の妨害で強制アウト（+1アウト）</span>
+                            <span class="text-[10px] text-slate-800 font-normal">走者の妨害で強制アウト（+1アウト）</span>
                         </button>
                     </div>
                 </div>
@@ -4669,13 +4771,147 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             safeStorage.setItem(ARCHIVE_KEY, JSON.stringify(list));
         }
 
+        // ================= 削除された試合（ゴミ箱） =================
+        // アーカイブから削除した試合は、完全に消さずゴミ箱へ移してバックアップとして残す。
+        // ゴミ箱からの完全削除も含め、削除操作は指導者ログインのみ可能。
+        const TRASH_KEY = 'baseball_official_scorebook_deleted_v1';
+        function getDeletedGames() {
+            try {
+                const raw = safeStorage.getItem(TRASH_KEY);
+                const list = raw ? JSON.parse(raw) : [];
+                return Array.isArray(list) ? list : [];
+            } catch (e) {
+                return [];
+            }
+        }
+        function saveDeletedGames(list) {
+            safeStorage.setItem(TRASH_KEY, JSON.stringify(list));
+        }
+
+        let pendingArchiveDeleteIdx = null;
+        let pendingTrashDeleteIdx = null;
+
+        // 削除ボタン：即削除せず、確認画面を出す
         function deleteArchivedGame(idx) {
             if (isPlayerLogin()) { showToast('試合データの削除は指導者ログインでのみ利用できます', 'warning'); return; }
             const archives = getArchivedGames();
-            archives.splice(idx, 1);
+            const item = archives[idx];
+            if (!item) return;
+            pendingArchiveDeleteIdx = idx;
+            const textEl = document.getElementById('confirm-archive-delete-text');
+            if (textEl) textEl.textContent = `${item.summary || '試合'}（${item.date || ''}）`;
+            openModal('modal-confirm-archive-delete');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // 確認が承認されたら、アーカイブからゴミ箱へ移す（完全削除はしない）
+        function confirmDeleteArchivedGame() {
+            if (isPlayerLogin()) { showToast('試合データの削除は指導者ログインでのみ利用できます', 'warning'); closeModal('modal-confirm-archive-delete'); return; }
+            if (pendingArchiveDeleteIdx === null) { closeModal('modal-confirm-archive-delete'); return; }
+            const archives = getArchivedGames();
+            const removed = archives.splice(pendingArchiveDeleteIdx, 1);
+            pendingArchiveDeleteIdx = null;
+            closeModal('modal-confirm-archive-delete');
+            if (removed.length) {
+                const trash = getDeletedGames();
+                trash.push(removed[0]);
+                saveDeletedGames(trash);
+            }
             saveArchivedGames(archives);
             renderArchivedGamesInDataModal();
-            showToast('保存済みデータを削除しました', 'info');
+            renderArchivePageList();
+            renderTrashPageList();
+            try { updateHomeScreenUI(); } catch (e) { /* ホーム未表示でも削除処理は継続 */ }
+            showToast('試合を「削除された試合」へ移しました', 'info');
+        }
+
+        function openArchiveListPage() {
+            renderArchivePageList();
+            renderTrashPageList();
+            const trashSection = document.getElementById('archive-trash-section');
+            if (trashSection) trashSection.classList.toggle('hidden', isPlayerLogin());
+            closeModal('modal-score-selector');
+            openModal('modal-archive-list');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function renderArchivePageList() {
+            const listEl = document.getElementById('archive-page-list');
+            if (!listEl) return;
+            const archives = getArchivedGames();
+            const countEl = document.getElementById('archive-section-count');
+            if (countEl) countEl.textContent = `${archives.length}試合`;
+            if (archives.length === 0) {
+                listEl.innerHTML = '<p class="text-xs text-slate-400 italic py-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">まだ試合データがありません。</p>';
+                return;
+            }
+            listEl.innerHTML = archives.map((item, idx) => `
+                <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 hover:bg-emerald-50/40 border border-slate-200 rounded-xl p-3 transition">
+                    <div>
+                        <div class="font-bold text-slate-800 text-xs sm:text-sm">${item.summary}</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">${item.date} | ${item.tournament} (${item.reason})</div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="closeModal('modal-archive-list'); loadArchivedGameToScorebook(${idx});" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow-2xs transition">開く・確認</button>
+                        ${isPlayerLogin() ? '' : `<button onclick="deleteArchivedGame(${idx})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg font-bold text-xs transition">削除</button>`}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 削除された試合は蓄積一覧ページ内の専用セクションで表示する（旧・単独ページへの互換入口）
+        function openTrashListPage() {
+            if (isPlayerLogin()) { showToast('削除された試合の管理は指導者ログインでのみ利用できます', 'warning'); return; }
+            openArchiveListPage();
+        }
+
+        function renderTrashPageList() {
+            const listEl = document.getElementById('trash-page-list');
+            if (!listEl) return;
+            const trash = getDeletedGames();
+            const countEl = document.getElementById('archive-trash-count');
+            if (countEl) countEl.textContent = `${trash.length}試合`;
+            const alertEl = document.getElementById('archive-trash-alert');
+            if (alertEl) alertEl.classList.toggle('hidden', !(trash.length > 5));
+            if (trash.length === 0) {
+                listEl.innerHTML = '<p class="text-xs text-slate-400 italic py-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">削除された試合はありません。</p>';
+                return;
+            }
+            listEl.innerHTML = trash.map((item, idx) => `
+                <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 border border-slate-200 rounded-xl p-3">
+                    <div>
+                        <div class="font-bold text-slate-800 text-xs sm:text-sm">${item.summary}</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">${item.date} | ${item.tournament || ''} (${item.reason || ''})</div>
+                    </div>
+                    <button onclick="requestPermanentDeleteTrashGame(${idx})" class="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-bold text-xs shadow-2xs transition">完全に削除</button>
+                </div>
+            `).join('');
+        }
+
+        // ゴミ箱からの完全削除：確認画面を出してから消す
+        function requestPermanentDeleteTrashGame(idx) {
+            if (isPlayerLogin()) { showToast('削除された試合の管理は指導者ログインでのみ利用できます', 'warning'); return; }
+            const trash = getDeletedGames();
+            const item = trash[idx];
+            if (!item) return;
+            pendingTrashDeleteIdx = idx;
+            const textEl = document.getElementById('confirm-trash-delete-text');
+            if (textEl) textEl.textContent = `${item.summary || '試合'}（${item.date || ''}）`;
+            openModal('modal-confirm-trash-delete');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function confirmPermanentDeleteTrashGame() {
+            if (isPlayerLogin()) { showToast('削除された試合の管理は指導者ログインでのみ利用できます', 'warning'); closeModal('modal-confirm-trash-delete'); return; }
+            if (pendingTrashDeleteIdx === null) { closeModal('modal-confirm-trash-delete'); return; }
+            const trash = getDeletedGames();
+            trash.splice(pendingTrashDeleteIdx, 1);
+            pendingTrashDeleteIdx = null;
+            closeModal('modal-confirm-trash-delete');
+            saveDeletedGames(trash);
+            renderTrashPageList();
+            try { updateHomeScreenUI(); } catch (e) { /* ホーム未表示でも削除処理は継続 */ }
+            showToast('試合を完全に削除しました', 'info');
         }
 
         // ================= 大会名プルダウン =================
@@ -4848,8 +5084,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // 反映は少し（260ms）遅らせる。ダブルクリックが来たらそちらを優先して「両」にする。
         const liveHandSwitchTimers = {};
         function onLiveHandSwitchClick(ev, el, who, kind) {
+            if (!el || typeof el.getBoundingClientRect !== 'function') return;
             const rect = el.getBoundingClientRect();
-            const x = (typeof ev.clientX === 'number' ? ev.clientX : rect.left + rect.width / 2) - rect.left;
+            const x = (ev && typeof ev.clientX === 'number' ? ev.clientX : rect.left + rect.width / 2) - rect.left;
             const side = x < rect.width / 2 ? '左' : '右';
             const key = who + '-' + kind;
             if (liveHandSwitchTimers[key]) clearTimeout(liveHandSwitchTimers[key]);
@@ -4864,6 +5101,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             applyLiveHandValue(who, kind, '両');
         }
         function onLiveHandSwitchKey(ev, who, kind) {
+            if (!ev) return;
             if (ev.key === 'ArrowLeft') { ev.preventDefault(); applyLiveHandValue(who, kind, '左'); }
             else if (ev.key === 'ArrowRight') { ev.preventDefault(); applyLiveHandValue(who, kind, '右'); }
             else if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); applyLiveHandValue(who, kind, '両'); }
@@ -8361,24 +8599,18 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 subEl.textContent = `${gameState.teams.away.name} ${awayR} - ${homeR} ${gameState.teams.home.name} (${getInningLabel()})`;
             }
 
-            const listEl = document.getElementById('home-archived-list');
-            if (!listEl) return;
-            if (archives.length === 0) {
-                listEl.innerHTML = '<p class="text-xs text-slate-400 italic py-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">まだ試合データがありません。</p>';
-                return;
-            }
-            listEl.innerHTML = archives.map((item, idx) => `
-                <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 hover:bg-emerald-50/40 border border-slate-200 rounded-xl p-3 transition">
-                    <div>
-                        <div class="font-bold text-slate-800 text-xs sm:text-sm">${item.summary}</div>
-                        <div class="text-[11px] text-slate-500 mt-0.5">${item.date} | ${item.tournament} (${item.reason})</div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="closeModal('modal-score-selector'); loadArchivedGameToScorebook(${idx});" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow-2xs transition">開く・確認</button>
-                        ${isPlayerLogin() ? '' : `<button onclick="deleteArchivedGame(${idx}); updateHomeScreenUI();" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg font-bold text-xs transition">削除</button>`}
-                    </div>
-                </div>
-            `).join('');
+            // 削除された試合は蓄積一覧ページ内の専用セクションで表示する。
+            // 5試合を超えたら、スコア選択画面の「蓄積一覧」ボタンと蓄積一覧ページ内の
+            // 「削除された試合」見出しにアラートを出す。管理は指導者のみ。
+            const trash = getDeletedGames();
+            const homeAlertEl = document.getElementById('home-archive-alert');
+            if (homeAlertEl) homeAlertEl.classList.toggle('hidden', isPlayerLogin() || !(trash.length > 5));
+            const trashSection = document.getElementById('archive-trash-section');
+            if (trashSection) trashSection.classList.toggle('hidden', isPlayerLogin());
+            const trashCountEl = document.getElementById('archive-trash-count');
+            if (trashCountEl) trashCountEl.textContent = `${trash.length}試合`;
+            const trashAlertEl = document.getElementById('archive-trash-alert');
+            if (trashAlertEl) trashAlertEl.classList.toggle('hidden', !(trash.length > 5));
         }
 
         function startNewGameFromHome() {
@@ -12157,7 +12389,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     { type: 'E', label: '失策 (エラー)', pos: true, cls: 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-200' },
                     { type: 'IBB', label: '申告敬遠', pos: false, cls: 'bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-200' },
                     { type: 'HBP', label: '死球', pos: false, cls: 'bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-200' },
-                    { type: 'CI', label: '打撃妨害', pos: false, cls: 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200' }
+                    { type: 'CI', label: '打撃妨害', pos: false, cls: 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200' },
+                    { type: 'FC', label: 'フィルダースチョイス (野選)', pos: true, cls: 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200 col-span-2' }
                 ];
             } else if (cat === 'special') {
                 titleText = '犠打・犠飛を選択';
@@ -12494,7 +12727,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             // 失策出塁は走者がいない場面でも、打者走者が何塁まで進んだかを選べるよう進塁先選択を開く
             // （エラーで大きく弾いた間に2塁・3塁まで進むケースを記録するため）
-            if ((activeRunners.length > 0 || wizardState.subResult === 'E') && ['1B', '2B', '3B', 'BUNT_HIT', 'SAC', 'SAC_FAIL', 'SF', 'GO', 'FO', 'LO', 'DP', 'FO_DP', 'LO_DP', 'SB_OUT', 'E'].includes(wizardState.subResult)) {
+            if ((activeRunners.length > 0 || wizardState.subResult === 'E') && ['1B', '2B', '3B', 'BUNT_HIT', 'SAC', 'SAC_FAIL', 'SF', 'GO', 'FO', 'LO', 'DP', 'FO_DP', 'LO_DP', 'SB_OUT', 'E', 'FC'].includes(wizardState.subResult)) {
                 openRunnerAdvanceModal(wizardState.subResult);
             } else {
                 pushUndoState();
@@ -12559,6 +12792,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <button type="button" onclick="setRunnerTarget(${idx}, 4)" class="runner-btn-${idx} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${defaultTarget === 4 ? 'bg-amber-500 text-white' : 'bg-white text-slate-700'}">生還</button>
                         <button type="button" onclick="setRunnerTarget(${idx}, 0)" class="runner-btn-${idx} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${defaultTarget === 0 ? 'bg-rose-600 text-white' : 'bg-white text-slate-700'}">アウト</button>
                     </div>
+                    <div class="runner-outbase-wrap ${defaultTarget === 0 ? '' : 'hidden'} items-center gap-1.5 pt-1" data-outbase-idx="${idx}">
+                        <span class="text-[11px] font-bold text-rose-700 shrink-0">アウトになった塁:</span>
+                        <div class="grid grid-cols-4 gap-1 flex-1">
+                            <button type="button" onclick="setRunnerOutBase(${idx}, 1)" class="runner-outbase-btn-${idx} py-1 rounded border text-[11px] font-bold bg-white text-slate-700">1塁</button>
+                            <button type="button" onclick="setRunnerOutBase(${idx}, 2)" class="runner-outbase-btn-${idx} py-1 rounded border text-[11px] font-bold bg-white text-slate-700">2塁</button>
+                            <button type="button" onclick="setRunnerOutBase(${idx}, 3)" class="runner-outbase-btn-${idx} py-1 rounded border text-[11px] font-bold bg-white text-slate-700">3塁</button>
+                            <button type="button" onclick="setRunnerOutBase(${idx}, 4)" class="runner-outbase-btn-${idx} py-1 rounded border text-[11px] font-bold bg-white text-slate-700">本塁</button>
+                        </div>
+                    </div>
                 `;
                 container.appendChild(div);
             });
@@ -12568,7 +12810,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 batterDefaultTarget = (subType === '1B' || subType === 'BUNT_HIT') ? 1 : (subType === '2B' ? 2 : (subType === '3B' ? 3 : 4));
             } else if (subType === 'SAC_FAIL') {
                 batterDefaultTarget = 1;
-            } else if (isDroppedKType(subType) || subType === 'E') {
+            } else if (isDroppedKType(subType) || subType === 'E' || subType === 'FC') {
                 batterDefaultTarget = 1;
             }
             // 振り逃げ詳細モーダルで打者の進塁先を選んでいた場合はそれを初期値にする
@@ -12643,7 +12885,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             pendingWizardData = {
                 subResult: subType,
                 runnerTargets: defaultRunnerTargets,
-                batterTarget: batterDefaultTarget
+                batterTarget: batterDefaultTarget,
+                // 走者がアウトの場合に「どこの塁でアウトになったか」。初期値は向かっていた次の塁
+                runnerOutBases: bases.map((id, idx) => (id && defaultRunnerTargets[idx] === 0) ? Math.min(idx + 2, 4) : null)
             };
             refreshRunnerAdvanceButtons();
             openModal('modal-runner-advance');
@@ -12767,8 +13011,32 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 paintGroup(batterGroup, pendingWizardData.batterTarget, { isBatter: true },
                     (val) => val === 4 ? 'bg-amber-500 text-white' : (val === 0 ? 'bg-rose-600 text-white' : 'bg-indigo-600 text-white'));
             }
+            // アウトになった塁の選択欄：対象走者が「アウト」のときだけ表示し、選択中を塗る
+            for (let idx = 0; idx < 3; idx++) {
+                const wrap = container.querySelector(`[data-outbase-idx="${idx}"]`);
+                if (!wrap) continue;
+                const isOut = pendingWizardData.runnerTargets[idx] === 0;
+                wrap.classList.toggle('hidden', !isOut);
+                wrap.classList.toggle('flex', isOut);
+                if (isOut && (!pendingWizardData.runnerOutBases || !pendingWizardData.runnerOutBases[idx])) {
+                    if (!Array.isArray(pendingWizardData.runnerOutBases)) pendingWizardData.runnerOutBases = [null, null, null];
+                    pendingWizardData.runnerOutBases[idx] = Math.min(idx + 2, 4);
+                }
+                const sel = pendingWizardData.runnerOutBases ? pendingWizardData.runnerOutBases[idx] : null;
+                Array.from(wrap.querySelectorAll(`.runner-outbase-btn-${idx}`)).forEach((btn, i) => {
+                    const val = i + 1;
+                    btn.className = `runner-outbase-btn-${idx} py-1 rounded border text-[11px] font-bold ${val === sel ? 'bg-rose-600 text-white border-rose-600' : 'bg-white text-slate-700'}`;
+                });
+            }
             // ダイヤモンド表示もボタン一覧と連動させる
             renderRunnerAdvanceDiamond();
+        }
+
+        function setRunnerOutBase(runnerIdx, base) {
+            if (!pendingWizardData) return;
+            if (!Array.isArray(pendingWizardData.runnerOutBases)) pendingWizardData.runnerOutBases = [null, null, null];
+            pendingWizardData.runnerOutBases[runnerIdx] = base;
+            refreshRunnerAdvanceButtons();
         }
 
         // ===== ダイヤモンド上での進塁先選択 =====
@@ -16112,7 +16380,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 } else {
                     batter.batting.sf += 1;
                 }
-                shortLabel = type === 'SAC' ? `${posText}犠打` : '犠飛';
+                shortLabel = type === 'SAC' ? `${posText}犠打` : `${posText}犠飛`;
                 logDesc = type === 'SAC' ? `${posText}犠打` : `${posText}犠飛`;
                 if (runnerTargets) {
                     outsAdded = baseAdvanceOuts;
@@ -16126,13 +16394,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (type === '2B') batter.batting.b2 = (batter.batting.b2 || 0) + 1;
                 else if (type === '3B') batter.batting.b3 = (batter.batting.b3 || 0) + 1;
                 else if (type === 'HR') batter.batting.hr = (batter.batting.hr || 0) + 1;
-                const hitNames = { '1B': '安', '2B': '二', '3B': '三', 'HR': '本', 'BUNT_HIT': 'バント安' };
+                const hitNames = { '1B': '安', '2B': '二', '3B': '三', 'HR': '本', 'BUNT_HIT': 'バ安' };
                 // 安打の打球性質（ゴロ・ライナー・フライ）：ウィザードで選択された場合のみ（バントヒットは対象外）
                 if (type !== 'BUNT_HIT' && wizardState.hitQuality && BATTED_QUALITY_LABELS[wizardState.hitQuality]) {
                     battedQuality = wizardState.hitQuality;
                     battedQualityLabel = BATTED_QUALITY_LABELS[wizardState.hitQuality];
                 }
-                shortLabel = battedQualityLabel ? `${posText}${battedQualityLabel}${hitNames[type]}` : `${posText}${hitNames[type]}`;
+                const hitShortName = type === 'HR' ? (wizardState.hrType === 'inside' ? '走本' : '本') : hitNames[type];
+                shortLabel = `${posText}${hitShortName}`;
                 if (type === 'BUNT_HIT') {
                     logDesc = `${posText}バントヒット`;
                 } else if (type === 'HR') {
@@ -16177,10 +16446,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const buntSuffixShort = isBuntErr ? 'バント失' : '失';
 
                 if (wizardState.errorCategory === 'RECEIVING' && wizardState.assistPos) {
-                    shortLabel = `${POS_NAMES[wizardState.assistPos]}-${posText} ${buntSuffixShort}`;
+                    shortLabel = `${posText}失`;
                     logDesc = `${buntPrefixLog}${POS_NAMES[wizardState.assistPos]}送球→${posText}${errName}により出塁`;
                 } else {
-                    shortLabel = isBuntErr ? `${posText}バント${errName}` : `${posText}${errName}`;
+                    shortLabel = `${posText}失`;
                     logDesc = `${buntPrefixLog}${posText}${errName}により出塁`;
                 }
                 
@@ -16198,10 +16467,27 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         (bases[0] && bases[1]) ? bases[1] : bases[2]
                     ];
                 }
+            } else if (type === 'FC') {
+                // フィルダースチョイス（野選）：打数に数え、安打にはしない。
+                // 打者走者は1塁（進塁先選択で変更可）、既存走者のアウトは進塁先選択で記録する。
+                batter.batting.ab += 1;
+                shortLabel = `${posText}野選`;
+                logDesc = `${posText}フィルダースチョイス（野選）`;
+                if (runnerTargets) {
+                    outsAdded = baseAdvanceOuts;
+                } else {
+                    outsAdded = 0;
+                    if (bases[0] && bases[1] && bases[2]) scoreRunner(bases[2]);
+                    newBases = [
+                        batter.id,
+                        bases[0] ? bases[0] : bases[1],
+                        (bases[0] && bases[1]) ? bases[1] : bases[2]
+                    ];
+                }
             } else if (['BB', 'IBB', 'HBP', 'CI'].includes(type)) {
                 if (['BB', 'IBB'].includes(type)) batter.batting.bb += 1;
                 else if (type === 'HBP') batter.batting.hbp += 1;
-                const walkNames = { 'BB': '四球', 'IBB': '敬遠', 'HBP': '死球', 'CI': '打妨' };
+                const walkNames = { 'BB': '四球', 'IBB': '敬遠', 'HBP': '死球', 'CI': '守妨' };
                 shortLabel = walkNames[type] || type;
                 logDesc = type === 'BB' ? '四球' : (type === 'IBB' ? '申告敬遠' : (type === 'HBP' ? '死球' : '打撃妨害'));
                 if (bases[0] && bases[1] && bases[2]) scoreRunner(bases[2]);
@@ -16216,7 +16502,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     'SO': '三振',
                     'BUNT_SO': '三振(ス)',
                     'SB_OUT': 'バントアウト',
-                    'GO': 'ゴロ',
+                    'GO': 'ゴ',
                     'FO': '飛',
                     'LO': '直',
                     'DP': 'ゴロ併殺',
@@ -16311,6 +16597,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 // 打点・得点があったプレーは、誰が生還したかと打点を経過ログに明記する
                 const scorerText = scorerNames.filter(Boolean).join('、');
                 logDesc += scorerText ? ` ― ${scorerText}が生還（打点${rbi}）` : ` ― ${runsScored}得点（打点${rbi}）`;
+            }
+            // 既存走者がアウトになった場合は、どこの塁でアウトになったかを経過ログに明記する
+            if (customTargets && Array.isArray(customTargets.runnerOutBases) && runnerTargets) {
+                const outParts = [];
+                customTargets.runnerOutBases.forEach((ob, oi) => {
+                    if (!ob || runnerTargets[oi] !== 0) return;
+                    const rp = bases[oi] ? findPlayerById(bases[oi]) : null;
+                    if (rp) outParts.push(`${rp.name}は${ob === 4 ? '本塁' : ob + '塁'}でアウト`);
+                });
+                if (outParts.length) logDesc += `（${outParts.join('、')}）`;
             }
             addLog(`${batter.order}番 ${batter.name}：${logDesc}`);
 
@@ -16496,6 +16792,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         statsEl.textContent = '初打席';
                     }
                 }
+                const batterLineEl = document.getElementById('curr-batter-line');
+                if (batterLineEl) {
+                    const brt = computeBatterRates(batter.batting);
+                    batterLineEl.textContent = `打率 ${fmtRate3(brt.avg)} ・ ${batter.batting.h || 0}安打 ・ ${batter.batting.hr || 0}本塁打 ・ ${batter.batting.rbi || 0}打点`;
+                }
             }
             const pitcher = getCurrentPitcher();
             if (pitcher) {
@@ -16510,6 +16811,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     const innPitches = gameState.live.inningPitches || 0;
                     const totalPitches = (gameState.live.pitcherPitchCounts && gameState.live.pitcherPitchCounts[pitcher.id]) || 0;
                     pitchesEl.textContent = `${innPitches} / ${totalPitches}球`;
+                }
+                const pitcherLineEl = document.getElementById('curr-pitcher-line');
+                if (pitcherLineEl) {
+                    const pl = pitcher.pitching || {};
+                    const outs = pl.outs || 0;
+                    const ipText = `${Math.floor(outs / 3)}${outs % 3 ? ' ' + (outs % 3) + '/3' : ''}回`;
+                    pitcherLineEl.textContent = `対戦打者 ${pl.bf || 0} ・ ${ipText} ・ 奪三振 ${pl.so || 0} ・ 与四球 ${pl.bb || 0}`;
                 }
             }
         }
@@ -16614,7 +16922,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // ユーティリティ名を返しても色は付かないため、必ず専用クラスを使うこと。
         function batterResultColorClass(label) {
             const t = label || '';
-            if (/四球|死球|敬遠|打妨/.test(t)) return 'res-hl-walk';
+            if (/四球|死球|敬遠|打妨|守妨/.test(t)) return 'res-hl-walk';
             if (/犠失/.test(t)) return ''; // 犠打失敗はアウト扱い（黒）
             if (/失/.test(t)) return 'res-hl-error';
             if (/犠/.test(t)) return 'res-hl-sac';
@@ -20084,7 +20392,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             confirmKDetail, backToStrikeoutType, selectOffensePinchRunnerTarget,
             selectOffenseSubRole, selectWizardAirOutMode, selectWizardCategory,
             selectWizardErrorBunt, selectWizardErrorCategory, selectWizardPos,
-            setBatterTarget, setRunnerTarget, showFieldBenchMemberList,
+            setBatterTarget, setRunnerTarget, setRunnerOutBase, showFieldBenchMemberList,
+            onLiveHandSwitchClick, onLiveHandSwitchDblClick, onLiveHandSwitchKey,
+            openArchiveListPage, openTrashListPage, confirmDeleteArchivedGame, confirmPermanentDeleteTrashGame, requestPermanentDeleteTrashGame,
             startNewGameFromHome, switchTab, switchTeamSettingsTab,
             undoLastAction, undoLastPitch, updateHomeScreenUI, updateMasterPlayer
         };
@@ -20120,9 +20430,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return parts;
         }
 
-        function __evalHandlerArg(token, el) {
+        function __evalHandlerArg(token, el, evt) {
             token = token.trim();
             if (token === '') return undefined;
+            if (token === 'event') return evt || null;
             if (token === 'this') return el;
             if (token === 'this.value') return el ? el.value : undefined;
             if (token === 'this.checked') return el ? el.checked : undefined;
@@ -20137,7 +20448,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return undefined;
         }
 
-        function __execHandlerCode(code, el) {
+        function __execHandlerCode(code, el, evt) {
             const statements = __splitTopLevel(code, ';');
             for (const stmt of statements) {
                 const m = stmt.trim().match(/^([A-Za-z_$][\w$]*)\s*\(([\s\S]*)\)$/);
@@ -20145,7 +20456,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const fn = HANDLER_FNS[m[1]] || window[m[1]];
                 if (typeof fn !== 'function') continue;
                 const argStr = m[2].trim();
-                const args = argStr === '' ? [] : __splitTopLevel(argStr, ',').map(t => __evalHandlerArg(t, el));
+                const args = argStr === '' ? [] : __splitTopLevel(argStr, ',').map(t => __evalHandlerArg(t, el, evt));
                 fn.apply(el, args);
             }
         }
@@ -20153,11 +20464,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function __bindInlineHandlers(root) {
             if (!root || root.nodeType !== 1) return;
             const targets = [];
-            if (root.hasAttribute && (root.hasAttribute('onclick') || root.hasAttribute('onchange'))) targets.push(root);
-            if (root.querySelectorAll) root.querySelectorAll('[onclick],[onchange]').forEach(el => targets.push(el));
+            if (root.hasAttribute && (root.hasAttribute('onclick') || root.hasAttribute('onchange') || root.hasAttribute('ondblclick') || root.hasAttribute('onkeydown'))) targets.push(root);
+            if (root.querySelectorAll) root.querySelectorAll('[onclick],[onchange],[ondblclick],[onkeydown]').forEach(el => targets.push(el));
             targets.forEach(el => {
                 let entry = __handlerCodes.get(el);
-                ['click', 'change'].forEach(type => {
+                ['click', 'change', 'dblclick', 'keydown'].forEach(type => {
                     const attr = 'on' + type;
                     if (el.hasAttribute && el.hasAttribute(attr)) {
                         if (!entry) { entry = {}; __handlerCodes.set(el, entry); }
@@ -20172,13 +20483,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             let node = evt.target;
             while (node && node !== document) {
                 const entry = __handlerCodes.get(node);
-                if (entry && entry[type]) __execHandlerCode(entry[type], node);
+                if (entry && entry[type]) __execHandlerCode(entry[type], node, evt);
                 node = node.parentNode;
             }
         }
 
         document.addEventListener('click', evt => __delegatedHandler('click', evt), false);
         document.addEventListener('change', evt => __delegatedHandler('change', evt), false);
+        document.addEventListener('dblclick', evt => __delegatedHandler('dblclick', evt), false);
+        document.addEventListener('keydown', evt => __delegatedHandler('keydown', evt), false);
         __bindInlineHandlers(document.body || document.documentElement);
         if (window.MutationObserver && document.documentElement) {
             new MutationObserver(mutations => {
