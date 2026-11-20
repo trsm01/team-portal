@@ -112,6 +112,34 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         /* === 走者進塁先の重なり防止（打者イベント） ===
            ほかの走者・打者がすでに選んでいる塁のボタンは選択不可にする */
         .advance-btn-occupied, .advance-btn-blocked { opacity: 0.35 !important; cursor: not-allowed !important; background-color: #e2e8f0 !important; color: #64748b !important; border-color: #cbd5e1 !important; }
+        /* === 走者進塁先の吹き出し（ダイヤモンド上の各走者に表示） ===
+           内蔵Tailwindでは位置指定が足りないため専用クラスで定義する。
+           吹き出しは選択中走者のチップの近くに絶対配置し、しっぽ（::after）で走者を指す。 */
+        .adv-stage { position: relative; }
+        #runner-advance-bubble { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+        .adv-bubble { position: absolute; width: 228px; max-width: 86%; background: #ffffff; border: 1.5px solid #94a3b8; border-radius: 12px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.28); padding: 8px 9px 9px; pointer-events: auto; }
+        .adv-bubble::after { content: ''; position: absolute; width: 13px; height: 13px; background: #ffffff; transform: rotate(45deg); }
+        .adv-tail-top::after { top: -8px; border-left: 1.5px solid #94a3b8; border-top: 1.5px solid #94a3b8; }
+        .adv-tail-bottom::after { bottom: -8px; border-right: 1.5px solid #94a3b8; border-bottom: 1.5px solid #94a3b8; }
+        .adv-pos-r2 { top: 15.5%; left: 50%; transform: translateX(-50%); }
+        .adv-pos-r2::after { left: 50%; margin-left: -7px; }
+        .adv-pos-r1 { top: 57%; right: 1%; }
+        .adv-pos-r1::after { right: 24%; }
+        .adv-pos-r3 { top: 57%; left: 1%; }
+        .adv-pos-r3::after { left: 24%; }
+        .adv-pos-batter { bottom: 15.5%; left: 50%; transform: translateX(-50%); }
+        .adv-pos-batter::after { left: 50%; margin-left: -7px; }
+        .adv-bubble-head { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
+        .adv-bubble-dot { width: 10px; height: 10px; border-radius: 9999px; flex-shrink: 0; }
+        .adv-bubble-title { font-size: 12px; font-weight: 800; color: #1e293b; flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .adv-bubble-close { flex-shrink: 0; width: 20px; height: 20px; line-height: 1; border: none; border-radius: 6px; background: #f1f5f9; color: #475569; font-size: 13px; font-weight: 800; cursor: pointer; }
+        .adv-bubble-btns { display: flex; flex-wrap: wrap; gap: 4px; }
+        .adv-bubble-btn { flex: 1 1 30%; padding: 7px 2px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; color: #334155; font-size: 11.5px; font-weight: 800; text-align: center; cursor: pointer; }
+        .adv-bubble-btn-sel { color: #ffffff !important; border-color: transparent !important; }
+        .adv-bubble-outbase { margin-top: 7px; border-top: 1px dashed #fecdd3; padding-top: 6px; }
+        .adv-bubble-outbase-label { font-size: 10.5px; font-weight: 800; color: #be123c; margin-bottom: 4px; }
+        .adv-summary-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border: 1.5px solid #cbd5e1; border-radius: 9999px; background: #ffffff; font-size: 11px; font-weight: 700; color: #334155; cursor: pointer; }
+        .adv-summary-dot { width: 8px; height: 8px; border-radius: 9999px; flex-shrink: 0; }
         /* === 経過ログ／打者成績表示の色分け（専用クラス） ===
            配色は打者成績表示と共通：アウトは黒（既定色）、安打はピンク、犠打は黄色、
            四死球は青、エラーは緑。
@@ -12749,14 +12777,18 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             advanceNote.className = 'text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2';
             advanceNote.textContent = '同じ塁には2人入れません。ほかの走者・打者が選んでいる塁は選べなくなります（生還・アウトは複数選べます）。また、今いる塁より後ろには戻れず、前の走者を追い越す進塁も選べません。';
             container.appendChild(advanceNote);
-            // ダイヤモンド上での進塁先選択（走者をタップ→進む塁をタップ）。
+            // ダイヤモンド上の各走者に吹き出しを出し、その中の選択肢をタップして進塁先を決める。
             // 中身は refreshRunnerAdvanceButtons 経由で描画する。
             const diamondWrap = document.createElement('div');
             diamondWrap.id = 'runner-advance-diamond';
             container.appendChild(diamondWrap);
-            // 初期選択は最も前の走者（いなければ打者走者）
+            const summaryWrap = document.createElement('div');
+            summaryWrap.id = 'runner-advance-summary';
+            container.appendChild(summaryWrap);
+            // 初期選択は最も前の走者（いなければ打者走者）。その走者の吹き出しを開いた状態で始める
             const initBases = gameState.live.bases || [];
             advanceDiamondSel = initBases[2] ? { runnerIdx: 2 } : (initBases[1] ? { runnerIdx: 1 } : (initBases[0] ? { runnerIdx: 0 } : { isBatter: true }));
+            advanceBubbleOpen = true;
             const bases = gameState.live.bases;
             const baseNames = ['1塁走者', '2塁走者', '3塁走者'];
             const batter = getCurrentBatter();
@@ -12780,37 +12812,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 return Math.min(idx + (subType === 'SAC' ? 2 : 1), 4);
             });
 
-            bases.forEach((runnerId, idx) => {
-                if (!runnerId) return;
-                const runner = findPlayerById(runnerId);
-                if (!runner) return;
-
-                const div = document.createElement('div');
-                div.className = 'bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5';
-                const defaultTarget = defaultRunnerTargets[idx];
-
-                div.innerHTML = `
-                    <div class="font-bold text-slate-800 text-xs">${baseNames[idx]}: ${runner.name} の進塁先</div>
-                    <div class="grid grid-cols-5 gap-1" data-runner-idx="${idx}">
-                        <button type="button" onclick="setRunnerTarget(${idx}, 1)" class="runner-btn-${idx} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${defaultTarget === 1 ? 'bg-emerald-600 text-white' : 'bg-white text-slate-700'}">1塁${idx === 0 ? '<span class="text-[9px] font-normal leading-none mt-0.5">（そのまま）</span>' : ''}</button>
-                        <button type="button" onclick="setRunnerTarget(${idx}, 2)" class="runner-btn-${idx} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${defaultTarget === 2 ? 'bg-emerald-600 text-white' : 'bg-white text-slate-700'}">2塁${idx === 1 ? '<span class="text-[9px] font-normal leading-none mt-0.5">（そのまま）</span>' : ''}</button>
-                        <button type="button" onclick="setRunnerTarget(${idx}, 3)" class="runner-btn-${idx} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${defaultTarget === 3 ? 'bg-emerald-600 text-white' : 'bg-white text-slate-700'}">3塁${idx === 2 ? '<span class="text-[9px] font-normal leading-none mt-0.5">（そのまま）</span>' : ''}</button>
-                        <button type="button" onclick="setRunnerTarget(${idx}, 4)" class="runner-btn-${idx} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${defaultTarget === 4 ? 'bg-amber-500 text-white' : 'bg-white text-slate-700'}">生還</button>
-                        <button type="button" onclick="setRunnerTarget(${idx}, 0)" class="runner-btn-${idx} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${defaultTarget === 0 ? 'bg-rose-600 text-white' : 'bg-white text-slate-700'}">アウト</button>
-                    </div>
-                    <div class="runner-outbase-wrap ${defaultTarget === 0 ? '' : 'hidden'} items-center gap-1.5 pt-1" data-outbase-idx="${idx}">
-                        <span class="text-[11px] font-bold text-rose-700 shrink-0">アウトになった塁:</span>
-                        <div class="grid grid-cols-4 gap-1 flex-1">
-                            <button type="button" onclick="setRunnerOutBase(${idx}, 1)" class="runner-outbase-btn-${idx} py-1 rounded border text-[11px] font-bold bg-white text-slate-700">1塁</button>
-                            <button type="button" onclick="setRunnerOutBase(${idx}, 2)" class="runner-outbase-btn-${idx} py-1 rounded border text-[11px] font-bold bg-white text-slate-700">2塁</button>
-                            <button type="button" onclick="setRunnerOutBase(${idx}, 3)" class="runner-outbase-btn-${idx} py-1 rounded border text-[11px] font-bold bg-white text-slate-700">3塁</button>
-                            <button type="button" onclick="setRunnerOutBase(${idx}, 4)" class="runner-outbase-btn-${idx} py-1 rounded border text-[11px] font-bold bg-white text-slate-700">本塁</button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-
             let batterDefaultTarget = 0;
             if (['1B', '2B', '3B', 'HR', 'BUNT_HIT'].includes(subType)) {
                 batterDefaultTarget = (subType === '1B' || subType === 'BUNT_HIT') ? 1 : (subType === '2B' ? 2 : (subType === '3B' ? 3 : 4));
@@ -12823,20 +12824,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (isDroppedKType(subType) && kPresetBatterTarget !== null && kPresetBatterTarget !== undefined) {
                 batterDefaultTarget = kPresetBatterTarget;
             }
-
-            const batterDiv = document.createElement('div');
-            batterDiv.className = 'bg-slate-50 p-3 rounded-xl border border-indigo-200 space-y-1.5 mt-2';
-            batterDiv.innerHTML = `
-                <div class="font-bold text-indigo-900 text-xs">打者走者: ${batter ? batter.name : ''} の結果</div>
-                <div class="grid grid-cols-5 gap-1" data-batter-target="true">
-                    <button type="button" onclick="setBatterTarget(1)" class="batter-btn flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${batterDefaultTarget === 1 ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700'}">1塁</button>
-                    <button type="button" onclick="setBatterTarget(2)" class="batter-btn flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${batterDefaultTarget === 2 ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700'}">2塁</button>
-                    <button type="button" onclick="setBatterTarget(3)" class="batter-btn flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${batterDefaultTarget === 3 ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700'}">3塁</button>
-                    <button type="button" onclick="setBatterTarget(4)" class="batter-btn flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${batterDefaultTarget === 4 ? 'bg-amber-500 text-white' : 'bg-white text-slate-700'}">生還</button>
-                    <button type="button" onclick="setBatterTarget(0)" class="batter-btn flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${batterDefaultTarget === 0 ? 'bg-rose-600 text-white' : 'bg-white text-slate-700'}">アウト</button>
-                </div>
-            `;
-            container.appendChild(batterDiv);
 
             // 初期値の重なり解消：打者の進塁先を優先し、3塁→2塁→1塁の順（先行走者優先）に
             // 確定していく。初期値が重なる走者は、空いている次の塁→生還の順にずらす。
@@ -12979,63 +12966,120 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return null;
         }
 
-        // 全グループ（各走者＋打者）のボタンの選択中表示と、重なる塁の選択不可表示を再描画する
+        // 進塁先の表示を再描画する（ダイヤモンド＋選択中走者の吹き出し＋全員の選択サマリー）。
+        // 選べない塁（重なり・後退・追い越し）は advanceBlockReason で判定し、
+        // 吹き出し内ではグレー表示にしてタップしても変わらないようにする。
         function refreshRunnerAdvanceButtons() {
             if (!pendingWizardData) return;
-            const container = document.getElementById('runner-advance-container');
-            if (!container) return;
-            const values = [1, 2, 3, 4, 0];
-            const paintGroup = (group, selected, self, activeFor) => {
-                if (!group) return;
-                const kind = group.getAttribute('data-batter-target') === 'true' ? 'batter-btn' : `runner-btn-${self.runnerIdx}`;
-                Array.from(group.children).forEach((btn, i) => {
-                    const val = values[i];
-                    const reason = val !== selected ? advanceBlockReason(self, val) : null;
-                    const taken = reason !== null;
-                    btn.disabled = taken;
-                    if (reason === 'backward') btn.title = '今いる塁より後ろには戻れません';
-                    else if (reason === 'occupied') btn.title = 'ほかの走者・打者が選んでいる塁です';
-                    else if (reason === 'order') btn.title = '前後の走者の順序が入れ替わる進塁はできません';
-                    else btn.removeAttribute('title');
-                    if (val === selected) {
-                        btn.className = `${kind} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold ${activeFor(val)}`;
-                    } else if (taken) {
-                        btn.className = `${kind} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold bg-white text-slate-700 advance-btn-blocked`;
-                    } else {
-                        btn.className = `${kind} flex flex-col items-center justify-center py-1.5 rounded border text-xs font-bold bg-white text-slate-700`;
-                    }
-                });
-            };
-            for (let idx = 0; idx < 3; idx++) {
-                const group = container.querySelector(`[data-runner-idx="${idx}"]`);
-                if (!group) continue;
-                paintGroup(group, pendingWizardData.runnerTargets[idx], { runnerIdx: idx },
-                    (val) => val === 4 ? 'bg-amber-500 text-white' : (val === 0 ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white'));
-            }
-            const batterGroup = container.querySelector('[data-batter-target="true"]');
-            if (batterGroup) {
-                paintGroup(batterGroup, pendingWizardData.batterTarget, { isBatter: true },
-                    (val) => val === 4 ? 'bg-amber-500 text-white' : (val === 0 ? 'bg-rose-600 text-white' : 'bg-indigo-600 text-white'));
-            }
-            // アウトになった塁の選択欄：対象走者が「アウト」のときだけ表示し、選択中を塗る
-            for (let idx = 0; idx < 3; idx++) {
-                const wrap = container.querySelector(`[data-outbase-idx="${idx}"]`);
-                if (!wrap) continue;
-                const isOut = pendingWizardData.runnerTargets[idx] === 0;
-                wrap.classList.toggle('hidden', !isOut);
-                wrap.classList.toggle('flex', isOut);
-                if (isOut && (!pendingWizardData.runnerOutBases || !pendingWizardData.runnerOutBases[idx])) {
-                    if (!Array.isArray(pendingWizardData.runnerOutBases)) pendingWizardData.runnerOutBases = [null, null, null];
-                    pendingWizardData.runnerOutBases[idx] = Math.min(idx + 2, 4);
-                }
-                const sel = pendingWizardData.runnerOutBases ? pendingWizardData.runnerOutBases[idx] : null;
-                Array.from(wrap.querySelectorAll(`.runner-outbase-btn-${idx}`)).forEach((btn, i) => {
-                    const val = i + 1;
-                    btn.className = `runner-outbase-btn-${idx} py-1 rounded border text-[11px] font-bold ${val === sel ? 'bg-rose-600 text-white border-rose-600' : 'bg-white text-slate-700'}`;
-                });
-            }
-            // ダイヤモンド表示もボタン一覧と連動させる
             renderRunnerAdvanceDiamond();
+            renderRunnerAdvanceBubble();
+            renderRunnerAdvanceSummary();
+        }
+
+        // ===== ダイヤモンド上の吹き出し =====
+        // 選択中の走者（本塁下のチップは打者走者）の近くに吹き出しを出し、
+        // 「何塁まで進塁するか」の選択肢をタップして進塁先を決める。
+        function renderRunnerAdvanceBubble() {
+            const wrap = document.getElementById('runner-advance-bubble');
+            if (!wrap) return;
+            if (!advanceBubbleOpen || !pendingWizardData) { wrap.innerHTML = ''; return; }
+            const persons = advanceDiamondPersons();
+            let sel = persons.find(p => isAdvanceDiamondSelected(p)) || null;
+            if (!sel) {
+                sel = persons.filter(p => !p.isBatter).pop() || persons[persons.length - 1];
+                advanceDiamondSel = sel.isBatter ? { isBatter: true } : { runnerIdx: sel.runnerIdx };
+            }
+            const self = sel.isBatter ? { isBatter: true } : { runnerIdx: sel.runnerIdx };
+            const esc = (s) => physicalEscapeHtml(s);
+            const roleLabel = sel.isBatter ? '打者走者' : `${sel.runnerIdx + 1}塁走者`;
+            const posClass = sel.isBatter ? 'adv-pos-batter adv-tail-bottom' : (sel.runnerIdx === 0 ? 'adv-pos-r1 adv-tail-top' : (sel.runnerIdx === 1 ? 'adv-pos-r2 adv-tail-top' : 'adv-pos-r3 adv-tail-top'));
+            const blockTitles = { backward: '今いる塁より後ろには戻れません', occupied: 'ほかの走者・打者が選んでいる塁です', order: '前後の走者の順序が入れ替わる進塁はできません' };
+            let btns = '';
+            [1, 2, 3, 4, 0].forEach(v => {
+                let label;
+                if (v === 0) label = 'アウト';
+                else if (v === 4) label = '生還';
+                else label = `${v}塁${!sel.isBatter && v === sel.origin ? '（そのまま）' : ''}`;
+                const isSel = sel.target === v;
+                const reason = !isSel ? advanceBlockReason(self, v) : null;
+                if (isSel) {
+                    const bg = v === 4 ? '#f59e0b' : (v === 0 ? '#e11d48' : sel.color);
+                    btns += `<button type="button" onclick="chooseAdvanceBubble(${v})" class="adv-bubble-btn adv-bubble-btn-sel" style="background-color:${bg}">${label}</button>`;
+                } else if (reason) {
+                    btns += `<button type="button" disabled title="${blockTitles[reason] || ''}" class="adv-bubble-btn advance-btn-blocked">${label}</button>`;
+                } else {
+                    btns += `<button type="button" onclick="chooseAdvanceBubble(${v})" class="adv-bubble-btn">${label}</button>`;
+                }
+            });
+            // 走者がアウトのときは、吹き出しの中で「アウトになった塁」も選ぶ
+            let outBaseHtml = '';
+            if (!sel.isBatter && sel.target === 0) {
+                if (!Array.isArray(pendingWizardData.runnerOutBases)) pendingWizardData.runnerOutBases = [null, null, null];
+                if (!pendingWizardData.runnerOutBases[sel.runnerIdx]) pendingWizardData.runnerOutBases[sel.runnerIdx] = Math.min(sel.runnerIdx + 2, 4);
+                const outSel = pendingWizardData.runnerOutBases[sel.runnerIdx];
+                let obBtns = '';
+                [1, 2, 3, 4].forEach(b => {
+                    const label = b === 4 ? '本塁' : `${b}塁`;
+                    if (b === outSel) obBtns += `<button type="button" onclick="setRunnerOutBase(${sel.runnerIdx}, ${b})" class="adv-bubble-btn adv-bubble-btn-sel" style="background-color:#e11d48">${label}</button>`;
+                    else obBtns += `<button type="button" onclick="setRunnerOutBase(${sel.runnerIdx}, ${b})" class="adv-bubble-btn">${label}</button>`;
+                });
+                outBaseHtml = `<div class="adv-bubble-outbase"><div class="adv-bubble-outbase-label">アウトになった塁</div><div class="adv-bubble-btns">${obBtns}</div></div>`;
+            }
+            wrap.innerHTML = `
+            <div class="adv-bubble ${posClass}">
+                <div class="adv-bubble-head">
+                    <span class="adv-bubble-dot" style="background-color:${sel.color}"></span>
+                    <span class="adv-bubble-title">${roleLabel} ${esc(sel.name)} の進塁先</span>
+                    <button type="button" onclick="closeAdvanceBubble()" class="adv-bubble-close" aria-label="吹き出しを閉じる">×</button>
+                </div>
+                <div class="adv-bubble-btns">${btns}</div>
+                ${outBaseHtml}
+            </div>`;
+        }
+
+        // 全員の現在の進塁先をチップで一覧する（タップでその走者の吹き出しが開く）
+        function renderRunnerAdvanceSummary() {
+            const wrap = document.getElementById('runner-advance-summary');
+            if (!wrap || !pendingWizardData) return;
+            const esc = (s) => physicalEscapeHtml(s);
+            const shortName = (s) => { s = String(s || ''); return s.length > 7 ? s.slice(0, 7) : s; };
+            const persons = advanceDiamondPersons().slice().sort((a, b) => advanceRankOf(a) - advanceRankOf(b));
+            const chips = persons.map(p => {
+                const roleLabel = p.isBatter ? '打者' : `${p.runnerIdx + 1}塁`;
+                const targetLabel = p.target === 0 ? 'アウト' : (p.target === 4 ? '生還' : `${p.target}塁${!p.isBatter && p.target === p.origin ? '（そのまま）' : ''}`);
+                const selected = isAdvanceDiamondSelected(p) && advanceBubbleOpen;
+                return `<button type="button" onclick="selectAdvanceDiamondPerson(${p.isBatter ? 'true' : 'false'}, ${p.isBatter ? 0 : p.runnerIdx})" class="adv-summary-chip" style="${selected ? `border-color:${p.color}; background-color:#f8fafc; box-shadow:0 0 0 1px ${p.color}` : ''}"><span class="adv-summary-dot" style="background-color:${p.color}"></span>${roleLabel} ${esc(shortName(p.name))} → ${targetLabel}</button>`;
+            }).join('');
+            wrap.innerHTML = `<div class="flex flex-wrap gap-1.5">${chips}</div>`;
+        }
+
+        // 吹き出し内の選択肢をタップしたときの処理。
+        // 進塁先を確定し、次の選手（前の走者→後ろの走者→打者走者）の吹き出しへ進む。
+        // 最後の選手なら吹き出しを閉じる。走者をアウトにしたときは、
+        // 「アウトになった塁」を続けて選べるよう吹き出しを開いたままにする。
+        function chooseAdvanceBubble(target) {
+            if (!pendingWizardData || !advanceDiamondSel) return;
+            const isBatter = !!advanceDiamondSel.isBatter;
+            const before = isBatter ? pendingWizardData.batterTarget : pendingWizardData.runnerTargets[advanceDiamondSel.runnerIdx];
+            if (isBatter) setBatterTarget(target);
+            else setRunnerTarget(advanceDiamondSel.runnerIdx, target);
+            const after = isBatter ? pendingWizardData.batterTarget : pendingWizardData.runnerTargets[advanceDiamondSel.runnerIdx];
+            if (after === before || (target === 0 && !isBatter)) { refreshRunnerAdvanceButtons(); return; }
+            const order = advanceDiamondPersons().slice().sort((a, b) => advanceRankOf(a) - advanceRankOf(b));
+            const curIdx = order.findIndex(p => isAdvanceDiamondSelected(p));
+            const next = order[curIdx + 1];
+            if (next) {
+                advanceDiamondSel = next.isBatter ? { isBatter: true } : { runnerIdx: next.runnerIdx };
+                advanceBubbleOpen = true;
+            } else {
+                advanceBubbleOpen = false;
+            }
+            refreshRunnerAdvanceButtons();
+        }
+
+        function closeAdvanceBubble() {
+            advanceBubbleOpen = false;
+            refreshRunnerAdvanceButtons();
         }
 
         function setRunnerOutBase(runnerIdx, base) {
@@ -13046,11 +13090,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         // ===== ダイヤモンド上での進塁先選択 =====
-        // 走者（本塁下のチップは打者走者）をタップして選び、進む塁をタップすると
-        // その選手の進塁先が変わる。本塁タップ＝生還、今いる塁タップ＝そのまま。
-        // 進塁先の重なり・後退・追い越しの可否はボタン一覧と同じ判定を使い、
+        // 走者（本塁下のチップは打者走者）をタップすると、その走者の吹き出しが開き、
+        // 吹き出しの中で進む塁をタップして進塁先を決める。塁を直接タップしても選べる
+        // （本塁タップ＝生還、今いる塁タップ＝そのまま）。
+        // 進塁先の重なり・後退・追い越しの可否は従来と同じ判定を使い、
         // 選べない塁はグレー表示にしてタップしても変わらない。
         let advanceDiamondSel = null; // { runnerIdx: n } | { isBatter: true }
+        let advanceBubbleOpen = false; // 選択中走者の吹き出しを開いているか
         const ADVANCE_DIAMOND_COLORS = { 0: '#0284c7', 1: '#7c3aed', 2: '#ea580c', batter: '#4f46e5' };
         const ADVANCE_BASE_POS = { 1: { x: 268, y: 150 }, 2: { x: 180, y: 62 }, 3: { x: 92, y: 150 }, 4: { x: 180, y: 238 } };
         const ADVANCE_CHIP_POS = { 0: { x: 308, y: 150 }, 1: { x: 180, y: 28 }, 2: { x: 52, y: 150 }, batter: { x: 180, y: 272 } };
@@ -13075,7 +13121,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         function selectAdvanceDiamondPerson(isBatter, runnerIdx) {
             advanceDiamondSel = isBatter ? { isBatter: true } : { runnerIdx: runnerIdx };
-            renderRunnerAdvanceDiamond();
+            advanceBubbleOpen = true;
+            refreshRunnerAdvanceButtons();
         }
 
         function advanceDiamondTapBase(base) {
@@ -13183,27 +13230,23 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </g>`;
             });
 
-            const roleLabel = sel.isBatter ? '打者走者' : `${sel.runnerIdx + 1}塁走者`;
-            const targetLabel = sel.target === 0 ? 'アウト' : (sel.target === 4 ? '生還' : `${sel.target}塁${!sel.isBatter && sel.target === sel.origin ? '（そのまま）' : ''}`);
-
             wrap.innerHTML = `
             <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-2 space-y-1.5">
-                <svg viewBox="0 0 360 300" class="w-full max-w-[340px] h-auto mx-auto no-select">
-                    ${defs}
-                    <rect x="0" y="0" width="360" height="300" rx="12" fill="#dcfce7"/>
-                    <line x1="180" y1="238" x2="322" y2="96" stroke="#ffffff" stroke-width="2"/>
-                    <line x1="180" y1="238" x2="38" y2="96" stroke="#ffffff" stroke-width="2"/>
-                    <polygon points="180,238 268,150 180,62 92,150" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
-                    <circle cx="180" cy="150" r="10" fill="#fde68a" stroke="#d97706" stroke-width="1"/>
-                    ${basesSvg}
-                    ${movesSvg}
-                    ${chipsSvg}
-                </svg>
-                <div class="flex items-center justify-between gap-2 px-0.5">
-                    <p class="text-[11px] font-bold text-slate-700">選択中：${roleLabel} ${esc(shortName(sel.name))} → ${targetLabel}</p>
-                    <button type="button" onclick="advanceDiamondSetOut()" class="shrink-0 px-2.5 py-1 rounded-lg border border-rose-300 bg-white hover:bg-rose-50 text-rose-600 font-bold text-[11px] transition">アウトにする</button>
+                <div class="adv-stage">
+                    <svg viewBox="0 0 360 300" class="w-full max-w-[340px] h-auto mx-auto no-select">
+                        ${defs}
+                        <rect x="0" y="0" width="360" height="300" rx="12" fill="#dcfce7"/>
+                        <line x1="180" y1="238" x2="322" y2="96" stroke="#ffffff" stroke-width="2"/>
+                        <line x1="180" y1="238" x2="38" y2="96" stroke="#ffffff" stroke-width="2"/>
+                        <polygon points="180,238 268,150 180,62 92,150" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+                        <circle cx="180" cy="150" r="10" fill="#fde68a" stroke="#d97706" stroke-width="1"/>
+                        ${basesSvg}
+                        ${movesSvg}
+                        ${chipsSvg}
+                    </svg>
+                    <div id="runner-advance-bubble"></div>
                 </div>
-                <p class="text-[10px] text-slate-500 leading-relaxed px-0.5">ダイヤモンド上の走者（本塁下は打者走者）をタップして選び、進む塁をタップしてください。本塁タップ＝生還、今いる塁タップ＝そのまま。選べない塁はグレーになります。下のボタンでも選べます。</p>
+                <p class="text-[10px] text-slate-500 leading-relaxed px-0.5">走者（本塁下は打者走者）をタップすると吹き出しが開きます。何塁まで進むかを吹き出しの中でタップしてください。選べない塁はグレーになります。</p>
             </div>`;
         }
 
@@ -20399,6 +20442,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             selectOffenseSubRole, selectWizardAirOutMode, selectWizardCategory,
             selectWizardErrorBunt, selectWizardErrorCategory, selectWizardPos,
             setBatterTarget, setRunnerTarget, setRunnerOutBase, showFieldBenchMemberList,
+            selectAdvanceDiamondPerson, advanceDiamondTapBase, advanceDiamondSetOut, chooseAdvanceBubble, closeAdvanceBubble,
             onLiveHandSwitchClick, onLiveHandSwitchDblClick, onLiveHandSwitchKey,
             openArchiveListPage, openTrashListPage, confirmDeleteArchivedGame, confirmPermanentDeleteTrashGame, requestPermanentDeleteTrashGame,
             startNewGameFromHome, switchTab, switchTeamSettingsTab,
