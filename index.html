@@ -2736,6 +2736,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 <div class="flex items-start gap-1.5"><span class="font-bold text-slate-500 shrink-0">今日:</span><span id="curr-batter-stats" class="font-mono text-slate-700">初打席</span></div>
                                 <div id="curr-batter-line" class="font-mono text-slate-600 mt-0.5">打率 -</div>
                             </div>
+                            <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-emerald-200/70">
+                                <span id="curr-batter-meta" class="text-[11px] font-bold text-slate-500">背番号 - ・ 守備 -</span>
+                                <button type="button" onclick="openLivePlayerEditModal('batter')" class="shrink-0 text-[11px] bg-white hover:bg-emerald-100 text-emerald-800 font-bold px-2 py-1 rounded-md border border-emerald-300 transition flex items-center gap-1" title="選手交代ではなく、オーダーの登録・氏名や守備位置、背番号の修正として記録します">
+                                    <i data-lucide="pencil" class="w-3 h-3"></i>
+                                    <span>登録・修正</span>
+                                </button>
+                            </div>
                         </div>
                         <!-- 投手 -->
                         <div class="bg-rose-50/60 border border-rose-200 rounded-xl p-3 space-y-2">
@@ -2750,6 +2757,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <div class="text-[11px] text-slate-600 leading-relaxed">
                                 <div class="flex items-center gap-1.5"><span class="font-bold text-slate-500 shrink-0">球数(回/計):</span><span id="curr-pitcher-pitches" class="font-mono font-bold text-slate-800">0 / 0球</span></div>
                                 <div id="curr-pitcher-line" class="font-mono text-slate-600 mt-0.5">対戦打者 -</div>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-rose-200/70">
+                                <span id="curr-pitcher-meta" class="text-[11px] font-bold text-slate-500">背番号 - ・ 守備 -</span>
+                                <button type="button" onclick="openLivePlayerEditModal('pitcher')" class="shrink-0 text-[11px] bg-white hover:bg-rose-100 text-rose-800 font-bold px-2 py-1 rounded-md border border-rose-300 transition flex items-center gap-1" title="選手交代ではなく、オーダーの登録・氏名や守備位置、背番号の修正として記録します">
+                                    <i data-lucide="pencil" class="w-3 h-3"></i>
+                                    <span>登録・修正</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -4600,6 +4614,45 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <button onclick="closeModal('modal-lineup-edit')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
                     <button onclick="saveLineupEdit()" class="px-4 py-2 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">スタメンを保存</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 対戦中の打者・投手の登録・修正モーダル（選手交代ではない） -->
+    <div id="modal-live-player-edit" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs hidden items-center justify-center z-50 p-3 sm:p-5 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden my-auto max-h-[92vh] flex flex-col">
+            <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between shrink-0">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i data-lucide="pencil" class="w-5 h-5 text-emerald-400"></i>選手の登録・修正
+                </h3>
+                <button onclick="closeModal('modal-live-player-edit')"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-5 space-y-4 overflow-y-auto text-sm flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span id="live-edit-role" class="text-[11px] font-extrabold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">打者</span>
+                    <span id="live-edit-context" class="text-xs font-bold text-slate-600"></span>
+                </div>
+                <p class="text-[11px] text-slate-500 leading-relaxed">ここでの変更は<strong class="text-slate-700">選手交代ではなく</strong>、オーダーの登録や、選手氏名・守備位置・背番号の誤りの修正として扱います。交代記録・経過ログには残らず、記録済みの成績はそのままこの選手に引き継がれます。</p>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1" for="live-edit-name">選手氏名</label>
+                    <input type="text" id="live-edit-name" placeholder="選手氏名を入力" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-bold bg-white">
+                </div>
+                <div class="grid grid-cols-2 gap-3 items-start">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1" for="live-edit-pos">守備位置</label>
+                        <select id="live-edit-pos" class="w-full border border-slate-300 rounded-lg px-2 py-2 font-bold bg-white"></select>
+                        <p id="live-edit-pos-note" class="hidden text-[11px] text-amber-700 font-bold mt-1 leading-relaxed"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1" for="live-edit-num">背番号</label>
+                        <select id="live-edit-num" class="w-full border border-slate-300 rounded-lg px-2 py-2 font-bold bg-white"></select>
+                    </div>
+                </div>
+                <div id="live-edit-error" class="hidden bg-rose-50 border border-rose-300 text-rose-800 rounded-lg px-3 py-2 text-xs font-bold leading-relaxed"></div>
+            </div>
+            <div class="bg-slate-100 px-5 py-3.5 border-t border-slate-200 shrink-0 flex items-center justify-end space-x-2">
+                <button onclick="closeModal('modal-live-player-edit')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">キャンセル</button>
+                <button onclick="saveLivePlayerEdit()" class="px-4 py-2 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">修正を保存</button>
             </div>
         </div>
     </div>
@@ -9725,6 +9778,134 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             saveAndRender();
             closeModal('modal-lineup-edit');
             showToast('スタメンを保存しました', 'success');
+        }
+
+        // ================= 対戦中の打者・投手の登録・修正（選手交代ではない） =================
+        // スコア入力画面の「対戦中の打者・投手」カードから、その選手の選手氏名・
+        // 守備位置・背番号を直接入力・修正できるようにする。ここでの変更は
+        // 選手交代ではなく、オーダーの登録や氏名などの誤りの修正として扱うため、
+        // 交代記録・経過ログには残さず、選手IDも変えない（記録済みの成績・
+        // 走者・カウントはそのままこの選手に引き継がれる）。保存する項目は
+        // 従来の選手データの name / pos / number のみで、形式は変えない。
+        let livePlayerEditState = null;
+        const LIVE_EDIT_POSITIONS = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'];
+        const LIVE_EDIT_POS_LABELS = { '投': '投手', '捕': '捕手', '一': '一塁手', '二': '二塁手', '三': '三塁手', '遊': '遊撃手', '左': '左翼手', '中': '中堅手', '右': '右翼手', '指': '指名打者' };
+
+        function openLivePlayerEditModal(who) {
+            if (!hasCurrentGame()) { showToast('進行中の試合がありません', 'warning'); return; }
+            const player = who === 'batter' ? getCurrentBatter() : getCurrentPitcher();
+            if (!player) { showToast('対象の選手がいません', 'warning'); return; }
+            const active = getActiveTeams();
+            const teamKey = who === 'batter' ? active.offenseKey : active.defenseKey;
+            livePlayerEditState = { who: who, teamKey: teamKey, playerId: player.id };
+            const roleEl = document.getElementById('live-edit-role');
+            if (roleEl) {
+                roleEl.textContent = who === 'batter' ? '打者' : '投手';
+                roleEl.className = 'text-[11px] font-extrabold px-2 py-0.5 rounded ' + (who === 'batter' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700');
+            }
+            const ctxEl = document.getElementById('live-edit-context');
+            if (ctxEl) {
+                const team = gameState.teams[teamKey];
+                const orderText = (player.order >= 1 && player.order <= 9) ? `${player.order}番` : '打順なし（10人目・投手）';
+                ctxEl.textContent = `${team ? team.name : ''} ／ ${orderText}`;
+            }
+            const nameEl = document.getElementById('live-edit-name');
+            if (nameEl) nameEl.value = player.name || '';
+            const isDHPitcher = !!(player.dhPitcher || player.order === 10);
+            const isTwoWayPitcher = !!(player.isTwoWay && player.twoWayPitcher);
+            const posEl = document.getElementById('live-edit-pos');
+            if (posEl) {
+                let opts = LIVE_EDIT_POSITIONS.map(s => `<option value="${s}" ${s === player.pos ? 'selected' : ''}>${s}（${LIVE_EDIT_POS_LABELS[s]}）</option>`).join('');
+                if (!player.pos) opts = '<option value="" selected>選択</option>' + opts;
+                posEl.innerHTML = opts;
+                // DHの投手（打順なし）と二刀流の投手は、守備位置を変えるとDHの
+                // 構成が壊れるため、この欄では守備位置を固定にする（氏名・背番号は変更できる）
+                posEl.disabled = isDHPitcher || isTwoWayPitcher;
+            }
+            const noteEl = document.getElementById('live-edit-pos-note');
+            if (noteEl) {
+                if (isDHPitcher) {
+                    noteEl.textContent = 'DHの投手は守備位置「投（投手）」固定です。選手氏名・背番号は変更できます。';
+                    noteEl.classList.remove('hidden');
+                } else if (isTwoWayPitcher) {
+                    noteEl.textContent = '二刀流の投手は、守備位置をこの欄では変更できません。選手氏名・背番号は変更できます。';
+                    noteEl.classList.remove('hidden');
+                } else if (who === 'pitcher') {
+                    noteEl.textContent = '現在投げている投手の守備位置は「投（投手）」のままにしてください。ほかの守備位置への変更は、守備変更・選手交代として記録してください。';
+                    noteEl.classList.remove('hidden');
+                } else {
+                    noteEl.textContent = '';
+                    noteEl.classList.add('hidden');
+                }
+            }
+            const numEl = document.getElementById('live-edit-num');
+            if (numEl) numEl.innerHTML = uniformNumberOptionsHtml(uniformNumberDefault(player.number));
+            const errEl = document.getElementById('live-edit-error');
+            if (errEl) errEl.classList.add('hidden');
+            openModal('modal-live-player-edit');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function saveLivePlayerEdit() {
+            if (!livePlayerEditState || !hasCurrentGame()) return;
+            const who = livePlayerEditState.who;
+            const teamKey = livePlayerEditState.teamKey;
+            const team = gameState.teams[teamKey];
+            const player = team ? team.players.find(p => p.id === livePlayerEditState.playerId) : null;
+            if (!player) {
+                livePlayerEditState = null;
+                closeModal('modal-live-player-edit');
+                showToast('対象の選手が見つかりません', 'warning');
+                return;
+            }
+            const errEl = document.getElementById('live-edit-error');
+            const showErr = (msg) => {
+                if (errEl) { errEl.textContent = msg; errEl.classList.remove('hidden'); }
+                showToast(msg, 'warning');
+            };
+            const nameEl = document.getElementById('live-edit-name');
+            const posEl = document.getElementById('live-edit-pos');
+            const numEl = document.getElementById('live-edit-num');
+            const name = nameEl ? nameEl.value.trim() : '';
+            if (!name) { showErr('選手氏名が未入力です'); return; }
+            const isDHPitcher = !!(player.dhPitcher || player.order === 10);
+            const isTwoWayPitcher = !!(player.isTwoWay && player.twoWayPitcher);
+            const posLocked = isDHPitcher || isTwoWayPitcher;
+            const newPos = posLocked ? (player.pos || '') : (posEl ? posEl.value : (player.pos || ''));
+            if (!newPos) { showErr('守備位置が未選択です'); return; }
+            if (!posLocked) {
+                const useDH = (typeof getTeamUseDH === 'function') ? getTeamUseDH(teamKey) : false;
+                if (who === 'pitcher' && newPos !== '投') {
+                    showErr('現在投げている投手の守備位置は「投（投手）」から変更できません。守備位置の変更は「オーダー・選手交代」タブのグラウンド図か守備側選手交代で記録してください（守備位置を「投」に戻せば、氏名・背番号の修正は保存できます）');
+                    return;
+                }
+                if (useDH && newPos === '投' && player.order >= 1 && player.order <= 9) {
+                    showErr('DH使用中のため、打順に入っている選手の守備位置を「投」にはできません（投手は10人目として登録されています）');
+                    return;
+                }
+                if (useDH && player.pos === '指' && newPos !== '指') {
+                    showErr('指名打者が守備につくとDHが消滅するため、この欄では変更できません。「DHを守備につける」または選手交代から記録してください（守備位置を「指」に戻せば、氏名・背番号の修正は保存できます）');
+                    return;
+                }
+                if (!useDH && newPos === '指') {
+                    showErr('この試合はDHを使用していないため、守備位置に「指（指名打者）」は選べません');
+                    return;
+                }
+                const dup = team.players.find(p => p.id !== player.id && p.isActive && p.order >= 1 && p.order <= 9 && p.pos === newPos);
+                if (dup) {
+                    showErr(`守備位置「${newPos}」は ${dup.name} が使っています。修正する場合は、先にそちらの守備位置を変更してください`);
+                    return;
+                }
+            }
+            if (errEl) errEl.classList.add('hidden');
+            pushUndoState();
+            player.name = name;
+            if (!posLocked) player.pos = newPos;
+            if (numEl) player.number = numEl.value;
+            livePlayerEditState = null;
+            saveAndRender();
+            closeModal('modal-live-player-edit');
+            showToast('登録・修正を保存しました（選手交代ではありません）', 'success');
         }
 
         function resumeCurrentGameFromHome() {
@@ -17137,6 +17318,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (batter) {
                 document.getElementById('curr-batter-order').textContent = `${batter.order}番 (${batter.pos})`;
                 document.getElementById('curr-batter-name').textContent = batter.name;
+                const batterMetaEl = document.getElementById('curr-batter-meta');
+                if (batterMetaEl) batterMetaEl.textContent = `背番号 ${batter.number ? '#' + batter.number : '-'} ・ 守備 ${batter.pos || '-'}`;
                 const batterHandEl = document.getElementById('curr-batter-hand');
                 if (batterHandEl) batterHandEl.innerHTML = liveHandChecksHtml('live-batter-hand', batter.throws || '', batter.bats || '', 'batter');
 
@@ -17171,6 +17354,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 document.getElementById('curr-pitcher-name').textContent = pitcher.isTwoWay && pitcher.twoWayPitcher
                     ? `${pitcher.name}（二刀流：投手兼DH）`
                     : ((pitcher.dhPitcher || pitcher.order === 10) ? `${pitcher.name}（DH・10人目／打順なし）` : pitcher.name);
+                const pitcherMetaEl = document.getElementById('curr-pitcher-meta');
+                if (pitcherMetaEl) pitcherMetaEl.textContent = `背番号 ${pitcher.number ? '#' + pitcher.number : '-'} ・ 守備 ${pitcher.pos || '-'}`;
                 const pitcherHandEl = document.getElementById('curr-pitcher-hand');
                 if (pitcherHandEl) pitcherHandEl.innerHTML = liveHandChecksHtml('live-pitcher-hand', pitcher.throws || '', pitcher.bats || '', 'pitcher');
 
@@ -20723,6 +20908,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             executeWizardFinalize, finalizeRunnerEvent, finalizeSubConfirmation,
             forceChangeHalfInning, handleFieldPositionClick,
             openLineupEditModal, switchLineupEditTeam, saveLineupEdit,
+            openLivePlayerEditModal, saveLivePlayerEdit,
             showFieldLineupEdit, onFieldEditPlayerChange, saveFieldLineupEdit,
             handlePickoffButtonClick, loadArchivedGameToScorebook, navigateApp, goBackScreen,
             openBallModal, openBatterEventModal, openCalledStrikeModal,
