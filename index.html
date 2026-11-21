@@ -2793,7 +2793,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 <button onclick="openDHGuideModal()" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-md border border-amber-300 transition" title="指名打者ルール（規則5.11）の早見表と、この試合のDH状態を表示">
                                     DHルール・状態
                                 </button>
-                                <button onclick="openDHMidgameModal()" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-bold px-2.5 py-1 rounded-md shadow-2xs transition" title="試合の途中からでもDHの使用・不使用、二刀流（投手がDHを兼ねる）への変更を設定できます">
+                                <button onclick="openDHMidgameModal()" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-bold px-2.5 py-1 rounded-md shadow-2xs transition" title="指名打者の有無と、通常DHか大谷ルール（二刀流）かを後付けで認識します">
                                     DH設定
                                 </button>
                                 <button onclick="forceChangeHalfInning()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded-md border border-slate-200 transition">
@@ -3012,8 +3012,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">指名打者（DH）の使用・形態</label>
-                    <button onclick="closeModal('modal-game-info'); openDHMidgameModal();" class="w-full border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-950 font-bold rounded-lg px-3 py-2 transition">DH設定を開く（試合途中・後付けの変更）</button>
-                    <p class="text-[11px] text-slate-500 mt-1">DHの使用・不使用と、二刀流〔5.11(b)〕（投手がDHを兼ねる）への変更は、試合途中からでもチームごとに設定できます。</p>
+                    <button onclick="closeModal('modal-game-info'); openDHMidgameModal();" class="w-full border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-950 font-bold rounded-lg px-3 py-2 transition">DH設定を開く（後付け認識）</button>
+                    <p class="text-[11px] text-slate-500 mt-1">DHの有無と、通常DHか大谷ルール（二刀流）かは、試合途中からでもチームごとに後付けで認識できます。打順や守備の組み替えは行いません。</p>
                 </div>
             </div>
             <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end space-x-2">
@@ -3106,15 +3106,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
     </div>
 
-    <!-- DH設定モーダル（試合途中からの変更・後付け認識） -->
+    <!-- DH設定モーダル（後付け認識：DHの有無と、通常DHか大谷ルールかを選ぶだけ） -->
     <div id="modal-dh-midgame" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden max-h-[90vh] flex flex-col">
             <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between shrink-0">
-                <h3 class="font-bold text-base flex items-center gap-2"><i data-lucide="settings-2" class="w-5 h-5 text-amber-400"></i>DH設定（試合途中・後付け）</h3>
+                <h3 class="font-bold text-base flex items-center gap-2"><i data-lucide="settings-2" class="w-5 h-5 text-amber-400"></i>DH設定（後付け認識）</h3>
                 <button onclick="closeModal('modal-dh-midgame')"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="p-5 space-y-3 text-xs overflow-y-auto">
-                <p class="text-slate-600 leading-relaxed">試合の途中からでも、チームごとに指名打者（DH）の使用・不使用を変更できます。設定し忘れや入力ミスの<strong class="text-slate-900">訂正・後付け認識</strong>として扱い、変更内容は経過ログに残ります。打順の人数（9人）は変わらない形に自動で組み替えます。</p>
+                <p class="text-slate-600 leading-relaxed">指名打者（DH）の<strong class="text-slate-900">有無と種類だけ</strong>を後付けで認識します。打順や守備位置の組み替えは行いません。打順が回ってきたときに分かった選手から、守備位置に「指」を入力していく使い方のための設定です。</p>
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">対象チーム</label>
                     <select id="dhm-team" onchange="renderDHMidgameForm()" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-bold bg-white">
@@ -3123,32 +3123,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </select>
                 </div>
                 <div id="dhm-status" class="bg-amber-50 border border-amber-300 rounded-xl p-3 font-bold text-amber-950"></div>
+                <div id="dhm-target-row" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-3 font-bold text-slate-800"></div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">DHの形態</label>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">指名打者（DH）の種類</label>
                     <select id="dhm-mode" onchange="renderDHMidgameForm()" class="w-full border border-amber-300 bg-amber-50 rounded-lg px-3 py-2 font-bold text-amber-950">
                         <option value="none">使用しない</option>
-                        <option value="standard">使用する（通常DH：投手とは別の選手が指名打者）</option>
-                        <option value="twoway">使用する・二刀流〔5.11(b)〕（投手が指名打者を兼ねる）</option>
+                        <option value="standard">通常DH（投手とは別の選手が指名打者）</option>
+                        <option value="twoway">大谷ルール（二刀流：投手が指名打者を兼ねる）</option>
                     </select>
                 </div>
-                <div id="dhm-dh-row" class="hidden">
-                    <label id="dhm-dh-label" class="block text-xs font-bold text-slate-600 mb-1">指名打者にする選手</label>
-                    <select id="dhm-dh-player" onchange="renderDHMidgameForm()" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-bold bg-white"></select>
-                </div>
-                <div id="dhm-dh-new-row" class="hidden">
-                    <label class="block text-xs font-bold text-slate-600 mb-1">新しい指名打者の氏名</label>
-                    <input type="text" id="dhm-dh-new-name" placeholder="選手氏名を入力" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-bold">
-                </div>
-                <div id="dhm-fill-row" class="hidden">
-                    <label id="dhm-fill-label" class="block text-xs font-bold text-slate-600 mb-1">出場する選手</label>
-                    <select id="dhm-fill-player" onchange="renderDHMidgameForm()" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-bold bg-white"></select>
-                </div>
-                <div id="dhm-fill-new-row" class="hidden">
-                    <label class="block text-xs font-bold text-slate-600 mb-1">新しい選手の氏名</label>
-                    <input type="text" id="dhm-fill-new-name" placeholder="選手氏名を入力" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-bold">
-                </div>
                 <div id="dhm-note" class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-700 leading-relaxed"></div>
-                <button id="dhm-confirm" onclick="confirmDHMidgame()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-extrabold py-3 px-4 rounded-xl shadow-sm transition text-sm disabled:opacity-40 disabled:pointer-events-none">この内容でDH設定を変更する</button>
+                <button id="dhm-confirm" onclick="confirmDHMidgame()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-extrabold py-3 px-4 rounded-xl shadow-sm transition text-sm disabled:opacity-40 disabled:pointer-events-none">この内容で認識する</button>
             </div>
         </div>
     </div>
@@ -4659,9 +4644,18 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <button type="button" id="lineup-edit-tab-away" onclick="switchLineupEditTeam('away')" class="px-3 py-2.5 rounded-lg text-sm font-extrabold transition bg-slate-900 text-white shadow-sm">先攻チーム</button>
                     <button type="button" id="lineup-edit-tab-home" onclick="switchLineupEditTeam('home')" class="px-3 py-2.5 rounded-lg text-sm font-extrabold transition bg-slate-100 text-slate-600 hover:bg-slate-200">後攻チーム</button>
                 </div>
-                <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">試合の途中でも、守備位置・選手名・背番号・利き手（投／打）を直せます。打順はプルダウンではなく、現在の数字がそのまま入った固定表示です（打順の変更は「オーダー・選手交代」タブのグラウンド図でポジションをタップして行えます）。記録済みの成績・走者・カウントはそのまま引き継がれます。</p>
+                <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">試合の途中でも、守備位置・選手名・背番号・利き手（投／打）を直せます。打順はプルダウンではなく、現在の数字がそのまま入った固定表示です（打順の変更は「オーダー・選手交代」タブのグラウンド図でポジションをタップして行えます）。記録済みの成績・走者・カウントはそのまま引き継がれます。ポジション未選択・選手名未入力のままでも保存でき、分かったときに随時入力できます。DHの有無と種類（通常DH／大谷ルール）もこの画面で選べます。</p>
             </div>
             <div class="p-5 space-y-4 overflow-y-auto text-sm flex-1">
+                <div class="bg-amber-50 border border-amber-300 rounded-lg px-3 py-2.5">
+                    <label class="block text-[11px] font-extrabold text-amber-900 mb-1">指名打者（DH）の認識</label>
+                    <select id="lineup-edit-dh-mode" class="w-full border border-amber-300 rounded-lg px-2 py-1.5 font-bold bg-white text-amber-950">
+                        <option value="none">使用しない</option>
+                        <option value="standard">通常DH（投手とは別の選手が指名打者）</option>
+                        <option value="twoway">大谷ルール（二刀流：投手が指名打者を兼ねる）</option>
+                    </select>
+                    <p class="text-[11px] text-amber-900/70 mt-1 leading-relaxed">有無と種類を選ぶだけです。指名打者だけが入っていて、投手が誰か分からないままでも保存できます。</p>
+                </div>
                 <div id="lineup-edit-list" class="space-y-1.5"></div>
                 <div id="lineup-edit-pitcher-area"></div>
                 <div id="lineup-edit-bench-area"></div>
@@ -9654,6 +9648,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const errEl = document.getElementById('lineup-edit-error');
             if (errEl) errEl.classList.add('hidden');
             const team = gameState.teams[lineupEditTeamKey];
+            const dhModeSel = document.getElementById('lineup-edit-dh-mode');
+            if (dhModeSel) {
+                dhModeSel.value = (typeof getDHMode === 'function') ? getDHMode(lineupEditTeamKey) : 'none';
+                dhModeSel.disabled = (typeof isDHTerminated === 'function') && isDHTerminated(lineupEditTeamKey);
+            }
             const positions = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'];
             const official = isCurrentGameOfficial();
             const starters = getActiveLineup(lineupEditTeamKey);
@@ -9716,10 +9715,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function saveLineupEdit() {
             if (!hasCurrentGame()) return;
             const team = gameState.teams[lineupEditTeamKey];
-            const problems = [];
             const edits = [];
-            const posSeen = {};
-            const orderSeen = {};
             lineupEditStarterIds.forEach((pid, idx) => {
                 const posEl = document.getElementById(`edit-pos-${idx}`);
                 const nameEl = document.getElementById(`edit-name-${idx}`);
@@ -9729,24 +9725,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const order = curPlayer ? curPlayer.order : (idx + 1);
                 const pos = posEl ? posEl.value : '';
                 const name = nameEl ? nameEl.value.trim() : '';
-                if (!name) problems.push(`${idx + 1}行目：選手名が未入力です`);
-                if (!pos) problems.push(`${idx + 1}行目（${name || '選手名未入力'}）：ポジションが未選択です`);
-                if (pos) { if (posSeen[pos]) problems.push(`ポジション「${pos}」が重複しています`); posSeen[pos] = true; }
-                orderSeen[order] = true;
+                // 打順が回ってくるたびに分かった範囲で入力していく使い方のため、
+                // ポジション未選択・選手名未入力・ポジション重複があっても止めず、
+                // 入力されている内容をそのまま保存する（後から随時直せる）。
                 edits.push({ id: pid, order: order, pos: pos, name: name, number: numEl ? numEl.value : undefined, throws: readHandChecks(`edit-hand-${idx}`, 'th'), bats: readHandChecks(`edit-hand-${idx}`, 'ba') });
             });
-            if (typeof getTeamUseDH === 'function' && getTeamUseDH(lineupEditTeamKey)) {
-                const poss = edits.map(e => e.pos);
-                if (poss.length && !poss.includes('指')) problems.push('DH使用中のため、打順に指名打者（指）を1人入れてください');
-                if (poss.includes('投')) problems.push('DH使用中のため、投手は打順に入れられません（投手は10人目欄で編集してください）');
-            }
-            const uniqProblems = [...new Set(problems)];
             const errEl = document.getElementById('lineup-edit-error');
-            if (uniqProblems.length) {
-                if (errEl) { errEl.innerHTML = uniqProblems.map(m => `<div>${physicalEscapeHtml(m)}</div>`).join(''); errEl.classList.remove('hidden'); }
-                showToast(uniqProblems[0], 'warning');
-                return;
-            }
             if (errEl) errEl.classList.add('hidden');
             const prevBatterIds = {};
             ['away', 'home'].forEach(k => {
@@ -9765,6 +9749,27 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (e.throws !== null && e.throws !== undefined) p.throws = e.throws;
                 if (e.bats !== null && e.bats !== undefined) p.bats = e.bats;
             });
+            // DHの認識（有無・種類）もこの画面で選べる。打順・守備の組み替えは
+            // 行わず、チームの useDH / dhMode と、守備位置「指」の選手の
+            // 二刀流フラグだけを合わせる。投手が未入力でも止めない。
+            const dhModeSelSave = document.getElementById('lineup-edit-dh-mode');
+            const dhModeVal = dhModeSelSave ? dhModeSelSave.value : null;
+            if (dhModeVal && !(typeof isDHTerminated === 'function' && isDHTerminated(lineupEditTeamKey))) {
+                const dhInLineup = lineupEditStarterIds.map(id => team.players.find(x => x.id === id)).find(p => p && p.pos === '指') || null;
+                team.players.forEach(p => { if (p.isTwoWay || p.twoWayPitcher) { p.isTwoWay = false; p.twoWayPitcher = false; } });
+                if (dhModeVal === 'standard') {
+                    team.useDH = true;
+                    team.dhMode = 'standard';
+                    if (dhInLineup && dhInLineup.batting && dhInLineup.batting.pa > 0) team.dhFirstPACompleted = true;
+                } else if (dhModeVal === 'twoway') {
+                    team.useDH = true;
+                    team.dhMode = 'twoway';
+                    if (dhInLineup) { dhInLineup.isTwoWay = true; dhInLineup.twoWayPitcher = true; }
+                } else {
+                    team.useDH = false;
+                    team.dhMode = 'none';
+                }
+            }
             if (lineupEditPitcherId) {
                 const pp = team.players.find(x => x.id === lineupEditPitcherId);
                 if (pp) {
@@ -9865,13 +9870,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const useDH = (typeof getTeamUseDH === 'function') ? getTeamUseDH(teamKey) : false;
                 if (!useDH && newPos === '指') {
                     // DH未使用の試合で「指」が選ばれたら、指名打者制の試合として
-                    // 後付けで認識する。打者本人が投手の場合は、その投手がDHを
-                    // 兼ねる二刀流〔5.11(b)〕としてDH設定モーダルを開く。
+                    // 後付けで認識する。DH設定モーダルで通常DHか大谷ルール
+                    // （二刀流）かを選ぶだけで、組み替えは行わない。打者本人が
+                    // 投手の場合は大谷ルールを初期選択にする。
                     const curPitcher = (typeof getTeamPitcher === 'function') ? getTeamPitcher(teamKey) : null;
                     const selfIsPitcher = who === 'pitcher' || !!(curPitcher && curPitcher.id === target.id);
                     const el = document.getElementById(elId);
                     if (el) el.value = target.pos || '';
-                    openDHMidgameModal(teamKey, selfIsPitcher ? { mode: 'twoway' } : { mode: 'standard', dhPlayerId: target.id });
+                    openDHMidgameModal(teamKey, { mode: selfIsPitcher ? 'twoway' : 'standard', playerId: target.id });
                     return;
                 }
                 if (who === 'pitcher' && newPos !== '投') {
@@ -9893,6 +9899,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 }
                 pushUndoState();
                 target.pos = newPos;
+                if (newPos === '指' && typeof getDHMode === 'function' && getDHMode(teamKey) === 'twoway') { target.isTwoWay = true; target.twoWayPitcher = true; }
             }
             saveAndRender();
         }
@@ -12505,35 +12512,38 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             showToast('指名打者が守備につきました。DHは消滅し、投手が打順に入ります', 'success');
         }
 
-        // ================= DH設定（試合途中からの変更・後付け認識） =================
-        // 試合開始時にDH設定をし忘れた場合などに、試合の途中からでもチームごとに
-        // DHの使用・不使用と形態（通常DH／二刀流〔5.11(b)〕）を変更できる。
-        // これは選手交代ではなく設定の訂正・後付け認識として扱い、変更は経過ログに残す。
-        // どの組み替えでも打順の人数（9人）と打順番号は変えず、選手ID・記録済みの
-        // 成績はそのまま引き継ぐ。保存する項目は従来の useDH / dhMode / dhPitcher /
-        // isTwoWay / twoWayPitcher / order / pos のみで、データ形式は変えない。
-
-        // まだこの試合に出場していないベンチ選手（再出場になる選手は候補にしない）
-        function dhBenchCandidates(teamKey) {
-            const team = gameState && gameState.teams ? gameState.teams[teamKey] : null;
-            if (!team) return [];
-            return team.players.filter(p => !p.isActive && !p.hasEnteredGame && !(p.order >= 1 && p.order <= 9) && !p.dhPitcher);
-        }
+        // ================= DH設定（後付け認識：有無と種類だけ） =================
+        // テレビ中継などで、打順1〜9番がどこを守る誰なのか最初は分からず、
+        // 打順が回ってくるたびに分かった範囲で入力していく使い方のための設定。
+        // ここでは指名打者（DH）の有無と種類（通常DH／大谷ルール＝二刀流
+        // 〔5.11(b)〕）を後付けで認識するだけにとどめ、守備に就いていた選手を
+        // 試合途中から指名打者に変換するような組み替え（打順の付け替え・
+        // 投手の10人目への移動・抜けた守備への控え選手の補充）は行わない。
+        // 対象選手がいる場合は、その選手の守備位置を「指」にするだけ。
+        // 保存する項目は従来の useDH / dhMode / pos / isTwoWay /
+        // twoWayPitcher のみで、データ形式は変えない。
 
         function openDHMidgameModal(teamKey, preset) {
             if (!hasCurrentGame()) { showToast('進行中の試合がありません', 'warning'); return; }
-            dhMidgamePreset = preset || null;
             const tk = teamKey || (document.getElementById('lineup-team-toggle') ? document.getElementById('lineup-team-toggle').value : 'away');
+            dhMidgamePreset = preset ? Object.assign({}, preset, { teamKey: (tk === 'home' ? 'home' : 'away') }) : null;
             const teamSel = document.getElementById('dhm-team');
             if (teamSel) teamSel.value = (tk === 'home' ? 'home' : 'away');
             const modeSel = document.getElementById('dhm-mode');
             if (modeSel) modeSel.value = (dhMidgamePreset && dhMidgamePreset.mode) ? dhMidgamePreset.mode : getDHMode(tk === 'home' ? 'home' : 'away');
-            // 前回開いたときの選択・入力が残らないようリセットする
-            ['dhm-dh-player', 'dhm-fill-player'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-            ['dhm-dh-new-name', 'dhm-fill-new-name'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             renderDHMidgameForm();
             openModal('modal-dh-midgame');
             if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // 対戦中カードで「指」を選んで開いた場合の対象選手
+        // （モーダルで同じチームを選んでいるときだけ有効）
+        function dhMidgameTargetPlayer(teamKey) {
+            if (!dhMidgamePreset || !dhMidgamePreset.playerId) return null;
+            if (dhMidgamePreset.teamKey && dhMidgamePreset.teamKey !== teamKey) return null;
+            const team = gameState && gameState.teams ? gameState.teams[teamKey] : null;
+            if (!team) return null;
+            return team.players.find(p => p.id === dhMidgamePreset.playerId) || null;
         }
 
         function renderDHMidgameForm() {
@@ -12548,155 +12558,65 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const statusEl = document.getElementById('dhm-status');
             const noteEl = document.getElementById('dhm-note');
             const confirmBtn = document.getElementById('dhm-confirm');
-            const dhRow = document.getElementById('dhm-dh-row');
-            const dhLabel = document.getElementById('dhm-dh-label');
-            const dhSel = document.getElementById('dhm-dh-player');
-            const dhNewRow = document.getElementById('dhm-dh-new-row');
-            const fillRow = document.getElementById('dhm-fill-row');
-            const fillLabel = document.getElementById('dhm-fill-label');
-            const fillSel = document.getElementById('dhm-fill-player');
-            const fillNewRow = document.getElementById('dhm-fill-new-row');
+            const targetRow = document.getElementById('dhm-target-row');
             const pitcher = getTeamPitcher(teamKey);
             const dhPlayer = getDHPlayer(teamKey);
             const curLabel = curMode === 'standard'
-                ? `通常DH（指名打者: ${dhPlayer ? `${dhPlayer.order}番 ${dhPlayer.name}` : '―'} ／ 投手: ${pitcher ? pitcher.name : '―'}・10人目）`
+                ? `通常DH（指名打者: ${dhPlayer ? `${dhPlayer.order}番 ${dhPlayer.name}` : '未入力'}）`
                 : curMode === 'twoway'
-                    ? `二刀流DH〔5.11(b)〕（${pitcher ? pitcher.name : '―'} が投手と指名打者を兼任）`
+                    ? `大谷ルール（二刀流：${pitcher ? pitcher.name : '―'} が投手と指名打者を兼任）`
                     : 'DH不使用';
-            if (statusEl) statusEl.innerHTML = `${team.name} ／ 現在の設定: <span class="font-extrabold">${curLabel}</span>`;
-            [dhRow, dhNewRow, fillRow, fillNewRow].forEach(el => { if (el) el.classList.add('hidden'); });
+            if (statusEl) statusEl.innerHTML = `${physicalEscapeHtml(team.name)} ／ 現在の認識: <span class="font-extrabold">${curLabel}</span>`;
+            const target = dhMidgameTargetPlayer(teamKey);
+            if (targetRow) {
+                if (target) {
+                    targetRow.innerHTML = `対象選手: <span class="font-extrabold">${target.order}番 ${physicalEscapeHtml(target.name || '')}</span>（守備位置で「指」を選択）`;
+                    targetRow.classList.remove('hidden');
+                } else {
+                    targetRow.innerHTML = '';
+                    targetRow.classList.add('hidden');
+                }
+            }
             let note = '';
             let confirmEnabled = true;
-            const benchOptionsHtml = () => dhBenchCandidates(teamKey)
-                .map(p => `<option value="${p.id}">ベンチ: ${physicalEscapeHtml(p.name)}${p.number ? ` #${p.number}` : ''}</option>`).join('')
-                + '<option value="new">＋ 新しい選手を入力</option>';
-            const basesInclude = (playerId) => Array.isArray(gameState.live.bases) && gameState.live.bases.includes(playerId);
             if (isDHTerminated(teamKey)) {
-                note = 'このチームはすでに指名打者が消滅しているため、DH設定は変更できません。';
+                note = 'このチームはすでに指名打者が消滅しているため、DHの認識は変更できません。';
                 confirmEnabled = false;
-            } else if (curMode === targetMode) {
-                note = '現在の設定と同じです。変更する場合は、別の形態を選んでください。';
+            } else if (target && targetMode === 'none') {
+                note = '「使用しない」を選んだ場合、この選手は指名打者として認識されません。守備位置の選択を取り消すだけなら、このまま閉じてカードの守備位置を選び直してください。';
                 confirmEnabled = false;
-            } else if (curMode === 'none' && targetMode === 'twoway') {
-                if (!pitcher || !(pitcher.order >= 1 && pitcher.order <= 9)) {
-                    note = '打順に入っている現在の投手が見つからないため、二刀流として設定できません。';
+            } else if (!target && curMode === targetMode) {
+                note = '現在の認識と同じです。変更する場合は、別の種類を選んでください。';
+                confirmEnabled = false;
+            } else if (curMode !== 'none' && targetMode !== 'none' && curMode !== targetMode) {
+                note = '通常DHと大谷ルールの切り替えは、ここでは行いません。いったん「使用しない」に戻してから、対戦中の打者・投手カードで対象選手の守備位置「指」を選び直してください。';
+                confirmEnabled = false;
+            } else if (target && targetMode === 'standard' && pitcher && pitcher.id === target.id) {
+                note = 'この選手は現在の投手です。投手本人が指名打者を兼ねる場合は「大谷ルール」を選んでください。';
+                confirmEnabled = false;
+            } else if (target) {
+                const otherDH = getActiveLineup(teamKey).find(p => p.pos === '指' && p.id !== target.id);
+                if (otherDH) {
+                    note = `すでに ${otherDH.order}番 ${otherDH.name} が指名打者として入力されています。別の選手を指名打者にする場合は、先にそちらの守備位置を変更してください。`;
                     confirmEnabled = false;
+                } else if (targetMode === 'standard') {
+                    note = `確定すると、${target.order}番 ${target.name} の守備位置が「指」になり、このチームは通常DHとして認識されます。他の選手の打順・守備位置は変更しません。投手が誰か分からなくても、そのままで問題ありません。`;
                 } else {
-                    note = `現在の投手 ${pitcher.name}（${pitcher.order}番）が、投手と指名打者を兼ねる二刀流〔5.11(b)〕として後付けで認識されます。打順はそのままで、守備位置の表示が「指」になります。以後の投手交代・DH交代は二刀流のルールで処理されます。`;
+                    note = `確定すると、${target.order}番 ${target.name} の守備位置が「指」になり、投手と指名打者を兼ねる大谷ルール（二刀流）として認識されます。他の選手の打順・守備位置は変更しません。`;
                 }
-            } else if (curMode === 'none' && targetMode === 'standard') {
-                if (!pitcher || !(pitcher.order >= 1 && pitcher.order <= 9)) {
-                    note = '打順に入っている現在の投手が見つからないため、通常DHとして設定できません。';
-                    confirmEnabled = false;
-                } else {
-                    dhRow.classList.remove('hidden');
-                    dhLabel.textContent = '指名打者にする選手';
-                    const fielders = getActiveLineup(teamKey).filter(p => p.id !== pitcher.id);
-                    const prevDhVal = dhSel.value;
-                    dhSel.innerHTML = fielders.map(p => `<option value="${p.id}">${p.order}番 ${physicalEscapeHtml(p.name)}（現在: ${p.pos}）</option>`).join('') + benchOptionsHtml();
-                    if (dhMidgamePreset && dhMidgamePreset.dhPlayerId && fielders.some(p => p.id === dhMidgamePreset.dhPlayerId)) {
-                        dhSel.value = dhMidgamePreset.dhPlayerId;
-                    } else if (prevDhVal && dhSel.innerHTML.indexOf(`value="${prevDhVal}"`) !== -1) {
-                        dhSel.value = prevDhVal;
-                    }
-                    const dhVal = dhSel.value;
-                    const dhCand = team.players.find(p => p.id === dhVal);
-                    if (dhVal === 'new') {
-                        dhNewRow.classList.remove('hidden');
-                        note = `新しい選手が指名打者として、投手の打順（${pitcher.order}番）に入ります。投手 ${pitcher.name} は打順に入らない10人目になります。`;
-                    } else if (dhCand && dhCand.isActive && dhCand.order >= 1 && dhCand.order <= 9) {
-                        fillRow.classList.remove('hidden');
-                        fillLabel.textContent = `${dhCand.name} が抜ける守備位置（${dhCand.pos}）に入る選手`;
-                        const prevFillVal = fillSel.value;
-                        fillSel.innerHTML = benchOptionsHtml();
-                        if (prevFillVal && fillSel.innerHTML.indexOf(`value="${prevFillVal}"`) !== -1) fillSel.value = prevFillVal;
-                        if (fillSel.value === 'new') fillNewRow.classList.remove('hidden');
-                        note = `${dhCand.name} が指名打者になります。選んだ選手が守備位置（${dhCand.pos}）につき、投手の打順（${pitcher.order}番）に入ります。投手 ${pitcher.name} は打順に入らない10人目になります。`;
-                    } else {
-                        note = `選んだ選手が指名打者として、投手の打順（${pitcher.order}番）に入ります。投手 ${pitcher.name} は打順に入らない10人目になります。`;
-                    }
-                }
-            } else if (curMode === 'standard' && targetMode === 'twoway') {
-                const dhPitcherRec = findDHPitcherRecord(teamKey);
-                if (!dhPlayer || !dhPitcherRec) {
-                    note = '指名打者または投手の登録が見つからないため変更できません。';
-                    confirmEnabled = false;
-                } else if (basesInclude(dhPlayer.id)) {
-                    note = `指名打者 ${dhPlayer.name} が現在塁上にいるため変更できません。攻守交替後など、塁上にいないときに設定してください。`;
-                    confirmEnabled = false;
-                } else {
-                    note = `指名打者 ${dhPlayer.name} は退き、投手 ${dhPitcherRec.name} がその打順（${dhPlayer.order}番）に入って、投手と指名打者を兼ねる二刀流〔5.11(b)〕として認識されます。`;
-                }
-            } else if (curMode === 'standard' && targetMode === 'none') {
-                const dhPitcherRec = findDHPitcherRecord(teamKey);
-                if (!dhPlayer || !dhPitcherRec) {
-                    note = '指名打者または投手の登録が見つからないため変更できません。';
-                    confirmEnabled = false;
-                } else if (basesInclude(dhPlayer.id)) {
-                    note = `指名打者 ${dhPlayer.name} が現在塁上にいるため変更できません。攻守交替後など、塁上にいないときに設定してください。`;
-                    confirmEnabled = false;
-                } else {
-                    note = `指名打者 ${dhPlayer.name} は退き、投手 ${dhPitcherRec.name} がその打順（${dhPlayer.order}番）に入って打つ、DHなしのオーダーに戻ります（設定の訂正として処理します）。`;
-                }
-            } else if (curMode === 'twoway' && targetMode === 'standard') {
-                if (!pitcher) {
-                    note = '現在の投手兼DHの選手が見つからないため変更できません。';
-                    confirmEnabled = false;
-                } else {
-                    dhRow.classList.remove('hidden');
-                    dhLabel.textContent = '指名打者にする選手';
-                    const prevDhVal2 = dhSel.value;
-                    dhSel.innerHTML = `<option value="${pitcher.id}">${physicalEscapeHtml(pitcher.name)}（現在の兼任選手：このまま指名打者にする）</option>` + benchOptionsHtml();
-                    if (prevDhVal2 && dhSel.innerHTML.indexOf(`value="${prevDhVal2}"`) !== -1) dhSel.value = prevDhVal2;
-                    if (dhSel.value === pitcher.id) {
-                        fillRow.classList.remove('hidden');
-                        fillLabel.textContent = '新しい投手（ベンチから）';
-                        const prevFillVal2 = fillSel.value;
-                        fillSel.innerHTML = benchOptionsHtml();
-                        if (prevFillVal2 && fillSel.innerHTML.indexOf(`value="${prevFillVal2}"`) !== -1) fillSel.value = prevFillVal2;
-                        if (fillSel.value === 'new') fillNewRow.classList.remove('hidden');
-                        note = `${pitcher.name} は指名打者専任になり、選んだ選手が投手（10人目・打順なし）になります。`;
-                    } else {
-                        if (dhSel.value === 'new') dhNewRow.classList.remove('hidden');
-                        note = `選んだ選手が指名打者（${pitcher.order}番）になり、${pitcher.name} は投手専任（10人目・打順なし）になります。`;
-                    }
-                }
-            } else if (curMode === 'twoway' && targetMode === 'none') {
-                if (!pitcher) {
-                    note = '現在の投手兼DHの選手が見つからないため変更できません。';
-                    confirmEnabled = false;
-                } else {
-                    note = `兼任選手 ${pitcher.name} は通常の投手に戻ります（守備位置は「投」、打順はそのまま）。`;
-                }
+            } else if (targetMode === 'standard') {
+                note = 'このチームを通常DHとして認識します。選手の打順・守備位置は変更しません。指名打者の選手が分かったら、その選手の守備位置に「指」を入力してください。投手が誰か分からなくても、そのままで問題ありません。';
+            } else if (targetMode === 'twoway') {
+                note = pitcher
+                    ? `このチームを大谷ルール（二刀流）として認識し、現在の投手 ${pitcher.name} が指名打者を兼ねるものとして扱います。打順は変更しません。`
+                    : 'このチームを大谷ルール（二刀流）として認識します。選手の打順・守備位置は変更しません。投手兼指名打者の選手が分かったら、その選手の守備位置に「指」を入力してください。';
+            } else {
+                note = curMode === 'twoway'
+                    ? 'DHの認識を取り消します。二刀流として入力されていた投手は、通常の投手（守備位置「投」）に戻ります。他の選手は変更しません。'
+                    : 'DHの認識を取り消します。選手の打順・守備位置は変更しません（守備位置「指」のままの選手がいる場合は、カードやスタメン編集で直してください）。';
             }
             if (noteEl) noteEl.textContent = note;
             if (confirmBtn) confirmBtn.disabled = !confirmEnabled;
-        }
-
-        // DH設定の組み替えで、ベンチ選手（または新規入力の選手）を出場させる
-        function dhEnterPlayer(teamKey, selValue, newName, order, pos) {
-            const team = gameState.teams[teamKey];
-            if (selValue === 'new') {
-                const name = (newName || '').trim();
-                if (!name) return null;
-                const np = {
-                    id: `${teamKey}_p_${Date.now()}`,
-                    order: order, pos: pos, number: '', name: name,
-                    throws: '右', bats: '右', isActive: true, hasEnteredGame: true,
-                    dhPitcher: (pos === '投' && order === 10),
-                    batting: { pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} }
-                };
-                team.players.push(np);
-                return np;
-            }
-            const p = team.players.find(x => x.id === selValue);
-            if (!p) return null;
-            p.order = order;
-            p.pos = pos;
-            p.isActive = true;
-            p.hasEnteredGame = true;
-            if (pos === '投' && order === 10) p.dhPitcher = true;
-            return p;
         }
 
         function confirmDHMidgame() {
@@ -12706,114 +12626,62 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (!teamSel || !modeSel) return;
             const teamKey = teamSel.value === 'home' ? 'home' : 'away';
             const team = gameState.teams[teamKey];
+            if (!team) return;
             const targetMode = modeSel.value;
             const curMode = getDHMode(teamKey);
-            if (curMode === targetMode || isDHTerminated(teamKey)) return;
-            const dhSel = document.getElementById('dhm-dh-player');
-            const fillSel = document.getElementById('dhm-fill-player');
-            const dhNewName = document.getElementById('dhm-dh-new-name') ? document.getElementById('dhm-dh-new-name').value : '';
-            const fillNewName = document.getElementById('dhm-fill-new-name') ? document.getElementById('dhm-fill-new-name').value : '';
-            // 新規入力が必要なのに氏名が空の場合は、変更せずに知らせる
-            const dhRowVisible = dhSel && !document.getElementById('dhm-dh-row').classList.contains('hidden');
-            const fillRowVisible = fillSel && !document.getElementById('dhm-fill-row').classList.contains('hidden');
-            if (dhRowVisible && dhSel.value === 'new' && !dhNewName.trim()) { showToast('新しい選手の氏名を入力してください', 'warning'); return; }
-            if (fillRowVisible && fillSel.value === 'new' && !fillNewName.trim()) { showToast('新しい選手の氏名を入力してください', 'warning'); return; }
+            if (isDHTerminated(teamKey)) return;
+            const target = dhMidgameTargetPlayer(teamKey);
+            if (!target && curMode === targetMode) return;
+            if (target && targetMode === 'none') return;
+            if (curMode !== 'none' && targetMode !== 'none' && curMode !== targetMode) return;
+            if (target && targetMode === 'standard') {
+                const pitcher = getTeamPitcher(teamKey);
+                if (pitcher && pitcher.id === target.id) return;
+                const otherDH = getActiveLineup(teamKey).find(p => p.pos === '指' && p.id !== target.id);
+                if (otherDH) return;
+            }
             pushUndoState();
             let summary = '';
-            if (curMode === 'none' && targetMode === 'twoway') {
-                const pitcher = getTeamPitcher(teamKey);
-                if (!pitcher) { undoStack.pop(); return; }
-                pitcher.pos = '指';
-                pitcher.isTwoWay = true;
-                pitcher.twoWayPitcher = true;
-                team.useDH = true;
-                team.dhMode = 'twoway';
-                summary = `二刀流・指名打者使用〔規則5.11(b)〕として後付け認識: ${pitcher.name}（${pitcher.order}番）が投手と指名打者を兼任`;
-            } else if (curMode === 'none' && targetMode === 'standard') {
-                const pitcher = getTeamPitcher(teamKey);
-                if (!pitcher || !dhSel) { undoStack.pop(); return; }
-                const dhCand = team.players.find(p => p.id === dhSel.value);
-                let dhPlayer = null;
-                if (dhCand && dhCand.isActive && dhCand.order >= 1 && dhCand.order <= 9 && dhCand.id !== pitcher.id) {
-                    const fill = dhEnterPlayer(teamKey, fillSel.value, fillNewName, pitcher.order, dhCand.pos);
-                    if (!fill) { undoStack.pop(); showToast('出場する選手を確定できませんでした', 'warning'); return; }
-                    dhPlayer = dhCand;
-                    dhPlayer.pos = '指';
-                } else {
-                    dhPlayer = dhEnterPlayer(teamKey, dhSel.value, dhNewName, pitcher.order, '指');
-                    if (!dhPlayer) { undoStack.pop(); showToast('指名打者を確定できませんでした', 'warning'); return; }
-                }
-                pitcher.order = 10;
-                pitcher.dhPitcher = true;
-                pitcher.isActive = true;
+            if (targetMode === 'standard') {
                 team.useDH = true;
                 team.dhMode = 'standard';
-                if (dhPlayer.batting && dhPlayer.batting.pa > 0) team.dhFirstPACompleted = true;
-                else if (typeof team.dhFirstPACompleted !== 'boolean') team.dhFirstPACompleted = false;
-                summary = `指名打者使用として後付け認識: 指名打者は ${dhPlayer.name}（${dhPlayer.order}番）、投手 ${pitcher.name} は打順に入らない10人目`;
-            } else if (curMode === 'standard' && targetMode === 'twoway') {
-                const dhPlayer = getDHPlayer(teamKey);
-                const pitcher = findDHPitcherRecord(teamKey);
-                if (!dhPlayer || !pitcher) { undoStack.pop(); return; }
-                dhPlayer.isActive = false;
-                pitcher.order = dhPlayer.order;
-                pitcher.dhPitcher = false;
-                pitcher.pos = '指';
-                pitcher.isTwoWay = true;
-                pitcher.twoWayPitcher = true;
-                pitcher.isActive = true;
+                if (target) {
+                    target.pos = '指';
+                    if (target.batting && target.batting.pa > 0) team.dhFirstPACompleted = true;
+                    summary = `通常DHとして後付け認識: ${target.order}番 ${target.name} が指名打者`;
+                } else {
+                    summary = '通常DHとして後付け認識（指名打者の選手は未入力）';
+                }
+            } else if (targetMode === 'twoway') {
                 team.useDH = true;
                 team.dhMode = 'twoway';
-                summary = `二刀流・指名打者使用〔規則5.11(b)〕として後付け認識: ${pitcher.name} が指名打者 ${dhPlayer.name} の打順（${pitcher.order}番）に入り、投手と指名打者を兼任`;
-            } else if (curMode === 'standard' && targetMode === 'none') {
-                const dhPlayer = getDHPlayer(teamKey);
-                const pitcher = findDHPitcherRecord(teamKey);
-                if (!dhPlayer || !pitcher) { undoStack.pop(); return; }
-                dhPlayer.isActive = false;
-                pitcher.order = dhPlayer.order;
-                pitcher.dhPitcher = false;
-                pitcher.pos = '投';
-                pitcher.isActive = true;
-                team.useDH = false;
-                team.dhMode = 'none';
-                summary = `指名打者を使用しない設定に変更: 投手 ${pitcher.name} が指名打者の打順（${pitcher.order}番）に入ります`;
-            } else if (curMode === 'twoway' && targetMode === 'standard') {
-                const tw = getTeamPitcher(teamKey);
-                if (!tw || !dhSel) { undoStack.pop(); return; }
-                if (dhSel.value === tw.id) {
-                    const newPitcher = dhEnterPlayer(teamKey, fillSel.value, fillNewName, 10, '投');
-                    if (!newPitcher) { undoStack.pop(); showToast('新しい投手を確定できませんでした', 'warning'); return; }
-                    tw.isTwoWay = false;
-                    tw.twoWayPitcher = false;
-                    summary = `通常の指名打者使用に変更: ${tw.name} は指名打者専任、新しい投手は ${newPitcher.name}（10人目・打順なし）`;
+                const tw = target || getTeamPitcher(teamKey);
+                if (tw) {
+                    tw.pos = '指';
+                    tw.isTwoWay = true;
+                    tw.twoWayPitcher = true;
+                    summary = `大谷ルール（二刀流）として後付け認識: ${tw.order}番 ${tw.name} が投手と指名打者を兼任`;
                 } else {
-                    const newDH = dhEnterPlayer(teamKey, dhSel.value, dhNewName, tw.order, '指');
-                    if (!newDH) { undoStack.pop(); showToast('指名打者を確定できませんでした', 'warning'); return; }
-                    tw.order = 10;
-                    tw.pos = '投';
-                    tw.isTwoWay = false;
-                    tw.twoWayPitcher = false;
-                    tw.dhPitcher = true;
-                    if (newDH.batting && newDH.batting.pa > 0) team.dhFirstPACompleted = true;
-                    summary = `通常の指名打者使用に変更: 指名打者は ${newDH.name}（${newDH.order}番）、${tw.name} は投手専任（10人目・打順なし）`;
+                    summary = '大谷ルール（二刀流）として後付け認識（投手兼指名打者の選手は未入力）';
                 }
-                team.useDH = true;
-                team.dhMode = 'standard';
-            } else if (curMode === 'twoway' && targetMode === 'none') {
-                const tw = getTeamPitcher(teamKey);
-                if (!tw) { undoStack.pop(); return; }
-                tw.pos = '投';
-                tw.isTwoWay = false;
-                tw.twoWayPitcher = false;
+            } else {
+                if (curMode === 'twoway') {
+                    const tw = team.players.find(p => p.isActive && p.isTwoWay && p.twoWayPitcher) || getTeamPitcher(teamKey);
+                    if (tw) {
+                        if (tw.pos === '指') tw.pos = '投';
+                        tw.isTwoWay = false;
+                        tw.twoWayPitcher = false;
+                    }
+                }
                 team.useDH = false;
                 team.dhMode = 'none';
-                summary = `指名打者を使用しない設定に変更: ${tw.name} は通常の投手に戻ります`;
+                summary = '指名打者を使用しない認識に変更';
             }
-            if (summary) addLog(`DH設定の途中変更 (${team.name}): ${summary}`);
+            addLog(`DH設定の後付け認識 (${team.name}): ${summary}`);
             dhMidgamePreset = null;
             closeModal('modal-dh-midgame');
             saveAndRender();
-            showToast('DH設定を変更しました', 'success');
+            showToast('DHの認識を保存しました', 'success');
         }
 
         // DHルール早見表モーダル（現在のDH状態つき）
@@ -12833,7 +12701,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     if (mode === 'standard') {
                         const dh = getDHPlayer(tk);
                         const pit = getDHPitcher(tk);
-                        return `${team.name}: 通常DH使用中 指名打者: ${dh ? `${dh.order}番 ${dh.name}` : '―'} ／ 投手: ${pit ? pit.name : '―'}（10人目・打順なし）${team.dhFirstPACompleted ? '' : ' ／ ※DHの初打席は未完了（交代制限あり）'}`;
+                        return `${team.name}: 通常DH使用中 指名打者: ${dh ? `${dh.order}番 ${dh.name}` : '未入力'} ／ ${pit ? `投手: ${pit.name}（10人目・打順なし）` : `投手: ${getTeamPitcher(tk) ? getTeamPitcher(tk).name : '未入力'}`}${team.dhFirstPACompleted ? '' : ' ／ ※DHの初打席は未完了（交代制限あり）'}`;
                     }
                     return `${team.name}: DH不使用（「DH設定」から試合途中でも後付けでDHとして認識できます）`;
                 });
@@ -12858,7 +12726,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             if (!getTeamUseDH(teamKey)) {
                 banner.innerHTML = `<span class="text-amber-800">指名打者（DH）は使用していません（${team.name}）。</span> 試合途中からでも、後付けでDHとして認識させることができます。 ／ 運用: ${modeLabel}
-                    <button type="button" onclick="openDHMidgameModal('${teamKey}')" class="ml-2 px-2 py-1 rounded bg-amber-600 text-white text-[11px] font-extrabold">DH設定（途中・後付け）</button>
+                    <button type="button" onclick="openDHMidgameModal('${teamKey}')" class="ml-2 px-2 py-1 rounded bg-amber-600 text-white text-[11px] font-extrabold">DH設定（後付け認識）</button>
                     <button type="button" onclick="openDHGuideModal()" class="ml-1 px-2 py-1 rounded bg-white border border-amber-400 text-amber-900 text-[11px] font-extrabold">DHルール早見表</button>`;
                 banner.classList.remove('hidden');
                 return;
@@ -12874,6 +12742,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 return;
             }
             const pitcher = getDHPitcher(teamKey);
+            if (!pitcher) {
+                // 後付け認識のみで、投手が10人目として登録されていない場合
+                const pitName = getTeamPitcher(teamKey);
+                banner.innerHTML = `<span class="text-amber-800">指名打者（DH）使用中・通常DH（${team.name}）:</span> 指名打者: <span class="font-extrabold">${dhPlayer ? `${dhPlayer.order}番 ${dhPlayer.name}` : '未入力'}</span> ／ 投手: ${pitName ? pitName.name : '未入力'} ／ 運用: ${modeLabel}
+                    <button type="button" onclick="openDHMidgameModal('${teamKey}')" class="ml-2 px-2 py-1 rounded bg-amber-600 text-white text-[11px] font-extrabold">DH設定（後付け認識）</button>
+                    <button type="button" onclick="openDHGuideModal()" class="ml-1 px-2 py-1 rounded bg-white border border-amber-400 text-amber-900 text-[11px] font-extrabold">DHルール早見表</button>`;
+                banner.classList.remove('hidden');
+                return;
+            }
             banner.innerHTML = `<span class="text-amber-800">指名打者（DH）使用中（${team.name}）:</span> 投手 ${pitcher ? `<span class="font-extrabold">${pitcher.name}</span> (#${pitcher.number || '-'})` : '―'} は打順に入らず<span class="font-extrabold">10人目</span>として登録（打席なし）${dhPlayer ? ` ／ 指名打者: <span class="font-extrabold">${dhPlayer.order}番 ${dhPlayer.name}</span>` : ''}${team.dhFirstPACompleted ? '' : ' ／ ※DHの初打席未完了（交代制限あり）'} ／ 運用: ${modeLabel}
                 <button type="button" onclick="openDHDefenseModal('${teamKey}')" class="ml-2 px-2 py-1 rounded bg-amber-600 text-white text-[11px] font-extrabold">DHを守備につける（DH消滅）</button>
                 <button type="button" onclick="openDHGuideModal()" class="ml-1 px-2 py-1 rounded bg-white border border-amber-400 text-amber-900 text-[11px] font-extrabold">DHルール早見表</button>`;
