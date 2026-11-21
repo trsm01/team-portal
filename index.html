@@ -2670,7 +2670,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                     <span class="text-xs sm:text-sm">ファウル</span>
                                     <span class="text-[10px] text-slate-300 font-normal">Foul</span>
                                 </button>
-                                <button onclick="handlePickoffButtonClick()" id="btn-record-pickoff" class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:pointer-events-none active:scale-[0.99] text-white font-bold py-2.5 px-1 rounded-xl shadow-xs transition flex flex-col items-center justify-center" title="牽制を記録（投手から／捕手からを選択。捕手からの場合は同時の投球でカウントが変動します）">
+                                <button onclick="handlePickoffButtonClick()" id="btn-record-pickoff" class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:pointer-events-none active:scale-[0.99] text-white font-bold py-2.5 px-1 rounded-xl shadow-xs transition flex flex-col items-center justify-center" title="牽制を記録（投手から／捕手からを選択。牽制死（アウト）もここから記録できます。捕手からの場合は同時の投球でカウントが変動します）">
                                     <span class="text-xs sm:text-sm">牽制</span>
                                     <span class="text-[10px] text-indigo-100 font-normal">Pickoff</span>
                                 </button>
@@ -3562,18 +3562,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <button onclick="backToPickoffSource()"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="p-5 space-y-4 text-sm">
-                <p class="font-bold text-slate-800 text-xs">この牽制と同時の投球を選択してください</p>
-                
-                <div class="space-y-2">
-                    <button onclick="finalizeRunnerEvent('ball')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-xs transition">
-                        ボール
-                    </button>
-                    <button onclick="finalizeRunnerEvent('strike_called')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-xs transition">
-                        見逃しストライク
-                    </button>
-                    <button onclick="finalizeRunnerEvent('strike_swing')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-xs transition">
-                        空振りストライク
-                    </button>
+                <p class="font-bold text-slate-800 text-xs">この牽制と同時の投球を選択してください（通常のスコア入力と同じく、バント・バスター・ファウルも選べます）</p>
+
+                <div id="pickoff-out-count-step1" class="grid grid-cols-2 gap-2">
+                    <button onclick="pickoffPitchCategory('out', 'ball')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-2 rounded-xl text-xs shadow-xs transition">ボール</button>
+                    <button onclick="pickoffPitchCategory('out', 'strike_called')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-2 rounded-xl text-xs shadow-xs transition">見逃しストライク</button>
+                    <button onclick="pickoffPitchCategory('out', 'strike_swing')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-2 rounded-xl text-xs shadow-xs transition">空振りストライク</button>
+                    <button onclick="pickoffPitchCategory('out', 'foul')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-2 rounded-xl text-xs shadow-xs transition">ファウル</button>
+                </div>
+                <div id="pickoff-out-count-step2" class="hidden space-y-2">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <span id="pickoff-out-count-step2-title" class="text-xs font-bold text-slate-700">種類を選択</span>
+                        <button onclick="pickoffPitchBack('out')" class="text-xs text-slate-500 hover:text-slate-800 underline">← 投球の種類に戻る</button>
+                    </div>
+                    <div id="pickoff-out-count-variants" class="space-y-2"></div>
                 </div>
             </div>
             <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end shrink-0">
@@ -3616,22 +3618,50 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <button onclick="backToPickoffAttemptSource()"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="p-5 space-y-4 text-sm">
-                <p class="font-bold text-slate-800 text-xs">この牽制と同時の投球を選択してください</p>
-                
-                <div class="space-y-2">
-                    <button onclick="selectPickoffAttemptCount('ball')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-xs transition">
-                        ボール
-                    </button>
-                    <button onclick="selectPickoffAttemptCount('strike_called')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-xs transition">
-                        見逃しストライク
-                    </button>
-                    <button onclick="selectPickoffAttemptCount('strike_swing')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-xs transition">
-                        空振りストライク
-                    </button>
+                <p class="font-bold text-slate-800 text-xs">この牽制と同時の投球を選択してください（通常のスコア入力と同じく、バント・バスター・ファウルも選べます）</p>
+
+                <div id="pickoff-attempt-count-step1" class="grid grid-cols-2 gap-2">
+                    <button onclick="pickoffPitchCategory('attempt', 'ball')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-2 rounded-xl text-xs shadow-xs transition">ボール</button>
+                    <button onclick="pickoffPitchCategory('attempt', 'strike_called')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-2 rounded-xl text-xs shadow-xs transition">見逃しストライク</button>
+                    <button onclick="pickoffPitchCategory('attempt', 'strike_swing')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-2 rounded-xl text-xs shadow-xs transition">空振りストライク</button>
+                    <button onclick="pickoffPitchCategory('attempt', 'foul')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-2 rounded-xl text-xs shadow-xs transition">ファウル</button>
+                </div>
+                <div id="pickoff-attempt-count-step2" class="hidden space-y-2">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <span id="pickoff-attempt-count-step2-title" class="text-xs font-bold text-slate-700">種類を選択</span>
+                        <button onclick="pickoffPitchBack('attempt')" class="text-xs text-slate-500 hover:text-slate-800 underline">← 投球の種類に戻る</button>
+                    </div>
+                    <div id="pickoff-attempt-count-variants" class="space-y-2"></div>
                 </div>
             </div>
             <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end shrink-0">
                 <button onclick="backToPickoffAttemptSource()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">戻る</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 牽制（カウント入力ボタンから）：結果選択モーダル -->
+    <div id="modal-pickoff-attempt-result" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full overflow-hidden">
+            <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 class="font-bold text-base">牽制の結果</h3>
+                <button onclick="backFromPickoffAttemptResult()"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-5 space-y-4 text-sm">
+                <p class="font-bold text-slate-800 text-xs">牽制の結果を選択してください</p>
+                <div class="space-y-2">
+                    <button onclick="selectPickoffAttemptResult(false)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-left shadow-xs transition flex flex-col items-start gap-0.5">
+                        <span class="text-sm font-extrabold">牽制（アウトでない）</span>
+                        <span class="text-[11px] text-indigo-100 font-normal">走者はセーフ。牽制だけを記録します</span>
+                    </button>
+                    <button onclick="selectPickoffAttemptResult(true)" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-4 rounded-xl text-left shadow-xs transition flex flex-col items-start gap-0.5">
+                        <span class="text-sm font-extrabold">牽制死（アウト）</span>
+                        <span class="text-[11px] text-rose-100 font-normal">牽制で走者がアウト（+1アウト）</span>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end shrink-0">
+                <button onclick="backFromPickoffAttemptResult()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition">戻る</button>
             </div>
         </div>
     </div>
@@ -4526,7 +4556,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-1">開催日</label>
-                            <input type="date" id="setup-date" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs">
+                            <input type="date" id="setup-date" onchange="renderNewGameLineupRows()" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-1">球場名</label>
@@ -4619,7 +4649,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                 </div>
 
-                <p class="text-[11px] text-slate-500 leading-relaxed">先攻・後攻がまだ決まっていないときは、分かっている方のチームだけ打順を入力して「スタメンのみ一旦登録」を押してください。もう一方のチームは空欄のまま登録でき、決まった後にスコア入力画面の「スタメン編集」から入力できます。チーム名に「高校」は使えません（例：庄和高校 → 庄和）。</p>
+                <p class="text-[11px] text-slate-500 leading-relaxed">先攻・後攻がまだ決まっていないときは、分かっている方のチームだけ打順を入力して「スタメンのみ一旦登録」を押してください。もう一方のチームは空欄のまま登録でき、決まった後にスコア入力画面の「スタメン編集」から入力できます。チーム名に「高校」は使えません（例：庄和高校 → 庄和）。学年は各行で登録でき、開催日の年度から入学年度に換算して保存されるため、翌年度には自動で進級し、成績の年度絞り込みにも使われます。</p>
             </div>
 
             <div class="bg-slate-100 px-5 py-3.5 border-t border-slate-200 shrink-0 space-y-2.5">
@@ -4664,7 +4694,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <button type="button" id="lineup-edit-tab-away" onclick="switchLineupEditTeam('away')" class="px-3 py-2.5 rounded-lg text-sm font-extrabold transition bg-slate-900 text-white shadow-sm">先攻チーム</button>
                     <button type="button" id="lineup-edit-tab-home" onclick="switchLineupEditTeam('home')" class="px-3 py-2.5 rounded-lg text-sm font-extrabold transition bg-slate-100 text-slate-600 hover:bg-slate-200">後攻チーム</button>
                 </div>
-                <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">試合の途中でも、守備位置・選手名・背番号・利き手（投／打）を直せます。打順はプルダウンではなく、現在の数字がそのまま入った固定表示です（打順の変更は「オーダー・選手交代」タブのグラウンド図でポジションをタップして行えます）。記録済みの成績・走者・カウントはそのまま引き継がれます。ポジション未選択・選手名未入力のままでも保存でき、分かったときに随時入力できます。DHの有無と種類（通常DH／大谷ルール）もこの画面で選べます。</p>
+                <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">試合の途中でも、守備位置・選手名・背番号・学年・利き手（投／打）を直せます。背番号は公式戦・練習試合を問わず入力できます。学年は入学年度として保存され、年度が替わると自動で進級して成績の年度絞り込みに使われます。打順はプルダウンではなく、現在の数字がそのまま入った固定表示です（打順の変更は「オーダー・選手交代」タブのグラウンド図でポジションをタップして行えます）。記録済みの成績・走者・カウントはそのまま引き継がれます。ポジション未選択・選手名未入力のままでも保存でき、分かったときに随時入力できます。DHの有無と種類（通常DH／大谷ルール）もこの画面で選べます。</p>
             </div>
             <div class="p-5 space-y-4 overflow-y-auto text-sm flex-1">
                 <div class="bg-amber-50 border border-amber-300 rounded-lg px-3 py-2.5">
@@ -5139,6 +5169,59 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return (!isNaN(n) && n >= 1 && n <= 25 && String(n) === String(value).trim()) ? String(n) : '';
         }
 
+        // ================= 学年（入学年度ベース） =================
+        // 試合データの選手には入学年度（entryYear）を持たせる。学年は常に
+        // 「年度 − 入学年度 ＋ 1」で計算するため、スタメン登録時に学年を
+        // 選んで入学年度へ換算して保存しておけば、年度が替わっても
+        // 保存し直すことなく自動で進級し、卒業すれば年度対象から外れる。
+        // 成績の年度絞り込みも、この入学年度を優先して使う。
+        // 日付文字列（YYYY-MM-DD）から年度（4月始まり）を返す
+        function fiscalYearOfDateStr(dateStr) {
+            const m = String(dateStr || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (!m) return currentFiscalYearDefault();
+            const y = parseInt(m[1], 10), mo = parseInt(m[2], 10);
+            if (isNaN(y) || isNaN(mo)) return currentFiscalYearDefault();
+            return mo >= 4 ? y : y - 1;
+        }
+
+        // 新規試合準備の開催日から年度を求める
+        function setupFiscalYear() {
+            const el = document.getElementById('setup-date');
+            return fiscalYearOfDateStr(el ? el.value : '');
+        }
+
+        // 学年プルダウン（未選択＋1年・2年・3年）の選択肢HTML
+        function gradeSelectOptionsHtml(selected) {
+            let html = '<option value="">学年</option>';
+            [1, 2, 3].forEach(n => {
+                html += `<option value="${n}"${String(selected) === String(n) ? ' selected' : ''}>${n}年</option>`;
+            });
+            return html;
+        }
+
+        // 指定年度における選手の学年（'1'〜'3'）。入学年度が無い・範囲外は ''
+        function gradeValueOfPlayerAt(player, fy) {
+            const g = playerGradeInYear(player, fy);
+            return (g !== null && g >= 1 && g <= 3) ? String(g) : '';
+        }
+
+        // 名簿選手の学年（入学年度から計算できればそれを優先し、
+        // 無ければ名簿の学年表記「3年」などから読み取る）
+        function masterGradeValue(p, fy) {
+            if (!p) return '';
+            const gv = gradeValueOfPlayerAt(p, fy);
+            if (gv) return gv;
+            const m = String(p.grade || '').match(/[123]/);
+            return m ? m[0] : '';
+        }
+
+        // 学年（'1'〜'3'）と年度から入学年度を逆算する。学年が無ければ ''
+        function entryYearFromGradeValue(gradeVal, fy) {
+            const g = parseInt(gradeVal, 10);
+            if (!g || !fy) return '';
+            return fy - g + 1;
+        }
+
         // ================= 利き手（投・打）チェック =================
         // 投げる手・打つ手は「右」「左」のチェックボックスで選ぶ。
         // 両方にチェックを付けると両投げ・両打ち（スイッチ）になる。
@@ -5249,6 +5332,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (numSel) numSel.value = p ? uniformNumberDefault(p.number) : '';
             // 利き手チェックも選んだ選手の登録内容に合わせる（この試合用に変更もできる）
             setHandChecks(`setup-my-hand-${idx}`, p ? (p.throws || '右') : '右', p ? (p.bats || '右') : '右');
+            // 学年も選んだ選手の登録内容（入学年度→学年）に合わせる
+            const gradeSel = document.getElementById(`setup-my-grade-${idx}`);
+            if (gradeSel) gradeSel.value = p ? masterGradeValue(p, setupFiscalYear()) : '';
         }
 
         // DH使用時の投手欄で投手を選び直した場合も同様に合わせる
@@ -5261,6 +5347,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const p = roster ? roster.players.find(x => x.id === playerSel.value) : null;
             if (numSel) numSel.value = p ? uniformNumberDefault(p.number) : '';
             setHandChecks('setup-my-pitcher-hand', p ? (p.throws || '右') : '右', p ? (p.bats || '右') : '右');
+            const gradeSel = document.getElementById('setup-my-pitcher-grade');
+            if (gradeSel) gradeSel.value = p ? masterGradeValue(p, setupFiscalYear()) : '';
         }
 
         // ===== 偵察対応：両チームとも「登録チーム／手入力」を選べる =====
@@ -5302,6 +5390,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const p = roster.players ? roster.players.find(x => x.id === playerSel.value) : null;
             if (numSel) numSel.value = p ? uniformNumberDefault(p.number) : '';
             setHandChecks(`setup-opp-hand-${idx}`, p ? (p.throws || '右') : '右', p ? (p.bats || '右') : '右');
+            const gradeSel = document.getElementById(`setup-opp-grade-${idx}`);
+            if (gradeSel) gradeSel.value = p ? masterGradeValue(p, setupFiscalYear()) : '';
         }
         function onSetupOppPitcherChange() {
             const playerSel = document.getElementById('setup-opp-pitcher-player');
@@ -5311,6 +5401,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const p = roster.players ? roster.players.find(x => x.id === playerSel.value) : null;
             if (numSel) numSel.value = p ? uniformNumberDefault(p.number) : '';
             setHandChecks('setup-opp-pitcher-hand', p ? (p.throws || '右') : '右', p ? (p.bats || '右') : '右');
+            const gradeSel = document.getElementById('setup-opp-pitcher-grade');
+            if (gradeSel) gradeSel.value = p ? masterGradeValue(p, setupFiscalYear()) : '';
         }
         function hasCurrentGame() {
             return !!(gameState && gameState.teams && gameState.teams.away && gameState.teams.home);
@@ -8776,9 +8868,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const oppDH = oppDHVal === '1';
             const myTwoWay = myDHVal === '2';
             const oppTwoWay = oppDHVal === '2';
+            // 学年の初期値（名簿選手の入学年度→学年の換算）に使う年度
+            const setupFY = setupFiscalYear();
 
             // 再描画（DH切り替え・チーム切替）前に、入力済みの値を保持する
-            const snap = { myPlayer: [], myPos: [], myNum: [], myName: [], oppPos: [], oppNum: [], oppName: [], oppPlayer: [], myPitcher: '', myPitcherNum: '', myPitcherName: '', oppPitcher: '', oppPitcherNum: '', oppPitcherName: '', myBench: [], oppBench: [], myBenchNum: [], oppBenchNum: [], myThrows: [], myBats: [], oppThrows: [], oppBats: [], myPitcherThrows: null, myPitcherBats: null, oppPitcherThrows: null, oppPitcherBats: null };
+            const snap = { myPlayer: [], myPos: [], myNum: [], myName: [], myGrade: [], oppPos: [], oppNum: [], oppName: [], oppGrade: [], oppPlayer: [], myPitcher: '', myPitcherNum: '', myPitcherName: '', myPitcherGrade: '', oppPitcher: '', oppPitcherNum: '', oppPitcherName: '', oppPitcherGrade: '', myBench: [], oppBench: [], myBenchNum: [], oppBenchNum: [], myBenchGrade: [], oppBenchGrade: [], myThrows: [], myBats: [], oppThrows: [], oppBats: [], myPitcherThrows: null, myPitcherBats: null, oppPitcherThrows: null, oppPitcherBats: null };
             for (let i = 0; i < 9; i++) {
                 const mp = document.getElementById(`setup-my-player-${i}`);
                 if (mp) snap.myPlayer[i] = mp.value;
@@ -8788,12 +8882,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (mnum) snap.myNum[i] = mnum.value;
                 const mname = document.getElementById(`setup-my-name-${i}`);
                 if (mname) snap.myName[i] = mname.value;
+                const mgrade = document.getElementById(`setup-my-grade-${i}`);
+                if (mgrade) snap.myGrade[i] = mgrade.value;
                 const opos = document.getElementById(`setup-opp-pos-${i}`);
                 if (opos) snap.oppPos[i] = opos.value;
                 const onum = document.getElementById(`setup-opp-num-${i}`);
                 if (onum) snap.oppNum[i] = onum.value;
                 const oname = document.getElementById(`setup-opp-name-${i}`);
                 if (oname) snap.oppName[i] = oname.value;
+                const ograde = document.getElementById(`setup-opp-grade-${i}`);
+                if (ograde) snap.oppGrade[i] = ograde.value;
                 const oplayer = document.getElementById(`setup-opp-player-${i}`);
                 if (oplayer) snap.oppPlayer[i] = oplayer.value;
                 const mth = readHandChecks(`setup-my-hand-${i}`, 'th');
@@ -8806,10 +8904,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (mb) snap.myBench[b] = mb.value;
                 const mbn = document.getElementById(`setup-my-bench-num-${b}`);
                 if (mbn) snap.myBenchNum[b] = mbn.value;
+                const mbg = document.getElementById(`setup-my-bench-grade-${b}`);
+                if (mbg) snap.myBenchGrade[b] = mbg.value;
                 const ob = document.getElementById(`setup-opp-bench-name-${b}`);
                 if (ob) snap.oppBench[b] = ob.value;
                 const obn = document.getElementById(`setup-opp-bench-num-${b}`);
                 if (obn) snap.oppBenchNum[b] = obn.value;
+                const obg = document.getElementById(`setup-opp-bench-grade-${b}`);
+                if (obg) snap.oppBenchGrade[b] = obg.value;
             }
             const snapMyPitcherEl = document.getElementById('setup-my-pitcher-player');
             if (snapMyPitcherEl) snap.myPitcher = snapMyPitcherEl.value;
@@ -8817,10 +8919,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (snapMyPitcherNumEl) snap.myPitcherNum = snapMyPitcherNumEl.value;
             const snapMyPitcherNameEl = document.getElementById('setup-my-pitcher-name');
             if (snapMyPitcherNameEl) snap.myPitcherName = snapMyPitcherNameEl.value;
+            const snapMyPitcherGradeEl = document.getElementById('setup-my-pitcher-grade');
+            if (snapMyPitcherGradeEl) snap.myPitcherGrade = snapMyPitcherGradeEl.value;
             const snapOppPNum = document.getElementById('setup-opp-pitcher-num');
             if (snapOppPNum) snap.oppPitcherNum = snapOppPNum.value;
             const snapOppPName = document.getElementById('setup-opp-pitcher-name');
             if (snapOppPName) snap.oppPitcherName = snapOppPName.value;
+            const snapOppPGrade = document.getElementById('setup-opp-pitcher-grade');
+            if (snapOppPGrade) snap.oppPitcherGrade = snapOppPGrade.value;
             const snapOppPPlayer = document.getElementById('setup-opp-pitcher-player');
             if (snapOppPPlayer) snap.oppPitcher = snapOppPPlayer.value;
             snap.myPitcherThrows = readHandChecks('setup-my-pitcher-hand', 'th');
@@ -8862,6 +8968,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     let numSelM = '';
                     if (hasSnapMy && snap.myNum[i] !== undefined) numSelM = uniformNumberDefault(snap.myNum[i]);
                     const nameValM = hasSnapMy && snap.myName[i] ? snap.myName[i] : '';
+                    const gradeValM = hasSnapMy && snap.myGrade[i] !== undefined ? snap.myGrade[i] : '';
                     const thValM = (hasSnapMy && snap.myThrows[i] !== undefined && snap.myThrows[i] !== null) ? snap.myThrows[i] : '右';
                     const batValM = (hasSnapMy && snap.myBats[i] !== undefined && snap.myBats[i] !== null) ? snap.myBats[i] : '右';
                     const rowM = document.createElement('div');
@@ -8871,6 +8978,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <select id="setup-my-pos-${i}" onchange="refreshSetupLineupFeedback(false)" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptionsM}</select>
                     <select id="setup-my-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNumM ? '' : 'hidden'}">${uniformNumberOptionsHtml(numSelM)}</select>
                     <input type="text" id="setup-my-name-${i}" value="${nameValM}" oninput="refreshSetupLineupFeedback(false)" placeholder="選手名を入力" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white">
+                    <select id="setup-my-grade-${i}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(gradeValM)}</select>
                     ${handChecksHtml(`setup-my-hand-${i}`, thValM, batValM)}
                     `;
                     myContainer.appendChild(rowM);
@@ -8895,6 +9003,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
                 const thValR = (hasSnapMy && snap.myThrows[i] !== undefined && snap.myThrows[i] !== null) ? snap.myThrows[i] : (selectedPlayer ? (selectedPlayer.throws || '右') : '右');
                 const batValR = (hasSnapMy && snap.myBats[i] !== undefined && snap.myBats[i] !== null) ? snap.myBats[i] : (selectedPlayer ? (selectedPlayer.bats || '右') : '右');
+                const gradeValR = (hasSnapMy && snap.myGrade[i] !== undefined && snap.myGrade[i] !== '') ? snap.myGrade[i] : masterGradeValue(selectedPlayer, setupFY);
                 const row = document.createElement('div');
                 row.className = 'flex flex-wrap items-center gap-1.5 text-xs';
                 row.innerHTML = `
@@ -8903,6 +9012,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <select id="setup-my-player-${i}" onchange="onSetupMyPlayerChange(${i})" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${playerOptions}</select>
                     ${handChecksHtml(`setup-my-hand-${i}`, thValR, batValR)}
                     <select id="setup-my-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNum ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedNum)}</select>
+                    <select id="setup-my-grade-${i}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(gradeValR)}</select>
                 `;
                 myContainer.appendChild(row);
             }
@@ -8924,6 +9034,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
                             <select id="setup-my-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.myPitcherNum))}</select>
                             <input type="text" id="setup-my-pitcher-name" value="${snap.myPitcherName || ''}" placeholder="投手名を入力" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white">
+                            <select id="setup-my-pitcher-grade" title="学年" class="w-14 shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.myPitcherGrade || '')}</select>
                             ${handChecksHtml('setup-my-pitcher-hand', snap.myPitcherThrows !== null && snap.myPitcherThrows !== undefined ? snap.myPitcherThrows : '右', snap.myPitcherBats !== null && snap.myPitcherBats !== undefined ? snap.myPitcherBats : '右')}
                         </div>
                         <p class="text-[10px] text-amber-800 font-bold mt-1">DH使用のため打順に入りません。打順に指名打者（指）を1人入れてください。</p>
@@ -8946,6 +9057,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
                             <select id="setup-my-pitcher-player" onchange="onSetupMyPitcherChange()" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${pitcherOptions}</select>
                             <select id="setup-my-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${showNumP ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedPitcherNum)}</select>
+                            <select id="setup-my-pitcher-grade" title="学年" class="w-14 shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.myPitcherGrade ? snap.myPitcherGrade : masterGradeValue(selectedPitcher, setupFY))}</select>
                             ${handChecksHtml('setup-my-pitcher-hand', snap.myPitcherThrows !== null && snap.myPitcherThrows !== undefined ? snap.myPitcherThrows : (selectedPitcher ? (selectedPitcher.throws || '右') : '右'), snap.myPitcherBats !== null && snap.myPitcherBats !== undefined ? snap.myPitcherBats : (selectedPitcher ? (selectedPitcher.bats || '右') : '右'))}
                         </div>
                         <p class="text-[10px] text-amber-800 font-bold mt-1">DH使用のため打順に入りません。打順に指名打者（指）を1人入れてください。</p>
@@ -8961,7 +9073,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (mySource === 'manual') {
                     let benchHtml = '<div class="text-[10px] font-extrabold text-slate-600 mb-1">ベンチ選手（任意・空欄可）</div><div class="space-y-1.5">';
                     for (let b = 0; b < 3; b++) {
-                        benchHtml += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-my-bench-name-${b}" value="${snap.myBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"><select id="setup-my-bench-num-${b}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.myBenchNum[b]))}</select></div>`;
+                        benchHtml += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-my-bench-name-${b}" value="${snap.myBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"><select id="setup-my-bench-num-${b}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.myBenchNum[b]))}</select><select id="setup-my-bench-grade-${b}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.myBenchGrade[b] || '')}</select></div>`;
                     }
                     benchHtml += '</div>';
                     myBenchArea.innerHTML = benchHtml;
@@ -8996,6 +9108,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     if (hasSnapOpp && snap.oppNum[i] !== undefined && snap.oppNum[i] !== '') selectedNumO = snap.oppNum[i];
                     const thValO = (hasSnapOpp && snap.oppThrows[i] !== undefined && snap.oppThrows[i] !== null) ? snap.oppThrows[i] : (selectedPlayerO ? (selectedPlayerO.throws || '右') : '右');
                     const batValO = (hasSnapOpp && snap.oppBats[i] !== undefined && snap.oppBats[i] !== null) ? snap.oppBats[i] : (selectedPlayerO ? (selectedPlayerO.bats || '右') : '右');
+                    const gradeValO = (hasSnapOpp && snap.oppGrade[i] !== undefined && snap.oppGrade[i] !== '') ? snap.oppGrade[i] : masterGradeValue(selectedPlayerO, setupFY);
                     const rowO = document.createElement('div');
                     rowO.className = 'flex flex-wrap items-center gap-1.5 text-xs';
                     rowO.innerHTML = `
@@ -9004,6 +9117,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <select id="setup-opp-player-${i}" onchange="onSetupOppPlayerChange(${i})" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${playerOptionsO}</select>
                     ${handChecksHtml(`setup-opp-hand-${i}`, thValO, batValO)}
                     <select id="setup-opp-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNumO ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedNumO)}</select>
+                    <select id="setup-opp-grade-${i}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(gradeValO)}</select>
                     `;
                     oppContainer.appendChild(rowO);
                     continue;
@@ -9021,6 +9135,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
                 const thValOM = (hasSnapOpp && snap.oppThrows[i] !== undefined && snap.oppThrows[i] !== null) ? snap.oppThrows[i] : '右';
                 const batValOM = (hasSnapOpp && snap.oppBats[i] !== undefined && snap.oppBats[i] !== null) ? snap.oppBats[i] : '右';
+                const gradeValOM = hasSnapOpp && snap.oppGrade[i] !== undefined ? snap.oppGrade[i] : '';
                 const row = document.createElement('div');
                 row.className = 'flex flex-wrap items-center gap-1.5 text-xs';
                 row.innerHTML = `
@@ -9028,6 +9143,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <select id="setup-opp-pos-${i}" onchange="refreshSetupLineupFeedback(false)" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptions}</select>
                     <select id="setup-opp-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showOppNum ? '' : 'hidden'}">${uniformNumberOptionsHtml(oppNumSel)}</select>
                     <input type="text" id="setup-opp-name-${i}" value="${oppNameVal}" oninput="refreshSetupLineupFeedback(false)" placeholder="選手名を入力" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white">
+                    <select id="setup-opp-grade-${i}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(gradeValOM)}</select>
                     ${handChecksHtml(`setup-opp-hand-${i}`, thValOM, batValOM)}
                 `;
                 oppContainer.appendChild(row);
@@ -9056,6 +9172,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
                             <select id="setup-opp-pitcher-player" onchange="onSetupOppPitcherChange()" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${pitcherOptionsO}</select>
                             <select id="setup-opp-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(selPitcherNumO)}</select>
+                            <select id="setup-opp-pitcher-grade" title="学年" class="w-14 shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.oppPitcherGrade ? snap.oppPitcherGrade : masterGradeValue(selPitcherO, setupFY))}</select>
                             ${handChecksHtml('setup-opp-pitcher-hand', snap.oppPitcherThrows !== null && snap.oppPitcherThrows !== undefined ? snap.oppPitcherThrows : (selPitcherO ? (selPitcherO.throws || '右') : '右'), snap.oppPitcherBats !== null && snap.oppPitcherBats !== undefined ? snap.oppPitcherBats : (selPitcherO ? (selPitcherO.bats || '右') : '右'))}
                         </div>
                         <p class="text-[10px] text-amber-800 font-bold mt-1">DH使用のため打順に入りません。打順に指名打者（指）を1人入れてください。</p>
@@ -9068,6 +9185,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
                             <select id="setup-opp-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.oppPitcherNum))}</select>
                             <input type="text" id="setup-opp-pitcher-name" value="${snap.oppPitcherName || ''}" placeholder="投手名を入力" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white">
+                            <select id="setup-opp-pitcher-grade" title="学年" class="w-14 shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.oppPitcherGrade || '')}</select>
                             ${handChecksHtml('setup-opp-pitcher-hand', snap.oppPitcherThrows !== null && snap.oppPitcherThrows !== undefined ? snap.oppPitcherThrows : '右', snap.oppPitcherBats !== null && snap.oppPitcherBats !== undefined ? snap.oppPitcherBats : '右')}
                         </div>
                         <p class="text-[10px] text-amber-800 font-bold mt-1">DH使用のため打順に入りません。打順に指名打者（指）を1人入れてください。</p>
@@ -9083,7 +9201,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (oppSource === 'manual') {
                     let benchHtmlO = '<div class="text-[10px] font-extrabold text-slate-600 mb-1">ベンチ選手（任意・空欄可）</div><div class="space-y-1.5">';
                     for (let b = 0; b < 3; b++) {
-                        benchHtmlO += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-opp-bench-name-${b}" value="${snap.oppBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"><select id="setup-opp-bench-num-${b}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.oppBenchNum[b]))}</select></div>`;
+                        benchHtmlO += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-opp-bench-name-${b}" value="${snap.oppBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"><select id="setup-opp-bench-num-${b}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.oppBenchNum[b]))}</select><select id="setup-opp-bench-grade-${b}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.oppBenchGrade[b] || '')}</select></div>`;
                     }
                     benchHtmlO += '</div>';
                     oppBenchArea.innerHTML = benchHtmlO;
@@ -9297,6 +9415,22 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const setupRuleMode = setupRuleModeEl && setupRuleModeEl.value === 'relaxed' ? 'relaxed' : 'strict';
             // 背番号プルダウンは公式戦（練習試合以外）のときだけ有効。選んだ背番号を試合データに保存する
             const officialSetup = isSetupTournamentOfficial();
+            // 学年は開催日の年度から入学年度へ換算して選手データに保存する。
+            // 学年プルダウンで選ばれていればそれを優先し、未選択で名簿選手なら
+            // 名簿の入学年度を引き継ぐ。入学年度で持つため、年度が替わっても
+            // 学年は自動で進級し、成績の年度絞り込みにもそのまま使える。
+            const setupFY = setupFiscalYear();
+            const gradeEntryYear = (elId, masterP) => {
+                const el = document.getElementById(elId);
+                const gv = el ? el.value : '';
+                if (gv) return entryYearFromGradeValue(gv, setupFY);
+                const mey = masterP ? parseEntryYear(masterP.entryYear) : null;
+                return mey !== null ? mey : '';
+            };
+            const masterEntryYear = (mp) => {
+                const mey = mp ? parseEntryYear(mp.entryYear) : null;
+                return mey !== null ? mey : '';
+            };
 
             // スタメン未入力・ポジション重複チェック（両チーム）。
             // チェックで止めるのは試合開始（スコア入力開始）のときだけ。
@@ -9431,20 +9565,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     const name = nameEl && nameEl.value.trim() ? nameEl.value.trim() : `選手${i + 1}`;
                     const thM = readHandChecks(`setup-my-hand-${i}`, 'th');
                     const baM = readHandChecks(`setup-my-hand-${i}`, 'ba');
-                    myPlayers.push({ id: `${mySide}_p_${i + 1}_${Date.now()}`, order: i + 1, pos: pos, number: num, name: name, throws: thM !== null ? thM : '右', bats: baM !== null ? baM : '右', isActive: true, batting: emptyBatting() });
+                    myPlayers.push({ id: `${mySide}_p_${i + 1}_${Date.now()}`, order: i + 1, pos: pos, number: num, name: name, throws: thM !== null ? thM : '右', bats: baM !== null ? baM : '右', entryYear: gradeEntryYear(`setup-my-grade-${i}`, null), isActive: true, batting: emptyBatting() });
                 }
                 if (myDH) {
                     const pNumEl = document.getElementById('setup-my-pitcher-num');
                     const pNameEl = document.getElementById('setup-my-pitcher-name');
                     const thPM = readHandChecks('setup-my-pitcher-hand', 'th');
                     const baPM = readHandChecks('setup-my-pitcher-hand', 'ba');
-                    myPlayers.push({ id: `${mySide}_p_10_${Date.now()}`, order: 10, pos: '投', number: officialSetup && pNumEl ? (pNumEl.value || '') : '', name: pNameEl ? (pNameEl.value.trim() || '投手') : '投手', throws: thPM !== null ? thPM : '右', bats: baPM !== null ? baPM : '右', isActive: true, dhPitcher: true, batting: emptyBatting() });
+                    myPlayers.push({ id: `${mySide}_p_10_${Date.now()}`, order: 10, pos: '投', number: officialSetup && pNumEl ? (pNumEl.value || '') : '', name: pNameEl ? (pNameEl.value.trim() || '投手') : '投手', throws: thPM !== null ? thPM : '右', bats: baPM !== null ? baPM : '右', entryYear: gradeEntryYear('setup-my-pitcher-grade', null), isActive: true, dhPitcher: true, batting: emptyBatting() });
                 }
                 for (let b = 0; b < 3; b++) {
                     const benchEl = document.getElementById(`setup-my-bench-name-${b}`);
                     const benchName = benchEl ? benchEl.value.trim() : '';
                     const benchNumEl = document.getElementById(`setup-my-bench-num-${b}`);
-                    if (benchName) myPlayers.push({ id: `${mySide}_bench_${b}_${Date.now()}`, order: 0, pos: '控', number: officialSetup && benchNumEl ? (benchNumEl.value || '') : '', name: benchName, isActive: false, batting: emptyBatting() });
+                    if (benchName) myPlayers.push({ id: `${mySide}_bench_${b}_${Date.now()}`, order: 0, pos: '控', number: officialSetup && benchNumEl ? (benchNumEl.value || '') : '', name: benchName, entryYear: gradeEntryYear(`setup-my-bench-grade-${b}`, null), isActive: false, batting: emptyBatting() });
                 }
             } else {
             for (let i = 0; i < 9; i++) {
@@ -9466,6 +9600,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     bats: baR !== null ? baR : (masterP && masterP.bats ? masterP.bats : '右'),
                     cohort: masterP && masterP.cohort != null ? masterP.cohort : '',
                     gradeColor: masterP ? normalizeGradeColor(masterP.gradeColor) : '',
+                    entryYear: gradeEntryYear(`setup-my-grade-${i}`, masterP),
                     isActive: true,
                     batting: emptyBatting()
                 });
@@ -9486,6 +9621,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     bats: baPR !== null ? baPR : (myPitcherMaster.bats || '右'),
                     cohort: myPitcherMaster.cohort != null ? myPitcherMaster.cohort : '',
                     gradeColor: normalizeGradeColor(myPitcherMaster.gradeColor),
+                    entryYear: gradeEntryYear('setup-my-pitcher-grade', myPitcherMaster),
                     isActive: true,
                     dhPitcher: true,
                     batting: emptyBatting()
@@ -9495,7 +9631,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const pNumEl2 = document.getElementById('setup-my-pitcher-num');
                 const thP2 = readHandChecks('setup-my-pitcher-hand', 'th');
                 const baP2 = readHandChecks('setup-my-pitcher-hand', 'ba');
-                myPlayers.push({ id: `${mySide}_p_10_${Date.now()}`, order: 10, pos: '投', number: officialSetup && pNumEl2 ? (pNumEl2.value || '') : '', name: '投手', throws: thP2 !== null ? thP2 : '右', bats: baP2 !== null ? baP2 : '右', isActive: true, dhPitcher: true, batting: emptyBatting() });
+                myPlayers.push({ id: `${mySide}_p_10_${Date.now()}`, order: 10, pos: '投', number: officialSetup && pNumEl2 ? (pNumEl2.value || '') : '', name: '投手', throws: thP2 !== null ? thP2 : '右', bats: baP2 !== null ? baP2 : '右', entryYear: gradeEntryYear('setup-my-pitcher-grade', null), isActive: true, dhPitcher: true, batting: emptyBatting() });
             }
             myRoster.players.forEach((mp, idx) => {
                 if (!selectedMasterIds.has(mp.id)) {
@@ -9509,6 +9645,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         bats: mp.bats || '右',
                         cohort: mp.cohort != null ? mp.cohort : '',
                         gradeColor: normalizeGradeColor(mp.gradeColor),
+                        entryYear: masterEntryYear(mp),
                         isActive: false,
                         batting: emptyBatting()
                     });
@@ -9533,7 +9670,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     const chosenNum = officialSetup && numSelEl ? numSelEl.value : '';
                     const thOR = readHandChecks(`setup-opp-hand-${i}`, 'th');
                     const baOR = readHandChecks(`setup-opp-hand-${i}`, 'ba');
-                    oppPlayers.push({ id: `${oppSide}_p_${i + 1}_${Date.now()}`, order: i + 1, pos: pos, number: chosenNum || (masterP ? masterP.number : String(i + 1)), name: masterP ? masterP.name : `選手${i + 1}`, throws: thOR !== null ? thOR : (masterP && masterP.throws ? masterP.throws : '右'), bats: baOR !== null ? baOR : (masterP && masterP.bats ? masterP.bats : '右'), cohort: masterP && masterP.cohort != null ? masterP.cohort : '', gradeColor: masterP ? normalizeGradeColor(masterP.gradeColor) : '', isActive: true, batting: emptyBatting() });
+                    oppPlayers.push({ id: `${oppSide}_p_${i + 1}_${Date.now()}`, order: i + 1, pos: pos, number: chosenNum || (masterP ? masterP.number : String(i + 1)), name: masterP ? masterP.name : `選手${i + 1}`, throws: thOR !== null ? thOR : (masterP && masterP.throws ? masterP.throws : '右'), bats: baOR !== null ? baOR : (masterP && masterP.bats ? masterP.bats : '右'), cohort: masterP && masterP.cohort != null ? masterP.cohort : '', gradeColor: masterP ? normalizeGradeColor(masterP.gradeColor) : '', entryYear: gradeEntryYear(`setup-opp-grade-${i}`, masterP), isActive: true, batting: emptyBatting() });
                 }
                 if (oppDH && oppPitcherMaster) {
                     selectedOppMasterIds.add(oppPitcherMaster.id);
@@ -9541,17 +9678,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     const chosenPitcherNum = officialSetup && pitcherNumSelEl ? pitcherNumSelEl.value : '';
                     const thOPR = readHandChecks('setup-opp-pitcher-hand', 'th');
                     const baOPR = readHandChecks('setup-opp-pitcher-hand', 'ba');
-                    oppPlayers.push({ id: `${oppSide}_p_10_${Date.now()}`, order: 10, pos: '投', number: chosenPitcherNum || oppPitcherMaster.number || '', name: oppPitcherMaster.name, throws: thOPR !== null ? thOPR : (oppPitcherMaster.throws || '右'), bats: baOPR !== null ? baOPR : (oppPitcherMaster.bats || '右'), cohort: oppPitcherMaster.cohort != null ? oppPitcherMaster.cohort : '', gradeColor: normalizeGradeColor(oppPitcherMaster.gradeColor), isActive: true, dhPitcher: true, batting: emptyBatting() });
+                    oppPlayers.push({ id: `${oppSide}_p_10_${Date.now()}`, order: 10, pos: '投', number: chosenPitcherNum || oppPitcherMaster.number || '', name: oppPitcherMaster.name, throws: thOPR !== null ? thOPR : (oppPitcherMaster.throws || '右'), bats: baOPR !== null ? baOPR : (oppPitcherMaster.bats || '右'), cohort: oppPitcherMaster.cohort != null ? oppPitcherMaster.cohort : '', gradeColor: normalizeGradeColor(oppPitcherMaster.gradeColor), entryYear: gradeEntryYear('setup-opp-pitcher-grade', oppPitcherMaster), isActive: true, dhPitcher: true, batting: emptyBatting() });
                 } else if (oppDH) {
                     // 一旦登録で投手が未選択のまま保存された場合の仮登録（試合中のスタメン編集で直せる）
                     const pNumElO2 = document.getElementById('setup-opp-pitcher-num');
                     const thOP2 = readHandChecks('setup-opp-pitcher-hand', 'th');
                     const baOP2 = readHandChecks('setup-opp-pitcher-hand', 'ba');
-                    oppPlayers.push({ id: `${oppSide}_p_10_${Date.now()}`, order: 10, pos: '投', number: officialSetup && pNumElO2 ? (pNumElO2.value || '') : '', name: '相手投手', throws: thOP2 !== null ? thOP2 : '右', bats: baOP2 !== null ? baOP2 : '右', isActive: true, dhPitcher: true, batting: emptyBatting() });
+                    oppPlayers.push({ id: `${oppSide}_p_10_${Date.now()}`, order: 10, pos: '投', number: officialSetup && pNumElO2 ? (pNumElO2.value || '') : '', name: '相手投手', throws: thOP2 !== null ? thOP2 : '右', bats: baOP2 !== null ? baOP2 : '右', entryYear: gradeEntryYear('setup-opp-pitcher-grade', null), isActive: true, dhPitcher: true, batting: emptyBatting() });
                 }
                 oppRoster.players.forEach((mp, idx) => {
                     if (!selectedOppMasterIds.has(mp.id)) {
-                        oppPlayers.push({ id: `${oppSide}_bench_${idx}_${Date.now()}`, order: 0, pos: mp.pos || '控', number: mp.number || '', name: mp.name, throws: mp.throws || '右', bats: mp.bats || '右', cohort: mp.cohort != null ? mp.cohort : '', gradeColor: normalizeGradeColor(mp.gradeColor), isActive: false, batting: emptyBatting() });
+                        oppPlayers.push({ id: `${oppSide}_bench_${idx}_${Date.now()}`, order: 0, pos: mp.pos || '控', number: mp.number || '', name: mp.name, throws: mp.throws || '右', bats: mp.bats || '右', cohort: mp.cohort != null ? mp.cohort : '', gradeColor: normalizeGradeColor(mp.gradeColor), entryYear: masterEntryYear(mp), isActive: false, batting: emptyBatting() });
                     }
                 });
             } else {
@@ -9570,6 +9707,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     name: name,
                     throws: thOM2 !== null ? thOM2 : '右',
                     bats: baOM2 !== null ? baOM2 : '右',
+                    entryYear: gradeEntryYear(`setup-opp-grade-${i}`, null),
                     isActive: true,
                     batting: emptyBatting()
                 });
@@ -9587,6 +9725,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     name: pNameEl ? (pNameEl.value.trim() || '相手投手') : '相手投手',
                     throws: thOPM !== null ? thOPM : '右',
                     bats: baOPM !== null ? baOPM : '右',
+                    entryYear: gradeEntryYear('setup-opp-pitcher-grade', null),
                     isActive: true,
                     dhPitcher: true,
                     batting: emptyBatting()
@@ -9596,7 +9735,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const benchEl = document.getElementById(`setup-opp-bench-name-${b}`);
                 const benchName = benchEl ? benchEl.value.trim() : '';
                 const benchNumEl = document.getElementById(`setup-opp-bench-num-${b}`);
-                if (benchName) oppPlayers.push({ id: `${oppSide}_bench_${b}_${Date.now()}`, order: 0, pos: '控', number: officialSetup && benchNumEl ? (benchNumEl.value || '') : '', name: benchName, isActive: false, batting: emptyBatting() });
+                if (benchName) oppPlayers.push({ id: `${oppSide}_bench_${b}_${Date.now()}`, order: 0, pos: '控', number: officialSetup && benchNumEl ? (benchNumEl.value || '') : '', name: benchName, entryYear: gradeEntryYear(`setup-opp-bench-grade-${b}`, null), isActive: false, batting: emptyBatting() });
             }
             }
             if (oppTwoWay) {
@@ -9748,20 +9887,23 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 dhModeSel.disabled = (typeof isDHTerminated === 'function') && isDHTerminated(lineupEditTeamKey);
             }
             const positions = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'];
-            const official = isCurrentGameOfficial();
+            // 学年の初期値は、試合日の年度と選手の入学年度から計算する
+            const gameFY = fiscalYearOfDateStr(gameState.meta && gameState.meta.date);
             const starters = getActiveLineup(lineupEditTeamKey);
             lineupEditStarterIds = starters.map(p => p.id);
             const listEl = document.getElementById('lineup-edit-list');
             listEl.innerHTML = '';
             starters.forEach((p, idx) => {
                 const posOptions = `<option value="" ${!p.pos ? 'selected' : ''}>選択</option>` + positions.map(pos => `<option value="${pos}" ${pos === p.pos ? 'selected' : ''}>${pos}</option>`).join('');
+                const gradeVal = gradeValueOfPlayerAt(p, gameFY);
                 const row = document.createElement('div');
                 row.className = 'flex flex-wrap items-center gap-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-2';
                 row.innerHTML = `
                     <span class="w-12 shrink-0 text-center font-extrabold text-slate-800 bg-slate-100 border border-slate-200 rounded px-1 py-1" title="打順（固定表示）">${p.order}番</span>
                     <select id="edit-pos-${idx}" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptions}</select>
                     <input type="text" id="edit-name-${idx}" value="${physicalEscapeHtml(p.name || '')}" placeholder="選手名を入力" class="flex-1 min-w-[7rem] border border-slate-300 rounded px-2 py-1 font-bold bg-white">
-                    <select id="edit-num-${idx}" title="背番号（公式戦のみ）" class="w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${official ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(p.number))}</select>
+                    <select id="edit-num-${idx}" title="背番号" class="w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(uniformNumberDefault(p.number))}</select>
+                    <select id="edit-grade-${idx}" data-init="${gradeVal}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(gradeVal)}</select>
                     ${handChecksHtml(`edit-hand-${idx}`, p.throws || '右', p.bats || '右')}
                 `;
                 listEl.appendChild(row);
@@ -9774,11 +9916,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             lineupEditPitcherId = dhPitcher ? dhPitcher.id : null;
             if (pitcherArea) {
                 if (dhPitcher) {
+                    const pitcherGradeVal = gradeValueOfPlayerAt(dhPitcher, gameFY);
                     pitcherArea.innerHTML = `
                         <div class="flex flex-wrap items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
                             <span class="shrink-0 text-center font-extrabold text-amber-900 leading-tight">10人目<br><span class="text-[9px] font-bold">打順なし・投手</span></span>
                             <input type="text" id="edit-pitcher-name" value="${physicalEscapeHtml(dhPitcher.name || '')}" placeholder="投手名を入力" class="flex-1 min-w-[7rem] border border-amber-300 rounded px-2 py-1 font-bold bg-white">
-                            <select id="edit-pitcher-num" title="背番号（公式戦のみ）" class="w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${official ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(dhPitcher.number))}</select>
+                            <select id="edit-pitcher-num" title="背番号" class="w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(uniformNumberDefault(dhPitcher.number))}</select>
+                            <select id="edit-pitcher-grade" data-init="${pitcherGradeVal}" title="学年" class="w-14 shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(pitcherGradeVal)}</select>
                             ${handChecksHtml('edit-pitcher-hand', dhPitcher.throws || '右', dhPitcher.bats || '右')}
                         </div>`;
                 } else {
@@ -9790,11 +9934,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             lineupEditBenchIds = bench.map(p => p.id);
             if (benchArea) {
                 if (bench.length) {
-                    let html = '<div class="text-[11px] font-extrabold text-slate-600 mb-1">ベンチ選手（名前・利き手を直せます）</div><div class="space-y-1.5">';
+                    let html = '<div class="text-[11px] font-extrabold text-slate-600 mb-1">ベンチ選手（名前・背番号・学年・利き手を直せます）</div><div class="space-y-1.5">';
                     bench.forEach((p, j) => {
+                        const benchGradeVal = gradeValueOfPlayerAt(p, gameFY);
                         html += `<div class="flex flex-wrap items-center gap-1.5 text-xs bg-white border border-slate-200 rounded-lg px-2 py-2">
                             <span class="w-10 text-center font-bold text-slate-500">${physicalEscapeHtml(p.pos || '控')}</span>
                             <input type="text" id="edit-bench-name-${j}" value="${physicalEscapeHtml(p.name || '')}" placeholder="選手名を入力" class="flex-1 min-w-[7rem] border border-slate-300 rounded px-2 py-1 font-bold bg-white">
+                            <select id="edit-bench-num-${j}" title="背番号" class="w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(uniformNumberDefault(p.number))}</select>
+                            <select id="edit-bench-grade-${j}" data-init="${benchGradeVal}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(benchGradeVal)}</select>
                             ${handChecksHtml(`edit-bench-hand-${j}`, p.throws || '右', p.bats || '右')}
                         </div>`;
                     });
@@ -9809,11 +9956,22 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function saveLineupEdit() {
             if (!hasCurrentGame()) return;
             const team = gameState.teams[lineupEditTeamKey];
+            const gameFY = fiscalYearOfDateStr(gameState.meta && gameState.meta.date);
+            // 学年プルダウンが初期表示から変更された場合だけ入学年度を書き換える。
+            // 未変更なら既存の入学年度を保持する（学年が1〜3の範囲外で表示が
+            // 「学年（未選択）」になっている選手の入学年度を消してしまわないため）。
+            // 戻り値 undefined は「変更なし」を表す。
+            const gradeEditOf = (el) => {
+                if (!el) return undefined;
+                if (el.value === (el.getAttribute('data-init') || '')) return undefined;
+                return el.value ? (gameFY - parseInt(el.value, 10) + 1) : '';
+            };
             const edits = [];
             lineupEditStarterIds.forEach((pid, idx) => {
                 const posEl = document.getElementById(`edit-pos-${idx}`);
                 const nameEl = document.getElementById(`edit-name-${idx}`);
                 const numEl = document.getElementById(`edit-num-${idx}`);
+                const gradeEl = document.getElementById(`edit-grade-${idx}`);
                 // 打順はプルダウンにせず固定表示のため、現在の打順をそのまま使う
                 const curPlayer = team.players.find(x => x.id === pid);
                 const order = curPlayer ? curPlayer.order : (idx + 1);
@@ -9822,7 +9980,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 // 打順が回ってくるたびに分かった範囲で入力していく使い方のため、
                 // ポジション未選択・選手名未入力・ポジション重複があっても止めず、
                 // 入力されている内容をそのまま保存する（後から随時直せる）。
-                edits.push({ id: pid, order: order, pos: pos, name: name, number: numEl ? numEl.value : undefined, throws: readHandChecks(`edit-hand-${idx}`, 'th'), bats: readHandChecks(`edit-hand-${idx}`, 'ba') });
+                edits.push({ id: pid, order: order, pos: pos, name: name, number: numEl ? numEl.value : undefined, entryYear: gradeEditOf(gradeEl), throws: readHandChecks(`edit-hand-${idx}`, 'th'), bats: readHandChecks(`edit-hand-${idx}`, 'ba') });
             });
             const errEl = document.getElementById('lineup-edit-error');
             if (errEl) errEl.classList.add('hidden');
@@ -9839,7 +9997,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 p.order = e.order;
                 p.pos = e.pos;
                 if (e.name) p.name = e.name;
-                if (e.number !== undefined && e.number !== null && isCurrentGameOfficial()) p.number = e.number;
+                // 背番号は公式戦・練習試合を問わず、この画面から入力・保存できる
+                if (e.number !== undefined && e.number !== null) p.number = e.number;
+                if (e.entryYear !== undefined) p.entryYear = e.entryYear;
                 if (e.throws !== null && e.throws !== undefined) p.throws = e.throws;
                 if (e.bats !== null && e.bats !== undefined) p.bats = e.bats;
             });
@@ -9870,7 +10030,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     const nEl = document.getElementById('edit-pitcher-name');
                     const numEl = document.getElementById('edit-pitcher-num');
                     if (nEl && nEl.value.trim()) pp.name = nEl.value.trim();
-                    if (numEl && isCurrentGameOfficial()) pp.number = numEl.value;
+                    if (numEl) pp.number = numEl.value;
+                    const pGrade = gradeEditOf(document.getElementById('edit-pitcher-grade'));
+                    if (pGrade !== undefined) pp.entryYear = pGrade;
                     const th = readHandChecks('edit-pitcher-hand', 'th');
                     if (th !== null) pp.throws = th;
                     const ba = readHandChecks('edit-pitcher-hand', 'ba');
@@ -9882,6 +10044,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (!p) return;
                 const nEl = document.getElementById(`edit-bench-name-${j}`);
                 if (nEl && nEl.value.trim()) p.name = nEl.value.trim();
+                const bNumEl = document.getElementById(`edit-bench-num-${j}`);
+                if (bNumEl) p.number = bNumEl.value;
+                const bGrade = gradeEditOf(document.getElementById(`edit-bench-grade-${j}`));
+                if (bGrade !== undefined) p.entryYear = bGrade;
                 const th = readHandChecks(`edit-bench-hand-${j}`, 'th');
                 if (th !== null) p.throws = th;
                 const ba = readHandChecks(`edit-bench-hand-${j}`, 'ba');
@@ -11553,9 +11719,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         if (p.dhPitcher && p.batting.pa === 0) return; // DH投手は打席がないため打撃成績に含めない
                         const key = statsAggKey(teamName, p.name);
                         if (!playerMap[key]) {
-                            playerMap[key] = { name: p.name, team: teamName, games: 0, pa: 0, ab: 0, h: 0, rbi: 0, r: 0, so: 0, bbHbp: 0, sacSf: 0, sf: 0, bb: 0, hbp: 0, sac: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0 };
+                            playerMap[key] = { name: p.name, team: teamName, entryYear: '', games: 0, pa: 0, ab: 0, h: 0, rbi: 0, r: 0, so: 0, bbHbp: 0, sacSf: 0, sf: 0, bb: 0, hbp: 0, sac: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0 };
                         }
                         const rec = playerMap[key];
+                        // 試合データに保存された入学年度を集計レコードへ引き継ぐ
+                        // （年度絞り込みで名簿より優先して使う。進級は年度計算で自動）
+                        const ey0 = parseEntryYear(p.entryYear);
+                        if (ey0 !== null && !rec.entryYear) rec.entryYear = ey0;
                         rec.games += 1;
                         rec.pa += p.batting.pa || 0;
                         rec.ab += p.batting.ab || 0;
@@ -11598,8 +11768,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const batterSource = statsSplitBatter !== 'ALL'
                 ? deriveBatterSplitLines(archives.map(a => (a && a.data) ? a.data : null).filter(Boolean), statsSplitBatter)
                 : playerMap;
-            // 選択中の年度で1〜3年生に当たる選手だけを表示（名簿で入学年度が判定できる選手のみ絞り込む）
-            const list = Object.values(batterSource).filter(p => isOwnTeamName(p.team) && (filterTeam === 'ALL' || p.team === filterTeam) && isNameInSelectedYear(p.name));
+            // 選択中の年度で1〜3年生に当たる選手だけを表示。試合データに
+            // 入学年度が保存されていればそれを優先し（年度が替われば自動で
+            // 進級・卒業が反映される）、無ければ従来どおり名簿で判定する
+            const list = Object.values(batterSource).filter(p => isOwnTeamName(p.team) && (filterTeam === 'ALL' || p.team === filterTeam) && (p.entryYear ? isPlayerInSelectedYear(p) : isNameInSelectedYear(p.name)));
             list.sort((a, b) => {
                 const avgA = a.ab > 0 ? a.h / a.ab : -1;
                 const avgB = b.ab > 0 ? b.h / b.ab : -1;
@@ -12937,12 +13109,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ];
             } else if (cat === 'out') {
                 titleText = 'アウトの種類を選択';
+                // 打球角度の直感に合わせ、フライ→ライナー→ゴロ→バントの順に並べる
+                // （ゴロ併殺打はゴロ系としてゴロアウトの直後に置く）
                 items = [
-                    { type: 'SB_OUT', label: 'セーフティバントアウト', pos: 'bunt', cls: 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-200' },
-                    { type: 'GO', label: 'ゴロアウト', pos: true, cls: 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300' },
                     { type: 'FO', label: 'フライアウト', pos: true, cls: 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300' },
                     { type: 'LO', label: 'ライナーアウト', pos: true, cls: 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300' },
-                    { type: 'DP', label: 'ゴロ併殺打', pos: true, cls: 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-200' }
+                    { type: 'GO', label: 'ゴロアウト', pos: true, cls: 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300' },
+                    { type: 'DP', label: 'ゴロ併殺打', pos: true, cls: 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-200' },
+                    { type: 'SB_OUT', label: 'セーフティバントアウト', pos: 'bunt', cls: 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-200' }
                 ];
             } else if (cat === 'walk') {
                 titleText = '死球・その他出塁を選択';
@@ -14059,6 +14233,76 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (!isLinked) saveAndRender();
         }
 
+        // 牽制と同時の投球の表示名（バント・バスター・ファウル系を含む）
+        function pickoffPitchLabel(pitchType) {
+            switch (pitchType) {
+                case 'ball': return 'ボール';
+                case 'ball_bunt': return 'バント構えボール';
+                case 'ball_buster': return 'バスター構えボール';
+                case 'strike_called': return '見逃しストライク';
+                case 'strike_called_bunt': return 'バント見逃し';
+                case 'strike_called_buster': return 'バスター見逃し';
+                case 'strike_swing': return '空振りストライク';
+                case 'strike_swing_bunt': return 'バント空振り';
+                case 'strike_swing_buster': return 'バスター空振り';
+                case 'foul': case 'foul_hitting': return 'ヒッティングファウル';
+                case 'foul_bunt': return 'バントファウル';
+                case 'foul_tip': return 'ファウルチップ';
+                default: return '';
+            }
+        }
+
+        // 捕手からの牽制の投球選択は、通常のスコア入力と同じ2段階にする：
+        // 1段階目で ボール／見逃し／空振り／ファウル を選び、2段階目で
+        // 通常／バント／バスター（ファウルはヒッティング／バント／チップ）を選ぶ。
+        // flow は 'attempt'（牽制ボタン）か 'out'（走者イベントの牽制死）。
+        const PICKOFF_PITCH_CATEGORIES = {
+            ball: { title: 'ボールの種類を選択', variants: [['ball', '通常ボール'], ['ball_bunt', 'バント構えボール'], ['ball_buster', 'バスター構えボール']] },
+            strike_called: { title: '見逃しの種類を選択', variants: [['strike_called', '通常見逃し'], ['strike_called_bunt', 'バント見逃し'], ['strike_called_buster', 'バスター見逃し']] },
+            strike_swing: { title: '空振りの種類を選択', variants: [['strike_swing', 'スイング空振り'], ['strike_swing_bunt', 'バント空振り'], ['strike_swing_buster', 'バスター空振り']] },
+            foul: { title: 'ファウルの種類を選択', variants: [['foul_hitting', 'ヒッティングファウル'], ['foul_bunt', 'バントファウル'], ['foul_tip', 'ファウルチップ']] }
+        };
+
+        function resetPickoffPitchSteps(flow) {
+            const s1 = document.getElementById(`pickoff-${flow}-count-step1`);
+            const s2 = document.getElementById(`pickoff-${flow}-count-step2`);
+            if (s1) s1.classList.remove('hidden');
+            if (s2) s2.classList.add('hidden');
+        }
+
+        function pickoffPitchCategory(flow, category) {
+            const cat = PICKOFF_PITCH_CATEGORIES[category];
+            if (!cat) return;
+            const s1 = document.getElementById(`pickoff-${flow}-count-step1`);
+            const s2 = document.getElementById(`pickoff-${flow}-count-step2`);
+            const titleEl = document.getElementById(`pickoff-${flow}-count-step2-title`);
+            const varEl = document.getElementById(`pickoff-${flow}-count-variants`);
+            if (titleEl) titleEl.textContent = cat.title;
+            if (varEl) {
+                varEl.innerHTML = cat.variants.map(v => `
+                    <button onclick="pickoffPitchVariant('${flow}', '${v[0]}')" class="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs flex items-center justify-between transition">
+                        <span>${v[1]}</span>
+                        <span class="text-[11px] text-slate-500">選択する →</span>
+                    </button>
+                `).join('');
+            }
+            if (s1) s1.classList.add('hidden');
+            if (s2) s2.classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function pickoffPitchBack(flow) {
+            resetPickoffPitchSteps(flow);
+        }
+
+        function pickoffPitchVariant(flow, pitchType) {
+            if (flow === 'attempt') {
+                selectPickoffAttemptCount(pitchType);
+            } else {
+                finalizeRunnerEvent(pitchType);
+            }
+        }
+
         function handlePickoffButtonClick() {
             const bases = gameState.live.bases || [null, null, null];
             const hasRunner = bases.some(Boolean);
@@ -14069,19 +14313,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
 
             // 牽制死と同様に、まず投手から／捕手からを選択する
-            pendingPickoffAttempt = { source: null, pitchType: null };
+            pendingPickoffAttempt = { source: null, pitchType: null, isOut: false };
             openModal('modal-pickoff-attempt-source');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function selectPickoffAttemptSource(source) {
-            if (!pendingPickoffAttempt) pendingPickoffAttempt = { source: null, pitchType: null };
+            if (!pendingPickoffAttempt) pendingPickoffAttempt = { source: null, pitchType: null, isOut: false };
             pendingPickoffAttempt.source = source;
             closeModal('modal-pickoff-attempt-source');
             if (source === 'pitcher') {
-                // 投手からの牽制は投球ではないため、カウント選択なしで記録する（牽制死・投手からと同様）
-                proceedToPickoffTargetSelection();
+                // 投手からの牽制は投球ではないため、カウント選択なしで結果選択へ進む
+                openModal('modal-pickoff-attempt-result');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             } else {
+                resetPickoffPitchSteps('attempt');
                 openModal('modal-pickoff-attempt-catcher-count');
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             }
@@ -14089,6 +14335,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         function backToPickoffAttemptSource() {
             closeModal('modal-pickoff-attempt-catcher-count');
+            resetPickoffPitchSteps('attempt');
             openModal('modal-pickoff-attempt-source');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
@@ -14097,6 +14344,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (!pendingPickoffAttempt) return;
             pendingPickoffAttempt.pitchType = pitchType;
             closeModal('modal-pickoff-attempt-catcher-count');
+            // 投球を選んだら、牽制の結果（セーフ／牽制死）を選ぶ
+            openModal('modal-pickoff-attempt-result');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function backFromPickoffAttemptResult() {
+            closeModal('modal-pickoff-attempt-result');
+            openModal('modal-pickoff-attempt-source');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function selectPickoffAttemptResult(isOut) {
+            if (!pendingPickoffAttempt) pendingPickoffAttempt = { source: 'pitcher', pitchType: null, isOut: false };
+            pendingPickoffAttempt.isOut = !!isOut;
+            closeModal('modal-pickoff-attempt-result');
             proceedToPickoffTargetSelection();
         }
 
@@ -14135,6 +14397,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const attempt = pendingPickoffAttempt || { source: 'pitcher', pitchType: null };
             const source = attempt.source || 'pitcher';
             const pitchType = source === 'catcher' ? (attempt.pitchType || null) : null;
+            const isOut = !!attempt.isOut;
             pendingPickoffAttempt = null;
 
             pushUndoState();
@@ -14163,10 +14426,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 recordPitch(pitchType, true);
             }
 
-            let pitchLabel = '';
-            if (pitchType === 'ball') pitchLabel = 'ボール';
-            else if (pitchType === 'strike_called') pitchLabel = '見逃しストライク';
-            else if (pitchType === 'strike_swing') pitchLabel = '空振りストライク';
+            const pitchLabel = pickoffPitchLabel(pitchType);
             const sourceLabel = source === 'catcher' ? (pitchLabel ? `捕手から・${pitchLabel}` : '捕手から') : '投手から';
 
             gameState.live.pitchHistory.push({
@@ -14182,15 +14442,49 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 batterName: batter ? batter.name : '',
                 pickoffSource: source,
                 linkedPitchType: pitchType || null,
-                label: `牽制(${targetBase}塁・${sourceLabel}${streak > 1 ? `・${streak}連続` : ''})`,
-                badgeClass: 'bg-indigo-600 text-white'
+                isOut: isOut,
+                label: `${isOut ? '牽制死' : '牽制'}(${targetBase}塁・${sourceLabel}${streak > 1 ? `・${streak}連続` : ''})`,
+                badgeClass: isOut ? 'bg-rose-600 text-white' : 'bg-indigo-600 text-white'
             });
 
             const b = gameState.live.balls;
             const s = gameState.live.strikes;
-            addLog(`牽制（${sourceLabel}） (${targetBase}塁 / カウント ${b}-${s}${streak > 1 ? ` / ${streak}球連続` : ''})`);
+            if (isOut) {
+                // 牽制死（アウト）：走者イベントから入れる牽制死と同じ記録にする。
+                // 走者を塁から外し、アウトを加え、投手成績のアウト数・継承走者の
+                // 付け替えも走者イベント側と揃える。あわせて、打席記録からの
+                // 投手アウト数復元が拾えるよう runner_event の牽制死も残す。
+                const outBases = [...(gameState.live.bases || [null, null, null])];
+                const outRunnerId = outBases[targetBase - 1] || null;
+                const outRunner = outRunnerId ? findPlayerById(outRunnerId) : null;
+                const outRunnerName = outRunner ? outRunner.name : '';
+                if (outRunnerId) {
+                    outBases[targetBase - 1] = null;
+                    gameState.live.bases = outBases;
+                }
+                const pickoffOutLabel = source === 'pitcher' ? '牽制死（投手から）' : '牽制死（捕手から）';
+                addLog(`${outRunnerName} (${targetBase}塁) ${source === 'catcher' && pitchLabel ? `牽制死（捕手から・${pitchLabel}）` : pickoffOutLabel} (カウント ${b}-${s})`);
+                const poPitcher = getCurrentPitcher();
+                if (poPitcher) ensurePitchingLine(poPitcher).outs += 1;
+                if (outRunnerId) {
+                    removeFromBequeathed(outRunnerId);
+                    if (gameState.live.runnerResp) delete gameState.live.runnerResp[outRunnerId];
+                }
+                gameState.live.pitchHistory.push({
+                    type: 'runner_event',
+                    label: pickoffOutLabel,
+                    badgeClass: 'bg-slate-700 text-white',
+                    pickoffSource: source,
+                    linkedPitchType: pitchType || null
+                });
+                addOuts(1);
+            } else {
+                addLog(`牽制（${sourceLabel}） (${targetBase}塁 / カウント ${b}-${s}${streak > 1 ? ` / ${streak}球連続` : ''})`);
+            }
             saveAndRender();
-            showToast(`${targetBase}塁へ牽制（${source === 'catcher' ? '捕手から' : '投手から'}）を記録しました（カウント ${b}-${s}）`, 'info');
+            showToast(isOut
+                ? `${targetBase}塁で牽制死（${sourceLabel}）を記録しました（カウント ${b}-${s}）`
+                : `${targetBase}塁へ牽制（${source === 'catcher' ? '捕手から' : '投手から'}）を記録しました（カウント ${b}-${s}）`, 'info');
 
             if (pitchType && gameState.live.outs < 3) {
                 if (gameState.live.balls >= 4) {
@@ -14204,7 +14498,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function recordPickoff(targetBase) {
-            pendingPickoffAttempt = { source: 'pitcher', pitchType: null };
+            pendingPickoffAttempt = { source: 'pitcher', pitchType: null, isOut: false };
             finalizePickoffAttempt(targetBase);
         }
 
@@ -14634,6 +14928,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 // 投手からの牽制死は投球ではないため、カウント選択なしで記録する
                 finalizeRunnerEvent(null);
             } else {
+                resetPickoffPitchSteps('out');
                 openModal('modal-pickoff-catcher-count');
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             }
@@ -14647,12 +14942,22 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         function backToPickoffSource() {
             closeModal('modal-pickoff-catcher-count');
+            resetPickoffPitchSteps('out');
             openModal('modal-pickoff-source');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function promptRunnerEventPitchLink(actionType) {
-            const checkboxes = document.querySelectorAll('input[name="target-runner"]:checked');
+            let checkboxes = document.querySelectorAll('input[name="target-runner"]:checked');
+            // 盗塁（成功・死）を選んだとき、塁上の走者が1人だけなら
+            // その走者を自動で対象にする（わざわざチェックし直さなくてよい）
+            if (checkboxes.length === 0 && (actionType === 'steal' || actionType === 'out_steal')) {
+                const allRunners = document.querySelectorAll('input[name="target-runner"]');
+                if (allRunners.length === 1) {
+                    allRunners[0].checked = true;
+                    checkboxes = allRunners;
+                }
+            }
             if (checkboxes.length === 0) {
                 showToast('走者が選択されていません', 'warning');
                 return;
@@ -14810,10 +15115,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     if (pickoffSource === 'pitcher') {
                         pickoffDetail = '牽制死（投手から）';
                     } else if (pickoffSource === 'catcher') {
-                        let pitchLabel = '';
-                        if (pitchType === 'ball') pitchLabel = 'ボール';
-                        else if (pitchType === 'strike_called') pitchLabel = '見逃しストライク';
-                        else if (pitchType === 'strike_swing') pitchLabel = '空振りストライク';
+                        const pitchLabel = pickoffPitchLabel(pitchType);
                         pickoffDetail = pitchLabel ? `牽制死（捕手から・${pitchLabel}）` : '牽制死（捕手から）';
                     }
                     addLog(`${rName} (${idx + 1}塁) ${pickoffDetail}`);
@@ -18843,16 +19145,29 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const strikeMap = {}, lineMap = {};
             allStrike.forEach(st => { strikeMap[statsAggKey(st.team, st.name)] = st; });
             allLines.forEach(l => { lineMap[statsAggKey(l.team, l.name)] = l; });
+            // 試合データに保存された入学年度（選手名→入学年度）を集めておく
+            const entryYearByName = {};
+            games.forEach(g => {
+                ['away', 'home'].forEach(tk => {
+                    const t = g.teams && g.teams[tk];
+                    if (!t || !Array.isArray(t.players)) return;
+                    t.players.forEach(p => {
+                        const ey = parseEntryYear(p.entryYear);
+                        if (ey !== null && !entryYearByName[p.name]) entryYearByName[p.name] = ey;
+                    });
+                });
+            });
             const keySet = new Set([...Object.keys(lineMap), ...Object.keys(strikeMap)]);
             let rows = Array.from(keySet).map(k => {
                 const src = lineMap[k] || strikeMap[k];
-                return { key: k, name: src.name, team: src.team, line: lineMap[k] || null, strike: strikeMap[k] || null };
+                return { key: k, name: src.name, team: src.team, entryYear: entryYearByName[src.name] || null, line: lineMap[k] || null, strike: strikeMap[k] || null };
             });
             // 'ALL' は「自チーム全体」の意味。他チームの投手は選手成績には出さない。
             if (filterTeam && filterTeam !== 'ALL') rows = rows.filter(r => r.team === filterTeam);
             else rows = rows.filter(r => isOwnTeamName(r.team));
-            // 選択中の年度で1〜3年生に当たる投手だけを表示（名簿で入学年度が判定できる投手のみ絞り込む）
-            rows = rows.filter(r => isNameInSelectedYear(r.name));
+            // 選択中の年度で1〜3年生に当たる投手だけを表示。試合データの
+            // 入学年度があればそれを優先し、無ければ名簿で判定する
+            rows = rows.filter(r => r.entryYear ? isPlayerInSelectedYear(r) : isNameInSelectedYear(r.name));
             rows.sort((a, b) => ((b.strike ? b.strike.total : 0) - (a.strike ? a.strike.total : 0)) || ((b.line ? b.line.outs : 0) - (a.line ? a.line.outs : 0)));
 
             if (rows.length === 0) {
@@ -21226,7 +21541,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             openSubMarkResolveModal, onSubMarkOutChange, onSubMarkInChange, deleteSubMark, confirmSubMarkResolution,
             openTiebreakConfirmModal, confirmEnterTiebreak, confirmTiebreakSetup, applyDefaultTiebreakRunners,
             promptPickoffOut, selectPickoffSource, backToRunnerEventFromPickoff, backToPickoffSource,
-            selectPickoffAttemptSource, backToPickoffAttemptSource, selectPickoffAttemptCount, proceedToPickoffTargetSelection, finalizePickoffAttempt,
+            selectPickoffAttemptSource, backToPickoffAttemptSource, selectPickoffAttemptCount, selectPickoffAttemptResult, backFromPickoffAttemptResult, pickoffPitchCategory, pickoffPitchBack, pickoffPitchVariant, proceedToPickoffTargetSelection, finalizePickoffAttempt,
             pushUndoState, recordPickoff, recordPitch, removeMasterPlayer,
             triggerRosterExcelSelect, handleRosterExcelFile, downloadRosterTemplateExcel, downloadRosterBlankTemplate, applyRosterImport,
             exportPlayerStatsExcel, exportTeamStatsExcel,
