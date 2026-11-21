@@ -2723,6 +2723,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <div class="grid grid-cols-2 gap-3">
                         <!-- 打者 -->
                         <div class="bg-emerald-50/60 border border-emerald-200 rounded-xl p-3 space-y-2">
+                            <div id="curr-batter-team" class="text-base font-extrabold text-emerald-900 leading-tight truncate" title="打者のチーム名"></div>
                             <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
                                 <span class="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">打者</span>
                                 <span id="curr-batter-order" class="font-mono text-[11px] text-slate-600">1番</span>
@@ -2747,6 +2748,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         </div>
                         <!-- 投手 -->
                         <div class="bg-rose-50/60 border border-rose-200 rounded-xl p-3 space-y-2">
+                            <div id="curr-pitcher-team" class="text-base font-extrabold text-rose-900 leading-tight truncate" title="投手のチーム名"></div>
                             <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
                                 <span class="text-[11px] font-extrabold text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded">投手</span>
                                 <input type="text" id="curr-pitcher-name" value="" placeholder="選手氏名" onchange="commitLivePlayerInline('pitcher','name',this.value)" class="flex-1 min-w-[5.5rem] border border-rose-300/80 rounded-md px-1.5 py-0.5 font-extrabold text-slate-900 text-sm bg-white/80 focus:bg-white focus:outline-none focus:ring-1 focus:ring-rose-400" title="選手氏名をそのまま入力・修正できます（選手交代ではなく、オーダーの登録・誤りの修正として扱います）">
@@ -2764,9 +2766,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 <label class="flex items-center gap-1 text-[10px] font-bold text-slate-500">背番号
                                     <select id="curr-pitcher-num" onchange="commitLivePlayerInline('pitcher','number',this.value)" class="border border-slate-300 rounded-md px-1 py-1 text-[11px] font-bold bg-white" title="背番号をそのまま変更できます（選手交代ではなく、登録・修正として扱います）"></select>
                                 </label>
-                                <label class="flex items-center gap-1 text-[10px] font-bold text-slate-500">守備
-                                    <select id="curr-pitcher-pos" onchange="commitLivePlayerInline('pitcher','pos',this.value)" class="border border-slate-300 rounded-md px-1 py-1 text-[11px] font-bold bg-white" title="守備位置をそのまま変更できます（選手交代ではなく、登録・修正として扱います）"></select>
-                                </label>
+                                <span class="flex items-center gap-1 text-[10px] font-bold text-slate-500">守備
+                                    <span id="curr-pitcher-pos" class="border border-slate-200 rounded-md px-1.5 py-1 text-[11px] font-bold bg-slate-100 text-slate-700 min-w-[2rem] text-center" title="投手の守備位置は「投」で固定です">投</span>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -4550,7 +4552,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <div class="border border-indigo-200 rounded-xl overflow-hidden">
                         <div class="bg-indigo-900 text-white px-3.5 py-2 flex items-center justify-between gap-2">
                             <span class="text-xs font-extrabold shrink-0">先攻チーム スタメン選択</span>
-                            <input type="text" id="setup-my-team-name" value="" placeholder="先攻チーム名を入力" class="bg-white text-slate-900 border border-indigo-300 rounded px-2 py-0.5 text-xs font-bold w-40">
+                            <input type="text" id="setup-my-team-name" value="" placeholder="先攻チーム名を入力" onchange="checkSetupTeamName('my')" class="bg-white text-slate-900 border border-indigo-300 rounded px-2 py-0.5 text-xs font-bold w-40">
                         </div>
                         <div class="px-3 py-2 bg-white border-b border-indigo-100 space-y-2">
                             <div class="flex flex-wrap items-center justify-between gap-2">
@@ -4585,7 +4587,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <div class="border border-slate-300 rounded-xl overflow-hidden">
                         <div class="bg-slate-800 text-white px-3.5 py-2 flex items-center justify-between gap-2">
                             <span class="text-xs font-extrabold shrink-0">後攻チーム スタメン選択</span>
-                            <input type="text" id="setup-opp-team-name" value="対戦相手校" placeholder="後攻チーム名を入力" class="bg-white text-slate-900 border border-slate-300 rounded px-2 py-0.5 text-xs font-bold w-40">
+                            <input type="text" id="setup-opp-team-name" value="対戦相手校" placeholder="後攻チーム名を入力" onchange="checkSetupTeamName('opp')" class="bg-white text-slate-900 border border-slate-300 rounded px-2 py-0.5 text-xs font-bold w-40">
                         </div>
                         <div class="px-3 py-2 bg-white border-b border-slate-200 space-y-2">
                             <div class="flex flex-wrap items-center justify-between gap-2">
@@ -4616,6 +4618,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <div id="setup-opp-bench-area" class="hidden px-2.5 pb-2.5 bg-slate-50/50"></div>
                     </div>
                 </div>
+
+                <p class="text-[11px] text-slate-500 leading-relaxed">先攻・後攻がまだ決まっていないときは、分かっている方のチームだけ打順を入力して「スタメンのみ一旦登録」を押してください。もう一方のチームは空欄のまま登録でき、決まった後にスコア入力画面の「スタメン編集」から入力できます。チーム名に「高校」は使えません（例：庄和高校 → 庄和）。</p>
             </div>
 
             <div class="bg-slate-100 px-5 py-3.5 border-t border-slate-200 shrink-0 space-y-2.5">
@@ -4625,6 +4629,22 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <button id="setup-btn-save-only" onclick="confirmNewGameSetup(false)" class="px-4 py-2 text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition">スタメンのみ一旦登録</button>
                         <button id="setup-btn-start" onclick="confirmNewGameSetup(true)" class="px-4 py-2 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">スコア入力開始</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- チーム名「高校」エラー用ポップアップ（スタメン先行登録・新規試合準備で統一） -->
+    <div id="modal-team-name-koko" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs hidden items-center justify-center z-[70] p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden">
+            <div class="bg-rose-700 text-white px-5 py-3 flex items-center gap-2">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                <h3 class="font-bold text-sm">チーム名の確認</h3>
+            </div>
+            <div class="p-5 space-y-4">
+                <p id="team-name-koko-message" class="text-sm text-slate-700 leading-relaxed font-bold"></p>
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeKokoTeamNamePopup()" class="px-4 py-2 text-xs font-extrabold bg-rose-600 hover:bg-rose-700 text-white rounded-lg shadow-sm transition">直して入力する</button>
                 </div>
             </div>
         </div>
@@ -9186,6 +9206,66 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
         }
 
+        // ================= チーム名の「高校」チェック（この画面で統一） =================
+        // チーム名に「高校」が含まれていたらエラーにし、ポップアップで
+        // 「〇〇高校なら〇〇だけにして」と案内する。チーム名入力欄の変更時と、
+        // 登録・開始ボタンを押したとき（最終チェック）の両方で確認する。
+        let kokoTeamNameFocusId = null;
+        function showKokoTeamNamePopup(name, focusId) {
+            const stripped = (name || '').replace(/高校/g, '').trim();
+            const msgEl = document.getElementById('team-name-koko-message');
+            if (msgEl) {
+                msgEl.textContent = stripped
+                    ? `チーム名に「高校」は使えません。「${name}」なら「${stripped}」だけにしてください。`
+                    : 'チーム名に「高校」だけでは登録できません。「高校」を除いた学校名を入力してください。';
+            }
+            kokoTeamNameFocusId = focusId || null;
+            openModal('modal-team-name-koko');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function closeKokoTeamNamePopup() {
+            closeModal('modal-team-name-koko');
+            if (kokoTeamNameFocusId) {
+                const el = document.getElementById(kokoTeamNameFocusId);
+                kokoTeamNameFocusId = null;
+                if (el) { el.focus(); if (el.select) el.select(); }
+            }
+        }
+
+        // チーム名入力欄の変更時にチェックする（「高校」が入っていたらポップアップ）
+        function checkSetupTeamName(which) {
+            const el = document.getElementById(which === 'my' ? 'setup-my-team-name' : 'setup-opp-team-name');
+            const name = el ? el.value.trim() : '';
+            if (name.includes('高校')) {
+                showKokoTeamNamePopup(name, el ? el.id : null);
+                return false;
+            }
+            return true;
+        }
+
+        // そのチームの打順が少しでも入力されているか。
+        // 先攻・後攻が未定で、片方のチームだけ先に登録する使い方の判定に使う。
+        function isSetupTeamEntered(key) {
+            const source = getSetupSource(key);
+            for (let i = 0; i < 9; i++) {
+                const posEl = document.getElementById(`setup-${key}-pos-${i}`);
+                if (posEl && posEl.value) return true;
+                if (source === 'roster') {
+                    const pEl = document.getElementById(`setup-${key}-player-${i}`);
+                    if (pEl && pEl.value) return true;
+                } else {
+                    const nEl = document.getElementById(`setup-${key}-name-${i}`);
+                    if (nEl && nEl.value.trim()) return true;
+                }
+            }
+            const pNameEl = document.getElementById(`setup-${key}-pitcher-name`);
+            if (pNameEl && pNameEl.value.trim()) return true;
+            const pSelEl = document.getElementById(`setup-${key}-pitcher-player`);
+            if (pSelEl && pSelEl.value) return true;
+            return false;
+        }
+
         function confirmNewGameSetup(startImmediately = true) {
             const mySource = getSetupSource('my');
             const oppSource = getSetupSource('opp');
@@ -9193,6 +9273,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const oppRoster = getSetupRoster('opp');
             const myTeamName = (document.getElementById('setup-my-team-name') ? document.getElementById('setup-my-team-name').value.trim() : '') || (mySource === 'roster' ? (myRoster.name || '先攻チーム') : '先攻チーム');
             const oppTeamNameEarly = (document.getElementById('setup-opp-team-name') ? document.getElementById('setup-opp-team-name').value.trim() : '') || (oppSource === 'roster' ? (oppRoster.name || '後攻チーム') : '後攻チーム');
+
+            // チーム名に「高校」が含まれていたらエラー（この画面で統一）。
+            // 「スタメンのみ一旦登録」「スコア入力開始」のどちらでも止める。
+            if (myTeamName.includes('高校')) { showKokoTeamNamePopup(myTeamName, 'setup-my-team-name'); return; }
+            if (oppTeamNameEarly.includes('高校')) { showKokoTeamNamePopup(oppTeamNameEarly, 'setup-opp-team-name'); return; }
+
+            // 先攻・後攻が未定で片方だけ分かっている場合に備え、
+            // どちらのチームの打順が入力済みかを控えておく（一旦登録の案内に使う）
+            const mySideEntered = isSetupTeamEntered('my');
+            const oppSideEntered = isSetupTeamEntered('opp');
 
             const mySide = 'away';
             const oppSide = 'home';
@@ -9599,7 +9689,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 showToast('スタメン情報を保存し、スコア入力を開始しました', 'success');
             } else {
                 navigateApp('home');
-                if (setupHasProblems) {
+                if (mySideEntered !== oppSideEntered) {
+                    // 先攻・後攻が未定で、分かっている方の打順だけを登録したケース
+                    const enteredName = mySideEntered ? myTeamName : oppTeamName;
+                    showToast(`${enteredName}の打順だけを登録しました。もう一方のチームは、決まった後にスコア入力画面の「スタメン編集」から入力できます`, 'success');
+                } else if (setupHasProblems) {
                     showToast('スタメンを一旦登録しました（未入力・重複が残っています。試合中にスコア入力画面の「スタメン編集」から直せます）', 'success');
                 } else {
                     showToast('スタメン情報を「現在進行中の試合」として保存しました', 'success');
@@ -9914,9 +10008,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const numEl = document.getElementById(prefix + '-num');
                 if (numEl && document.activeElement !== numEl) numEl.innerHTML = uniformNumberOptionsHtml(uniformNumberDefault(player.number));
                 const posEl = document.getElementById(prefix + '-pos');
-                if (posEl && document.activeElement !== posEl) {
+                if (posEl && posEl.tagName === 'SELECT' && document.activeElement !== posEl) {
                     posEl.innerHTML = livePosOptionsHtml(player.pos || '');
                     posEl.disabled = livePosLocked(player);
+                } else if (posEl && posEl.tagName !== 'SELECT') {
+                    // 投手の守備位置は選択式にせず「投」固定表示（投手は投手のため）。
+                    // 二刀流で指名打者を兼ねる投手だけは、兼任が分かるよう「指」と表示する。
+                    posEl.textContent = (player.pos === '指') ? '指' : '投';
                 }
             };
             syncOne('curr-batter', batter);
@@ -17513,6 +17611,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 }
             });
 
+            // 対戦中カードの上部に、それぞれのチーム名を少し大きめに表示する
+            const activeForCards = getActiveTeams();
+            const batterTeamEl = document.getElementById('curr-batter-team');
+            if (batterTeamEl) batterTeamEl.textContent = (activeForCards.offense && activeForCards.offense.name) || '';
+            const pitcherTeamEl = document.getElementById('curr-pitcher-team');
+            if (pitcherTeamEl) pitcherTeamEl.textContent = (activeForCards.defense && activeForCards.defense.name) || '';
+
             const batter = getCurrentBatter();
             if (batter) {
                 document.getElementById('curr-batter-order').textContent = `${batter.order}番 (${batter.pos})`;
@@ -21105,6 +21210,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             forceChangeHalfInning, handleFieldPositionClick,
             openLineupEditModal, switchLineupEditTeam, saveLineupEdit,
             commitLivePlayerInline,
+            checkSetupTeamName, closeKokoTeamNamePopup,
             showFieldLineupEdit, onFieldEditPlayerChange, saveFieldLineupEdit,
             handlePickoffButtonClick, loadArchivedGameToScorebook, navigateApp, goBackScreen,
             openBallModal, openBatterEventModal, openCalledStrikeModal,
