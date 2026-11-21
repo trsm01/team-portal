@@ -3163,7 +3163,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <label class="block text-xs font-bold text-slate-600 mb-1.5">入る選手のポジション</label>
                         <select id="submark-resolve-pos" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white"></select>
                     </div>
-                    <p class="text-[11px] text-slate-500 leading-relaxed">投手交代の場合、このマークの場面以降の投球は入る投手の記録に付け替え、球数・投手成績を再計算します。代打の場合も、この場面以降の打席を入る選手の記録に付け替えます。</p>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">投手交代の場合、このマークの場面以降の投球は入る投手の記録に付け替え、球数・投手成績を再計算します。失点・自責点は走者を出した投手に付け、マーク時点で塁上にいた走者は元の投手の継承走者として数え直します。代打・代走の場合も、この場面以降の打席を入る選手の記録に付け替え、打点・得点も実際に入った打者・生還した走者のものに付け替えます。</p>
                 </div>
             </div>
             <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between shrink-0">
@@ -9471,6 +9471,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     pendingDefenseSubs: [],
                     runnerResp: {},
                     bequeathed: {},
+                    bequeathedCounted: {},
                     pitcherTenure: null
                 },
                 teams: {
@@ -10617,29 +10618,76 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return team.players.find(p => p.id === key.slice(idx + 2)) || null;
         }
 
+        // ===== 得点台帳（交代マークの付け替え用） =====
+        // 得点が入るたびに、その内訳（生還した走者・失点を付けた投手・自責点か・
+        // 継承生還として数えた投手・打点が付いた打者）を runLog に残す。
+        // 交代マークを後から入力したとき、この台帳をもとに公式記録どおり
+        // （失点・自責点は走者を出した投手へ、継承走者が生還した失点は元の投手へ、
+        // 打点は実際に打った打者へ、得点は実際に生還した走者へ）付け替える。
+        // 台帳に残っていない旧データの得点は、誰の走者だったかを辿る情報が無いため
+        // 付け替え対象にしない（従来どおり元の記録のまま残す）。
+        function ensureRunLog() {
+            if (!gameState) return [];
+            if (!Array.isArray(gameState.runLog)) gameState.runLog = [];
+            return gameState.runLog;
+        }
+
+        function logRunScored(entry) {
+            const log = ensureRunLog();
+            entry.id = 'run_' + Date.now() + '_' + Math.floor(Math.random() * 1000000) + '_' + log.length;
+            log.push(entry);
+        }
+
+        // 台帳の得点が、交代マークより後のプレーで入ったものかを判定する。
+        // 打席記録の付け替え（reassignPitchingAfterMark）と同じ境界の考え方で、
+        // マークと同じ打席の得点は投球履歴上の位置（seqIdx）で前後を分ける。
+        function runLogAfterMark(e, mark) {
+            const mp = mark.paIndex || 0;
+            if (e.paIndex > mp) return true;
+            if (e.paIndex < mp) return false;
+            return (e.seqIdx || 0) >= (mark.pitchIdx || 0);
+        }
+
+        // 得点を責任投手の失点に数える。付け替えた先を呼び出し側（得点台帳）が
+        // 記録できるよう、実際に付けた投手と継承生還の情報を返す。
         function chargeRunScored(runnerId, earned) {
-            if (!runnerId || !gameState || !gameState.live) return;
+            if (!runnerId || !gameState || !gameState.live) return null;
             const live = gameState.live;
             let target = null;
-            const respKey = live.runnerResp ? live.runnerResp[runnerId] : null;
+            let respKey = live.runnerResp ? live.runnerResp[runnerId] : null;
             if (respKey) target = findPlayerByPitcherKey(respKey);
-            if (!target) target = getCurrentPitcher();
+            if (!target) {
+                target = getCurrentPitcher();
+                if (target) {
+                    try { respKey = getActiveTeams().defenseKey + '__' + target.id; } catch (e) { respKey = null; }
+                }
+            }
             if (target) {
                 const L = ensurePitchingLine(target);
                 L.r += 1;
                 if (earned) L.er += 1;
             }
+            let irsKey = null;
             if (live.bequeathed) {
                 Object.keys(live.bequeathed).forEach(k => {
                     const b = live.bequeathed[k];
                     if (b && Array.isArray(b.ids) && b.ids.indexOf(runnerId) !== -1) {
                         b.ids = b.ids.filter(id => id !== runnerId);
                         const p = findPlayerByPitcherKey(k);
-                        if (p) ensurePitchingLine(p).irs += 1;
+                        if (p) { ensurePitchingLine(p).irs += 1; irsKey = k; }
                     }
                 });
             }
             if (live.runnerResp) delete live.runnerResp[runnerId];
+            if (!target) return null;
+            return {
+                respKey: respKey,
+                respId: target.id,
+                respName: target.name,
+                earned: !!earned,
+                irsKey: irsKey,
+                irsId: irsKey ? irsKey.slice(irsKey.indexOf('__') + 2) : null
+            };
         }
 
         function removeFromBequeathed(runnerId) {
@@ -10671,6 +10719,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         ensurePitchingLine(prevPlayer).ir += runnerIds.length;
                         if (!live.bequeathed) live.bequeathed = {};
                         live.bequeathed[prev.key] = { ids: runnerIds.slice(), name: prevPlayer.name };
+                        // 継承走者として数えた走者を控えておく（交代マークの後付け入力で
+                        // 継承走者を数え直すときに、二重に数えないための控え）
+                        if (!live.bequeathedCounted) live.bequeathedCounted = {};
+                        const countedPrev = new Set(live.bequeathedCounted[prev.key] || []);
+                        runnerIds.forEach(id => countedPrev.add(id));
+                        live.bequeathedCounted[prev.key] = Array.from(countedPrev);
                     }
                 }
             }
@@ -12032,6 +12086,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     pendingDefenseSubs: [],
                     runnerResp: {},
                     bequeathed: {},
+                    bequeathedCounted: {},
                     pitcherTenure: null
                 },
                 teams: {
@@ -12040,7 +12095,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 },
                 logs: [],
                 atBatRecords: [],
-                subMarks: []
+                subMarks: [],
+                runLog: []
             };
         }
 
@@ -14043,6 +14099,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (idx === 2) {
                     if (runner) runner.batting.r += 1;
                     addRuns(1);
+                    const balkBatter = (typeof getCurrentBatter === 'function') ? getCurrentBatter() : null;
+                    logRunScored({
+                        paIndex: Array.isArray(gameState.atBatRecords) ? gameState.atBatRecords.length : 0,
+                        seqIdx: Array.isArray(gameState.live.pitchHistory) ? gameState.live.pitchHistory.length : 0,
+                        inning: gameState.live.inning,
+                        half: gameState.live.half,
+                        kind: 'balk',
+                        runnerId: runnerId,
+                        runnerName: rName,
+                        batterId: balkBatter ? balkBatter.id : null,
+                        rbiTo: null,
+                        charged: false,
+                        respKey: null, respId: null, respName: '',
+                        earned: false, irsKey: null, irsId: null
+                    });
                     addLog(`${rName} (3塁) ボークにより生還`);
                 } else {
                     bases[idx + 1] = runnerId;
@@ -14180,6 +14251,36 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 eventLabel = '走塁妨害';
             }
 
+            // 得点台帳用の文脈（この走者イベントが属する打席と投球履歴上の位置）
+            const runLogBatter = (typeof getCurrentBatter === 'function') ? getCurrentBatter() : null;
+            const runLogCtx = {
+                paIndex: Array.isArray(gameState.atBatRecords) ? gameState.atBatRecords.length : 0,
+                seqIdx: Array.isArray(gameState.live.pitchHistory) ? gameState.live.pitchHistory.length : 0,
+                inning: gameState.live.inning,
+                half: gameState.live.half,
+                batterId: runLogBatter ? runLogBatter.id : null
+            };
+            const logRunnerEventRun = (runnerId, rName, kind, charged) => {
+                logRunScored({
+                    paIndex: runLogCtx.paIndex,
+                    seqIdx: runLogCtx.seqIdx,
+                    inning: runLogCtx.inning,
+                    half: runLogCtx.half,
+                    kind: kind,
+                    runnerId: runnerId,
+                    runnerName: rName,
+                    batterId: runLogCtx.batterId,
+                    rbiTo: null,
+                    charged: !!charged,
+                    respKey: charged ? charged.respKey : null,
+                    respId: charged ? charged.respId : null,
+                    respName: charged ? charged.respName : '',
+                    earned: charged ? charged.earned : false,
+                    irsKey: charged ? charged.irsKey : null,
+                    irsId: charged ? charged.irsId : null
+                });
+            };
+
             iterIdxs.forEach(idx => {
                 const runnerId = bases[idx];
                 if (!runnerId) return;
@@ -14192,7 +14293,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     if (idx === 2) {
                         if (runner) runner.batting.r += 1;
                         addRuns(1);
-                        chargeRunScored(runnerId, actionType !== 'pb');
+                        const chargedRE = chargeRunScored(runnerId, actionType !== 'pb');
+                        logRunnerEventRun(runnerId, rName, actionType, chargedRE);
                         addLog(`${rName} (3塁) ${actName}により生還`);
                     } else {
                         bases[idx + 1] = runnerId;
@@ -14204,7 +14306,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     if (idx === 2) {
                         if (runner) runner.batting.r += 1;
                         addRuns(1);
-                        chargeRunScored(runnerId, true);
+                        const chargedSteal = chargeRunScored(runnerId, true);
+                        logRunnerEventRun(runnerId, rName, 'steal', chargedSteal);
                         addLog(`${rName} 本盗成功！`);
                     } else {
                         bases[idx + 1] = runnerId;
@@ -14217,6 +14320,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     if (idx === 2) {
                         if (runner) runner.batting.r += 1;
                         addRuns(1);
+                        logRunnerEventRun(runnerId, rName, 'obstruction', null);
                         addLog(isForced ? `${rName} (3塁) 走塁妨害（押し出し）により生還` : `${rName} (3塁) 走塁妨害により進塁権付与・生還`);
                     } else {
                         bases[idx + 1] = runnerId;
@@ -14951,6 +15055,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 pitcherName: pitcher ? pitcher.name : '',
                 offenseKey: offenseKey,
                 defenseKey: defenseKey,
+                // 付け替え判定用：マーク時点で塁上にいた走者と、その時点の責任投手。
+                // マーク前から塁上にいた走者は元の投手の責任（継承走者）として扱い、
+                // マーク以降に出塁した走者と区別するために控えておく。
+                bases: Array.isArray(live.bases) ? live.bases.slice() : [null, null, null],
+                runnerResp: live.runnerResp ? Object.assign({}, live.runnerResp) : {},
                 memo: memoEl ? memoEl.value.trim() : '',
                 resolved: false,
                 resolution: null
@@ -15276,6 +15385,159 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return moved;
         }
 
+        // ===== 交代マーク：失点・自責点・継承走者・打点・得点の付け替え =====
+        // 公式記録の原則どおりに付け替える。
+        // ・失点・自責点は「走者を出した投手」に付ける。マーク時点で塁上にいた走者は
+        //   元の投手の責任のまま（付け替えない）。マーク以降に出塁した走者の失点は、
+        //   記録上は元の投手に付いているので、入る投手へ付け替える。
+        // ・継承走者は、マーク時点で塁上にいた走者を元の投手の継承走者として数え直す。
+        //   すでに生還していれば継承生還にも数え、まだ塁上にいれば以降の生還で
+        //   数えられるよう bequeathed に登録する。
+        // ・打点は、付け替えた打席で実際に入った打者へ付け替える。
+        // ・得点は、実際に生還した走者へ付ける。代打で入った選手がその打席以降に
+        //   生還した得点と、代走で入った選手がマーク以降に生還した得点を付け替える。
+        // 付け替えは得点台帳（runLog）に残っている得点だけが対象。台帳の無い
+        // 旧データの得点は付け替えできないため、従来どおり元の記録のまま残す。
+        function reassignRunsForPitchingMark(mark, outPlayer, inPlayer) {
+            const result = { runs: 0, earnedRuns: 0, inherited: 0, inheritedScored: 0, inheritedFixed: 0 };
+            const teamKey = mark.teamKey;
+            const outKey = teamKey + '__' + outPlayer.id;
+            const inKey = teamKey + '__' + inPlayer.id;
+            const defKeyOf = (half) => half === 'top' ? 'home' : 'away';
+            const basesAtMark = Array.isArray(mark.bases) ? mark.bases : [];
+            const outLine = ensurePitchingLine(outPlayer);
+            const inLine = ensurePitchingLine(inPlayer);
+            const log = ensureRunLog();
+            const live = gameState.live;
+
+            // 1) 失点・自責点：マーク以降に出塁した走者の失点を入る投手へ付け替える
+            log.forEach(e => {
+                if (!e || !e.charged || e.respId !== outPlayer.id) return;
+                if (defKeyOf(e.half) !== teamKey) return;
+                if (!runLogAfterMark(e, mark)) return;
+                if (basesAtMark.indexOf(e.runnerId) !== -1) return;
+                outLine.r = Math.max(0, (outLine.r || 0) - 1);
+                inLine.r = (inLine.r || 0) + 1;
+                result.runs += 1;
+                if (e.earned) {
+                    outLine.er = Math.max(0, (outLine.er || 0) - 1);
+                    inLine.er = (inLine.er || 0) + 1;
+                    result.earnedRuns += 1;
+                }
+                e.respId = inPlayer.id;
+                e.respKey = inKey;
+                e.respName = inPlayer.name;
+            });
+
+            // 2) 継承走者・継承生還：マーク時点で塁上にいた走者を数え直す
+            if (!live.bequeathedCounted) live.bequeathedCounted = {};
+            const counted = new Set(live.bequeathedCounted[outKey] || []);
+            log.forEach(e => { if (e && e.irsId === outPlayer.id) counted.add(e.runnerId); });
+            if (live.bequeathed && live.bequeathed[outKey] && Array.isArray(live.bequeathed[outKey].ids)) {
+                live.bequeathed[outKey].ids.forEach(id => counted.add(id));
+            }
+            const stillOnBase = [];
+            basesAtMark.forEach(runnerId => {
+                if (!runnerId || counted.has(runnerId)) return;
+                counted.add(runnerId);
+                outLine.ir = (outLine.ir || 0) + 1;
+                result.inherited += 1;
+                const scored = log.find(e => e && e.runnerId === runnerId && defKeyOf(e.half) === teamKey && runLogAfterMark(e, mark));
+                if (scored) {
+                    outLine.irs = (outLine.irs || 0) + 1;
+                    result.inheritedScored += 1;
+                    scored.irsId = outPlayer.id;
+                    scored.irsKey = outKey;
+                } else if ((live.bases || []).indexOf(runnerId) !== -1) {
+                    stillOnBase.push(runnerId);
+                }
+            });
+            // 2b) マーク後に通常の投手交代として記録されていた場合、その交代時点で
+            //     継承走者に数えられた走者のうち、マーク以降に出塁した走者（本来は
+            //     入る投手の走者）は継承走者から外し直す
+            Array.from(counted).forEach(runnerId => {
+                if (basesAtMark.indexOf(runnerId) !== -1) return;
+                const pending = !!(live.bequeathed && live.bequeathed[outKey] && Array.isArray(live.bequeathed[outKey].ids) && live.bequeathed[outKey].ids.indexOf(runnerId) !== -1);
+                const scoredEntry = log.find(e => e && e.runnerId === runnerId && e.irsId === outPlayer.id && defKeyOf(e.half) === teamKey && runLogAfterMark(e, mark));
+                if (!pending && !scoredEntry) return;
+                counted.delete(runnerId);
+                outLine.ir = Math.max(0, (outLine.ir || 0) - 1);
+                result.inheritedFixed += 1;
+                if (pending) live.bequeathed[outKey].ids = live.bequeathed[outKey].ids.filter(id => id !== runnerId);
+                if (scoredEntry) {
+                    outLine.irs = Math.max(0, (outLine.irs || 0) - 1);
+                    scoredEntry.irsId = null;
+                    scoredEntry.irsKey = null;
+                }
+            });
+            live.bequeathedCounted[outKey] = Array.from(counted);
+            if (stillOnBase.length) {
+                if (!live.bequeathed) live.bequeathed = {};
+                const curIds = live.bequeathed[outKey] && Array.isArray(live.bequeathed[outKey].ids) ? live.bequeathed[outKey].ids : [];
+                live.bequeathed[outKey] = { ids: Array.from(new Set(curIds.concat(stillOnBase))), name: outPlayer.name };
+            }
+
+            // 3) まだ塁上にいる走者の責任投手を付け替える（マーク以降に出塁した走者のみ）
+            if (live.runnerResp) {
+                Object.keys(live.runnerResp).forEach(rid => {
+                    if (live.runnerResp[rid] === outKey && basesAtMark.indexOf(rid) === -1 && (live.bases || []).indexOf(rid) !== -1) {
+                        live.runnerResp[rid] = inKey;
+                    }
+                });
+            }
+            return result;
+        }
+
+        // 代打の付け替え：打点は入った打者へ、得点はその打席以降に生還した入った選手へ
+        function reassignRunsForBatterMark(mark, outPlayer, inPlayer) {
+            const result = { rbi: 0, runs: 0 };
+            const offKeyOf = (half) => half === 'top' ? 'away' : 'home';
+            const basesAtMark = Array.isArray(mark.bases) ? mark.bases : [];
+            [outPlayer, inPlayer].forEach(pl => {
+                if (!pl.batting) pl.batting = { pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} };
+            });
+            ensureRunLog().forEach(e => {
+                if (!e || offKeyOf(e.half) !== mark.teamKey) return;
+                if (!runLogAfterMark(e, mark)) return;
+                if (e.rbiTo === outPlayer.id) {
+                    outPlayer.batting.rbi = Math.max(0, (outPlayer.batting.rbi || 0) - 1);
+                    inPlayer.batting.rbi = (inPlayer.batting.rbi || 0) + 1;
+                    e.rbiTo = inPlayer.id;
+                    result.rbi += 1;
+                }
+                if (e.runnerId === outPlayer.id && basesAtMark.indexOf(e.runnerId) === -1) {
+                    outPlayer.batting.r = Math.max(0, (outPlayer.batting.r || 0) - 1);
+                    inPlayer.batting.r = (inPlayer.batting.r || 0) + 1;
+                    e.runnerId = inPlayer.id;
+                    e.runnerName = inPlayer.name;
+                    result.runs += 1;
+                }
+                if (e.batterId === outPlayer.id) e.batterId = inPlayer.id;
+            });
+            return result;
+        }
+
+        // 代走の付け替え：マーク以降に生還した得点は、実際に出塁していた入った選手へ
+        function reassignRunsForRunnerMark(mark, outPlayer, inPlayer) {
+            const result = { runs: 0 };
+            const offKeyOf = (half) => half === 'top' ? 'away' : 'home';
+            [outPlayer, inPlayer].forEach(pl => {
+                if (!pl.batting) pl.batting = { pa: 0, ab: 0, r: 0, h: 0, rbi: 0, so: 0, bb: 0, hbp: 0, sac: 0, sf: 0, b2: 0, b3: 0, hr: 0, sb: 0, cs: 0, sacFail: 0, results: {} };
+            });
+            ensureRunLog().forEach(e => {
+                if (!e || offKeyOf(e.half) !== mark.teamKey) return;
+                if (!runLogAfterMark(e, mark)) return;
+                if (e.runnerId === outPlayer.id) {
+                    outPlayer.batting.r = Math.max(0, (outPlayer.batting.r || 0) - 1);
+                    inPlayer.batting.r = (inPlayer.batting.r || 0) + 1;
+                    e.runnerId = inPlayer.id;
+                    e.runnerName = inPlayer.name;
+                    result.runs += 1;
+                }
+            });
+            return result;
+        }
+
         function confirmSubMarkResolution() {
             if (!hasCurrentGame()) return;
             const mark = ensureSubMarks().find(m => m.id === subMarkResolveState.markId);
@@ -15294,6 +15556,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const posVal = posSel.value || outPlayer.pos;
 
             pushUndoState();
+            const basesBeforeSwap = Array.isArray(gameState.live.bases) ? gameState.live.bases.slice() : [];
             let inPlayer = null;
             if (outPlayer.isActive) {
                 // 通常の選手交代と同じ手順でラインナップを入れ替える
@@ -15336,15 +15599,43 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             // マーク位置を境に記録を付け替える
             let movedPitches = 0;
             let movedAtBats = 0;
+            let scoringMoved = { runs: 0, earnedRuns: 0, inherited: 0, inheritedScored: 0, rbi: 0, scoredRuns: 0 };
             const pitcherAtMarkId = getMarkRecordedPitcherId(mark);
             const isPitchingChange = !!(pitcherAtMarkId && pitcherAtMarkId === outPlayer.id && posVal === '投');
             if (isPitchingChange) {
                 movedPitches = reassignPitchingAfterMark(mark, outPlayer, inPlayer);
                 recomputePitchCountsFromRecords();
+                // 失点・自責点・継承走者も公式記録どおりに付け替える
+                const pr = reassignRunsForPitchingMark(mark, outPlayer, inPlayer);
+                scoringMoved.runs = pr.runs;
+                scoringMoved.earnedRuns = pr.earnedRuns;
+                scoringMoved.inherited = pr.inherited;
+                scoringMoved.inheritedScored = pr.inheritedScored;
+                // 継承走者の付け直しが済んだ投手交代は、保存時の自動検知
+                // （syncBequeathedOnPitcherChange）で二重に数えないよう、
+                // 現在の投手を入る投手として在任記録を合わせておく
+                try {
+                    const act = getActiveTeams();
+                    if (act.defenseKey === teamKey && getCurrentPitcher() && getCurrentPitcher().id === inPlayer.id) {
+                        gameState.live.pitcherTenure = { key: teamKey + '__' + inPlayer.id, inning: gameState.live.inning, half: gameState.live.half };
+                    }
+                } catch (e) { /* 在任記録の調整に失敗しても付け替え自体は継続する */ }
             }
             const isBatterChange = !!(mark.offenseKey === teamKey && mark.batterId && mark.batterId === outPlayer.id);
             if (isBatterChange) {
                 movedAtBats = reassignBattingAfterMark(mark, outPlayer, inPlayer);
+                // 打点・得点も、実際に入った打者・生還した走者へ付け替える
+                const br = reassignRunsForBatterMark(mark, outPlayer, inPlayer);
+                scoringMoved.rbi = br.rbi;
+                scoringMoved.scoredRuns = br.runs;
+            }
+            // 代走の後付け入力：退く選手がマーク時点で塁上にいた走者だった場合は、
+            // マーク以降の得点を実際に出塁していた入る選手へ付け替える
+            const markBasesForRunner = Array.isArray(mark.bases) ? mark.bases : basesBeforeSwap;
+            const isRunnerChange = !!(mark.offenseKey === teamKey && !isBatterChange && markBasesForRunner.indexOf(outPlayer.id) !== -1);
+            if (isRunnerChange) {
+                const rr = reassignRunsForRunnerMark(mark, outPlayer, inPlayer);
+                scoringMoved.scoredRuns += rr.runs;
             }
 
             mark.resolved = true;
@@ -15352,10 +15643,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 outId: outPlayer.id, outName: outPlayer.name,
                 inId: inPlayer.id, inName: inPlayer.name,
                 pos: posVal, resolvedAt: Date.now(),
-                movedPitches: movedPitches, movedAtBats: movedAtBats
+                movedPitches: movedPitches, movedAtBats: movedAtBats,
+                movedRuns: scoringMoved.runs, movedEarnedRuns: scoringMoved.earnedRuns,
+                movedInherited: scoringMoved.inherited, movedInheritedScored: scoringMoved.inheritedScored,
+                movedRbi: scoringMoved.rbi, movedScoredRuns: scoringMoved.scoredRuns
             };
             const roleLabel = isPitchingChange ? '投手交代' : (isBatterChange ? '代打・選手交代' : '選手交代');
-            addLog(`${roleLabel}（後から入力） (${team.name}): ${outPlayer.name} → ${inPlayer.name} (${posVal}) ※${mark.inningLabel}の交代マークより`);
+            const scoringNoteParts = [];
+            if (scoringMoved.runs > 0) scoringNoteParts.push(`失点${scoringMoved.runs}（うち自責点${scoringMoved.earnedRuns}）`);
+            if (scoringMoved.inherited > 0) scoringNoteParts.push(`継承走者${scoringMoved.inherited}（生還${scoringMoved.inheritedScored}）`);
+            if (scoringMoved.rbi > 0) scoringNoteParts.push(`打点${scoringMoved.rbi}`);
+            if (scoringMoved.scoredRuns > 0) scoringNoteParts.push(`得点${scoringMoved.scoredRuns}`);
+            const scoringNote = scoringNoteParts.length ? ` ／ ${scoringNoteParts.join('・')}を付け替え` : '';
+            addLog(`${roleLabel}（後から入力） (${team.name}): ${outPlayer.name} → ${inPlayer.name} (${posVal}) ※${mark.inningLabel}の交代マークより${scoringNote}`);
             closeModal('modal-submark-resolve');
             saveAndRender();
             showToast(`${roleLabel}を記録しました（${mark.inningLabel}の場面）`, 'success');
@@ -16336,7 +16636,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 // 投手成績：得点はその走者を出した投手（責任投手）の失点に数える。
                 // 失策で出塁した打者の打席や、振り逃げの失策が絡んだ打席での得点は自責点に含めない。
                 const runEarned = !(type === 'E' || (isDroppedKType(type) && parseKDetail(type).errorCode));
-                chargeRunScored(runnerId, runEarned);
+                const charged = chargeRunScored(runnerId, runEarned);
+                // 得点台帳：後から交代マークを入力したときに付け替えられるよう内訳を残す
+                logRunScored({
+                    paIndex: Array.isArray(gameState.atBatRecords) ? gameState.atBatRecords.length : 0,
+                    seqIdx: Array.isArray(gameState.live.pitchHistory) ? gameState.live.pitchHistory.length : 0,
+                    inning: gameState.live.inning,
+                    half: gameState.live.half,
+                    kind: 'pa',
+                    runnerId: runnerId,
+                    runnerName: p ? p.name : '',
+                    batterId: batter.id,
+                    rbiTo: batter.id,
+                    charged: !!charged,
+                    respKey: charged ? charged.respKey : null,
+                    respId: charged ? charged.respId : null,
+                    respName: charged ? charged.respName : '',
+                    earned: charged ? charged.earned : false,
+                    irsKey: charged ? charged.irsKey : null,
+                    irsId: charged ? charged.irsId : null
+                });
             };
 
             if (runnerTargets) {
@@ -19560,6 +19879,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         if (!Array.isArray(gameState.live.pitchHistory)) gameState.live.pitchHistory = [];
                         if (!Array.isArray(gameState.atBatRecords)) gameState.atBatRecords = [];
                         if (!Array.isArray(gameState.subMarks)) gameState.subMarks = [];
+                        if (!Array.isArray(gameState.runLog)) gameState.runLog = [];
+                        if (!gameState.live.bequeathedCounted) gameState.live.bequeathedCounted = {};
                         if (gameState.live.isTiebreakActive === undefined) gameState.live.isTiebreakActive = false;
                         if (!Array.isArray(gameState.live.pendingDefenseSubs)) gameState.live.pendingDefenseSubs = [];
                         if (!gameState.live.runnerResp) gameState.live.runnerResp = {};
