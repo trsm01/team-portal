@@ -906,14 +906,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <i data-lucide="settings-2" class="w-4 h-4"></i>
                         <span class="hidden md:inline">試合設定</span>
                     </button>
-                    <button data-coach-only onclick="openDataIoModal()" class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-700 transition">
-                        <i data-lucide="database" class="w-4 h-4"></i>
-                        <span class="hidden md:inline">データ管理</span>
-                    </button>
-                    <button onclick="openPickoffAnalyticsModal()" class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-700 transition" title="カウント別牽制・連続牽制回数を分析">
-                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-300"></i>
-                        <span class="hidden md:inline">牽制分析</span>
-                    </button>
                     <button onclick="undoLastAction()" id="btn-undo" disabled class="flex items-center space-x-1 bg-amber-600/90 hover:bg-amber-600 disabled:opacity-40 disabled:pointer-events-none text-white text-xs sm:text-sm px-3 py-1.5 rounded-lg transition" title="直前の操作を取り消す">
                         <i data-lucide="undo-2" class="w-4 h-4"></i>
                         <span class="hidden sm:inline">1手戻す</span>
@@ -4694,7 +4686,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <button type="button" id="lineup-edit-tab-away" onclick="switchLineupEditTeam('away')" class="px-3 py-2.5 rounded-lg text-sm font-extrabold transition bg-slate-900 text-white shadow-sm">先攻チーム</button>
                     <button type="button" id="lineup-edit-tab-home" onclick="switchLineupEditTeam('home')" class="px-3 py-2.5 rounded-lg text-sm font-extrabold transition bg-slate-100 text-slate-600 hover:bg-slate-200">後攻チーム</button>
                 </div>
-                <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">試合の途中でも、守備位置・選手名・背番号・学年・利き手（投／打）を直せます。背番号は公式戦・練習試合を問わず入力できます。学年は入学年度として保存され、年度が替わると自動で進級して成績の年度絞り込みに使われます。打順はプルダウンではなく、現在の数字がそのまま入った固定表示です（打順の変更は「オーダー・選手交代」タブのグラウンド図でポジションをタップして行えます）。記録済みの成績・走者・カウントはそのまま引き継がれます。ポジション未選択・選手名未入力のままでも保存でき、分かったときに随時入力できます。DHの有無と種類（通常DH／大谷ルール）もこの画面で選べます。</p>
             </div>
             <div class="p-5 space-y-4 overflow-y-auto text-sm flex-1">
                 <div class="bg-amber-50 border border-amber-300 rounded-lg px-3 py-2.5">
