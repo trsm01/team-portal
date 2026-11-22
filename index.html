@@ -5148,13 +5148,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const sel = document.getElementById(selId);
             const custom = document.getElementById(customId);
             if (custom) custom.classList.toggle('hidden', !sel || sel.value !== '__other__');
-            // 新規試合のスタメン選択では、公式戦のときだけ背番号プルダウンを出す
+            // 背番号プルダウンは公式戦・練習試合を問わず常時表示する（大会を切り替えても隠さない）
             if (selId === 'setup-tournament') updateSetupUniformNumberVisibility();
         }
 
         // ================= 背番号（試合ごとに選択） =================
-        // 背番号は選手登録では持たず、試合のスタメン選択時に、その試合の
-        // 大会が練習試合以外の公式戦の場合だけプルダウン（1〜25）で選ぶ。
+        // 背番号は選手登録では持たず、試合のスタメン選択時にプルダウン
+        // （1〜25）で選ぶ。公式戦・練習試合を問わず常時表示し、選べる。
         // 選んだ背番号は試合データ（gameState の選手）に保存され、
         // ボックススコア等の表示はそちらを使う。
         function isSetupTournamentOfficial() {
@@ -5163,9 +5163,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function updateSetupUniformNumberVisibility() {
-            const show = isSetupTournamentOfficial();
+            // 背番号は大会種別を問わず入力できるため、常に表示する
             document.querySelectorAll('#modal-new-game-setup .setup-uniform-num').forEach(el => {
-                el.classList.toggle('hidden', !show);
+                el.classList.remove('hidden');
             });
         }
 
@@ -9003,7 +9003,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     rowM.innerHTML = `
                     <span class="w-6 text-center font-extrabold text-indigo-900">${i + 1}番</span>
                     <select id="setup-my-pos-${i}" onchange="refreshSetupLineupFeedback(false)" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptionsM}</select>
-                    <select id="setup-my-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNumM ? '' : 'hidden'}">${uniformNumberOptionsHtml(numSelM)}</select>
+                    <select id="setup-my-num-${i}" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(numSelM)}</select>
                     <input type="text" id="setup-my-name-${i}" value="${nameValM}" oninput="refreshSetupLineupFeedback(false)" placeholder="選手名を入力" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white">
                     <select id="setup-my-grade-${i}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(gradeValM)}</select>
                     ${handChecksHtml(`setup-my-hand-${i}`, thValM, batValM)}
@@ -9023,7 +9023,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const posOptions = `<option value="" ${defaultPos === '' ? 'selected' : ''}>選択</option>` + positions.map(pos =>
                     `<option value="${pos}" ${pos === defaultPos ? 'selected' : ''}>${pos}</option>`
                 ).join('');
-                // 背番号プルダウン（公式戦のみ表示。練習試合では出さない）
+                // 背番号プルダウン（公式戦・練習試合を問わず表示）
                 const showNum = isSetupTournamentOfficial();
                 let selectedNum = selectedPlayer ? uniformNumberDefault(selectedPlayer.number) : '';
                 if (hasSnapMy && snap.myNum[i] !== undefined) selectedNum = snap.myNum[i];
@@ -9043,7 +9043,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <input type="hidden" id="setup-my-name-${i}" value="${physicalEscapeHtml(nameValR)}">
                     ${!selectedPlayer && nameValR ? `<span class="text-[10px] font-bold text-slate-500">手入力：${physicalEscapeHtml(nameValR)}</span>` : ''}
                     ${handChecksHtml(`setup-my-hand-${i}`, thValR, batValR)}
-                    <select id="setup-my-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNum ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedNum)}</select>
+                    <select id="setup-my-num-${i}" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(selectedNum)}</select>
                     <select id="setup-my-grade-${i}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(gradeValR)}</select>
                 `;
                 myContainer.appendChild(row);
@@ -9064,7 +9064,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <div class="flex flex-wrap items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
                             <span class="shrink-0 text-center font-extrabold text-amber-900 leading-tight">10人目<br><span class="text-[9px] font-bold">打順なし</span></span>
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
-                            <select id="setup-my-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.myPitcherNum))}</select>
+                            <select id="setup-my-pitcher-num" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(uniformNumberDefault(snap.myPitcherNum))}</select>
                             <input type="text" id="setup-my-pitcher-name" value="${snap.myPitcherName || ''}" placeholder="投手名を入力" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white">
                             <select id="setup-my-pitcher-grade" title="学年" class="w-14 shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.myPitcherGrade || '')}</select>
                             ${handChecksHtml('setup-my-pitcher-hand', snap.myPitcherThrows !== null && snap.myPitcherThrows !== undefined ? snap.myPitcherThrows : '右', snap.myPitcherBats !== null && snap.myPitcherBats !== undefined ? snap.myPitcherBats : '右')}
@@ -9078,7 +9078,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     const pitcherOptions = `<option value="" ${!selectedPitcherId ? 'selected' : ''}>投手を選択</option>` + myRoster.players.map(p =>
                         `<option value="${p.id}" ${p.id === selectedPitcherId ? 'selected' : ''}>${p.name} (${p.grade || ''}/${p.bats || ''}打)${cohortLabel(p.cohort) ? ' ' + cohortLabel(p.cohort) : ''}${gradeColorLabel(p.gradeColor) ? ' ' + gradeColorLabel(p.gradeColor) : ''}</option>`
                     ).join('');
-                    // 背番号プルダウン（公式戦のみ表示。練習試合では出さない）
+                    // 背番号プルダウン（公式戦・練習試合を問わず表示）
                     const showNumP = isSetupTournamentOfficial();
                     const selectedPitcher = myRoster.players.find(p => p.id === selectedPitcherId);
                     let selectedPitcherNum = selectedPitcher ? uniformNumberDefault(selectedPitcher.number) : '';
@@ -9090,7 +9090,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <select id="setup-my-pitcher-player" onchange="onSetupMyPitcherChange()" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${pitcherOptions}</select>
                             <input type="hidden" id="setup-my-pitcher-name" value="${physicalEscapeHtml(snap.myPitcherName || '')}">
                             ${!selectedPitcherId && snap.myPitcherName ? `<span class="text-[10px] font-bold text-amber-800">手入力：${physicalEscapeHtml(snap.myPitcherName)}</span>` : ''}
-                            <select id="setup-my-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${showNumP ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedPitcherNum)}</select>
+                            <select id="setup-my-pitcher-num" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(selectedPitcherNum)}</select>
                             <select id="setup-my-pitcher-grade" title="学年" class="w-14 shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.myPitcherGrade ? snap.myPitcherGrade : masterGradeValue(selectedPitcher, setupFY))}</select>
                             ${handChecksHtml('setup-my-pitcher-hand', snap.myPitcherThrows !== null && snap.myPitcherThrows !== undefined ? snap.myPitcherThrows : (selectedPitcher ? (selectedPitcher.throws || '右') : '右'), snap.myPitcherBats !== null && snap.myPitcherBats !== undefined ? snap.myPitcherBats : (selectedPitcher ? (selectedPitcher.bats || '右') : '右'))}
                         </div>
@@ -9107,7 +9107,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (mySource === 'manual') {
                     let benchHtml = '<div class="text-[10px] font-extrabold text-slate-600 mb-1">ベンチ選手（任意・空欄可）</div><div class="space-y-1.5">';
                     for (let b = 0; b < 3; b++) {
-                        benchHtml += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-my-bench-name-${b}" value="${snap.myBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"><select id="setup-my-bench-num-${b}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.myBenchNum[b]))}</select><select id="setup-my-bench-grade-${b}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.myBenchGrade[b] || '')}</select></div>`;
+                        benchHtml += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-my-bench-name-${b}" value="${snap.myBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"><select id="setup-my-bench-num-${b}" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(uniformNumberDefault(snap.myBenchNum[b]))}</select><select id="setup-my-bench-grade-${b}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.myBenchGrade[b] || '')}</select></div>`;
                     }
                     benchHtml += '</div>';
                     myBenchArea.innerHTML = benchHtml;
@@ -9154,7 +9154,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <input type="hidden" id="setup-opp-name-${i}" value="${physicalEscapeHtml(nameValOR)}">
                     ${!selectedPlayerO && nameValOR ? `<span class="text-[10px] font-bold text-slate-500">手入力：${physicalEscapeHtml(nameValOR)}</span>` : ''}
                     ${handChecksHtml(`setup-opp-hand-${i}`, thValO, batValO)}
-                    <select id="setup-opp-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNumO ? '' : 'hidden'}">${uniformNumberOptionsHtml(selectedNumO)}</select>
+                    <select id="setup-opp-num-${i}" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(selectedNumO)}</select>
                     <select id="setup-opp-grade-${i}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(gradeValO)}</select>
                     `;
                     oppContainer.appendChild(rowO);
@@ -9165,7 +9165,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const posOptions = `<option value="" ${defaultPos === '' ? 'selected' : ''}>選択</option>` + positions.map(pos =>
                     `<option value="${pos}" ${pos === defaultPos ? 'selected' : ''}>${pos}</option>`
                 ).join('');
-                // 背番号プルダウン（自チームと同様、公式戦のみ表示。練習試合では出さない）
+                // 背番号プルダウン（自チームと同様、公式戦・練習試合を問わず表示）
                 const showOppNum = isSetupTournamentOfficial();
                 let oppNumSel = '';
                 if (hasSnapOpp && snap.oppNum[i] !== undefined) oppNumSel = uniformNumberDefault(snap.oppNum[i]);
@@ -9179,7 +9179,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 row.innerHTML = `
                     <span class="w-6 text-center font-extrabold text-slate-700">${i + 1}番</span>
                     <select id="setup-opp-pos-${i}" onchange="refreshSetupLineupFeedback(false)" class="w-14 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${posOptions}</select>
-                    <select id="setup-opp-num-${i}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showOppNum ? '' : 'hidden'}">${uniformNumberOptionsHtml(oppNumSel)}</select>
+                    <select id="setup-opp-num-${i}" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(oppNumSel)}</select>
                     <input type="text" id="setup-opp-name-${i}" value="${oppNameVal}" oninput="refreshSetupLineupFeedback(false)" placeholder="選手名を入力" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white">
                     <select id="setup-opp-grade-${i}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(gradeValOM)}</select>
                     ${handChecksHtml(`setup-opp-hand-${i}`, thValOM, batValOM)}
@@ -9211,7 +9211,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <select id="setup-opp-pitcher-player" onchange="onSetupOppPitcherChange()" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white text-slate-800">${pitcherOptionsO}</select>
                             <input type="hidden" id="setup-opp-pitcher-name" value="${physicalEscapeHtml(snap.oppPitcherName || '')}">
                             ${!selPitcherIdO && snap.oppPitcherName ? `<span class="text-[10px] font-bold text-amber-800">手入力：${physicalEscapeHtml(snap.oppPitcherName)}</span>` : ''}
-                            <select id="setup-opp-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(selPitcherNumO)}</select>
+                            <select id="setup-opp-pitcher-num" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(selPitcherNumO)}</select>
                             <select id="setup-opp-pitcher-grade" title="学年" class="w-14 shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.oppPitcherGrade ? snap.oppPitcherGrade : masterGradeValue(selPitcherO, setupFY))}</select>
                             ${handChecksHtml('setup-opp-pitcher-hand', snap.oppPitcherThrows !== null && snap.oppPitcherThrows !== undefined ? snap.oppPitcherThrows : (selPitcherO ? (selPitcherO.throws || '右') : '右'), snap.oppPitcherBats !== null && snap.oppPitcherBats !== undefined ? snap.oppPitcherBats : (selPitcherO ? (selPitcherO.bats || '右') : '右'))}
                         </div>
@@ -9223,7 +9223,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <div class="flex flex-wrap items-center gap-1.5 text-xs bg-amber-50 border border-amber-300 rounded-lg px-2 py-2">
                             <span class="shrink-0 text-center font-extrabold text-amber-900 leading-tight">10人目<br><span class="text-[9px] font-bold">打順なし</span></span>
                             <span class="w-14 text-center border border-amber-300 rounded px-1 py-1 font-extrabold bg-white text-amber-900">投</span>
-                            <select id="setup-opp-pitcher-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.oppPitcherNum))}</select>
+                            <select id="setup-opp-pitcher-num" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(uniformNumberDefault(snap.oppPitcherNum))}</select>
                             <input type="text" id="setup-opp-pitcher-name" value="${snap.oppPitcherName || ''}" placeholder="投手名を入力" class="flex-1 border border-amber-300 rounded px-2 py-1 font-bold bg-white">
                             <select id="setup-opp-pitcher-grade" title="学年" class="w-14 shrink-0 border border-amber-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.oppPitcherGrade || '')}</select>
                             ${handChecksHtml('setup-opp-pitcher-hand', snap.oppPitcherThrows !== null && snap.oppPitcherThrows !== undefined ? snap.oppPitcherThrows : '右', snap.oppPitcherBats !== null && snap.oppPitcherBats !== undefined ? snap.oppPitcherBats : '右')}
@@ -9241,7 +9241,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if (oppSource === 'manual') {
                     let benchHtmlO = '<div class="text-[10px] font-extrabold text-slate-600 mb-1">ベンチ選手（任意・空欄可）</div><div class="space-y-1.5">';
                     for (let b = 0; b < 3; b++) {
-                        benchHtmlO += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-opp-bench-name-${b}" value="${snap.oppBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"><select id="setup-opp-bench-num-${b}" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${isSetupTournamentOfficial() ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(snap.oppBenchNum[b]))}</select><select id="setup-opp-bench-grade-${b}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.oppBenchGrade[b] || '')}</select></div>`;
+                        benchHtmlO += `<div class="flex items-center gap-1.5 text-xs"><span class="w-6 text-center font-bold text-slate-500">控${b + 1}</span><input type="text" id="setup-opp-bench-name-${b}" value="${snap.oppBench[b] || ''}" placeholder="ベンチ選手名（任意）" class="flex-1 border border-slate-300 rounded px-2 py-1 font-bold bg-white"><select id="setup-opp-bench-num-${b}" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(uniformNumberDefault(snap.oppBenchNum[b]))}</select><select id="setup-opp-bench-grade-${b}" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(snap.oppBenchGrade[b] || '')}</select></div>`;
                     }
                     benchHtmlO += '</div>';
                     oppBenchArea.innerHTML = benchHtmlO;
@@ -9511,7 +9511,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 </div>
                 <div class="flex flex-wrap items-center gap-1">
                     ${orderHtml}
-                    <select id="${base}-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNum ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(data.num))}</select>
+                    <select id="${base}-num" title="背番号" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(uniformNumberDefault(data.num))}</select>
                     <select id="${base}-grade" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(data.grade || '')}</select>
                 </div>
                 ${handChecksHtml(`${base}-hand`, data.th || '右', data.ba || '右')}
@@ -10005,8 +10005,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const oppTwoWay = oppDHVal === '2';
             const setupRuleModeEl = document.getElementById('setup-rule-mode');
             const setupRuleMode = setupRuleModeEl && setupRuleModeEl.value === 'relaxed' ? 'relaxed' : 'strict';
-            // 背番号プルダウンは公式戦（練習試合以外）のときだけ有効。選んだ背番号を試合データに保存する
-            const officialSetup = isSetupTournamentOfficial();
+            // 背番号プルダウンは公式戦・練習試合を問わず有効。選んだ背番号を試合データに保存する
+            const officialSetup = true;
             // 学年は開催日の年度から入学年度へ換算して選手データに保存する。
             // 学年プルダウンで選ばれていればそれを優先し、未選択で名簿選手なら
             // 名簿の入学年度を引き継ぐ。入学年度で持つため、年度が替わっても
