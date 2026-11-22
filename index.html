@@ -4601,7 +4601,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 <option value="2">使用する・二刀流 5.11(b)（先発投手がDHを兼任）</option>
                             </select>
                         </div>
+                        <div class="px-3 py-2 bg-white border-b border-indigo-100 flex flex-wrap items-center justify-between gap-2">
+                            <span class="text-[11px] font-extrabold text-slate-700">登録のしかた</span>
+                            <div class="flex rounded-lg overflow-hidden border border-indigo-300" role="group" aria-label="登録方法の切り替え（先攻チーム）">
+                                <button type="button" id="setup-my-view-order" onclick="setSetupViewMode('my','order')" class="px-2.5 py-1 text-[11px] font-extrabold transition bg-indigo-900 text-white">打順で登録</button>
+                                <button type="button" id="setup-my-view-pos" onclick="setSetupViewMode('my','pos')" class="px-2.5 py-1 text-[11px] font-extrabold transition bg-white text-slate-600 hover:bg-indigo-50">守備位置で登録</button>
+                            </div>
+                        </div>
                         <div class="p-2.5 bg-indigo-50/30 space-y-1.5" id="setup-my-lineup-list"></div>
+                        <div id="setup-my-diamond" class="hidden p-2.5 bg-indigo-50/30" onchange="onSetupDiaChange('my', event)" oninput="onSetupDiaInput('my')"></div>
                         <div id="setup-my-pitcher-area" class="hidden px-2.5 pb-2.5 bg-indigo-50/30"></div>
                         <div id="setup-my-bench-area" class="hidden px-2.5 pb-2.5 bg-indigo-50/30"></div>
                     </div>
@@ -4635,7 +4643,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                                 <option value="2">使用する・二刀流 5.11(b)（先発投手がDHを兼任）</option>
                             </select>
                         </div>
+                        <div class="px-3 py-2 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                            <span class="text-[11px] font-extrabold text-slate-700">登録のしかた</span>
+                            <div class="flex rounded-lg overflow-hidden border border-slate-300" role="group" aria-label="登録方法の切り替え（後攻チーム）">
+                                <button type="button" id="setup-opp-view-order" onclick="setSetupViewMode('opp','order')" class="px-2.5 py-1 text-[11px] font-extrabold transition bg-slate-900 text-white">打順で登録</button>
+                                <button type="button" id="setup-opp-view-pos" onclick="setSetupViewMode('opp','pos')" class="px-2.5 py-1 text-[11px] font-extrabold transition bg-white text-slate-600 hover:bg-slate-50">守備位置で登録</button>
+                            </div>
+                        </div>
                         <div class="p-2.5 bg-slate-50/50 space-y-1.5" id="setup-opp-lineup-list"></div>
+                        <div id="setup-opp-diamond" class="hidden p-2.5 bg-slate-50/50" onchange="onSetupDiaChange('opp', event)" oninput="onSetupDiaInput('opp')"></div>
                         <div id="setup-opp-pitcher-area" class="hidden px-2.5 pb-2.5 bg-slate-50/50"></div>
                         <div id="setup-opp-bench-area" class="hidden px-2.5 pb-2.5 bg-slate-50/50"></div>
                     </div>
@@ -4697,7 +4713,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </select>
                     <p class="text-[11px] text-amber-900/70 mt-1 leading-relaxed">有無と種類を選ぶだけです。指名打者だけが入っていて、投手が誰か分からないままでも保存できます。</p>
                 </div>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span class="text-[11px] font-extrabold text-slate-700">編集のしかた</span>
+                    <div class="flex rounded-lg overflow-hidden border border-slate-300" role="group" aria-label="編集方法の切り替え">
+                        <button type="button" id="lineup-edit-view-order" onclick="setLineupEditViewMode('order')" class="px-2.5 py-1 text-[11px] font-extrabold transition bg-slate-900 text-white">打順で編集</button>
+                        <button type="button" id="lineup-edit-view-pos" onclick="setLineupEditViewMode('pos')" class="px-2.5 py-1 text-[11px] font-extrabold transition bg-white text-slate-600 hover:bg-slate-50">守備位置で編集</button>
+                    </div>
+                </div>
                 <div id="lineup-edit-list" class="space-y-1.5"></div>
+                <div id="lineup-edit-diamond" class="hidden" onchange="onEditDiaChange(event)" oninput="onEditDiaInput()"></div>
                 <div id="lineup-edit-pitcher-area"></div>
                 <div id="lineup-edit-bench-area"></div>
             </div>
@@ -8839,12 +8863,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (oppNameEl) oppNameEl.value = '対戦相手校';
             const myDhEl = document.getElementById('setup-my-dh'); if (myDhEl) myDhEl.value = '0';
             const oppDhEl = document.getElementById('setup-opp-dh'); if (oppDhEl) oppDhEl.value = '0';
+            // 登録方法（打順／守備位置）は開くたびに「打順で登録」へ戻す
+            setupDiaState.my.mode = 'order'; setupDiaState.my.dirty = false; setupDiaState.my.fromSlot = {};
+            setupDiaState.opp.mode = 'order'; setupDiaState.opp.dirty = false; setupDiaState.opp.fromSlot = {};
             renderNewGameLineupRows();
             openModal('modal-new-game-setup');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function renderNewGameLineupRows(resetScope) {
+            // 守備位置で登録（ダイヤモンド表示）中のチームは、先にダイヤモンドの
+            // 入力内容を打順の入力欄へ書き戻してからスナップショットを取る
+            syncSetupDiamondToRows('my');
+            syncSetupDiamondToRows('opp');
             const mySource = getSetupSource('my');
             const oppSource = getSetupSource('opp');
             const rosterKey = getSetupRosterKey('my');
@@ -9200,6 +9231,362 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 } else { oppBenchArea.innerHTML = ''; oppBenchArea.classList.add('hidden'); }
             }
             refreshSetupLineupFeedback(false);
+            // 表示方法（打順／守備位置）を現在の状態に合わせて反映する
+            applySetupViewMode('my');
+            applySetupViewMode('opp');
+        }
+
+        // ================= 守備位置で登録（ダイヤモンド表示） =================
+        // スタメン登録は「打順で登録」（従来の打順リスト）と「守備位置で登録」
+        // （ダイヤモンドの各ポジションへ入力）を切り替えられる。後攻チームは
+        // テレビ中継で打順が分からなくても守備位置だけ先に紹介されることが
+        // あるため、ポジションごとに選手名・背番号・学年・利き手を入力し、
+        // 打順は分かった選手だけ選ぶ（未定のまま一旦登録もできる）。
+        // 保存先は従来どおり打順1〜9番の入力欄（＋DH時の投手欄）で、
+        // ダイヤモンドはその表示・入力方法を変えたもの。保存データ形式や
+        // 計算ロジックは変えない。打順未定のまま登録された選手は、空いている
+        // 打順へ入れて保存され、後からスタメン編集で直せる。
+        const DIA_POS_CELLS = [
+            { key: 'lf', symbol: '左', label: '左翼手', num: '7' },
+            { key: 'cf', symbol: '中', label: '中堅手', num: '8' },
+            { key: 'rf', symbol: '右', label: '右翼手', num: '9' },
+            { key: 'f3', symbol: '三', label: '三塁手', num: '5' },
+            { key: 'p', symbol: '投', label: '投手', num: '1' },
+            { key: 'f1', symbol: '一', label: '一塁手', num: '3' },
+            { key: 'ss', symbol: '遊', label: '遊撃手', num: '6' },
+            { key: 'c', symbol: '捕', label: '捕手', num: '2' },
+            { key: 'f2', symbol: '二', label: '二塁手', num: '4' },
+            { key: 'dh', symbol: '指', label: '指名打者', num: 'DH' }
+        ];
+        const DIA_POS_ORDER = ['p', 'c', 'f1', 'f2', 'f3', 'ss', 'lf', 'cf', 'rf', 'dh'];
+        const setupDiaState = {
+            my: { mode: 'order', dirty: false, fromSlot: {} },
+            opp: { mode: 'order', dirty: false, fromSlot: {} }
+        };
+
+        function setupDiaDhKind(key) {
+            const el = document.getElementById(`setup-${key}-dh`);
+            const v = el ? el.value : '0';
+            return v === '1' ? 'standard' : (v === '2' ? 'twoway' : 'none');
+        }
+
+        // 打順の入力欄が「登録チーム選択」形式か「手入力」形式かを、DOMの
+        // 有無で判定する（切替直後でも現在の欄の形式に合わせるため）
+        function setupDiaRowIsRoster(key) {
+            return !!document.getElementById(`setup-${key}-player-0`);
+        }
+
+        // 打順 i（0〜8）の入力欄から現在の値を読む
+        function readSetupRowSlot(key, i) {
+            const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+            const th = readHandChecks(`setup-${key}-hand-${i}`, 'th');
+            const ba = readHandChecks(`setup-${key}-hand-${i}`, 'ba');
+            return {
+                pos: val(`setup-${key}-pos-${i}`),
+                playerId: val(`setup-${key}-player-${i}`),
+                name: val(`setup-${key}-name-${i}`),
+                num: val(`setup-${key}-num-${i}`),
+                grade: val(`setup-${key}-grade-${i}`),
+                th: th !== null ? th : '右',
+                ba: ba !== null ? ba : '右'
+            };
+        }
+
+        // DH使用時の投手欄（打順なし・10人目）の値を読む。欄が無ければ null
+        function readSetupPitcherSlot(key) {
+            const hasPlayer = !!document.getElementById(`setup-${key}-pitcher-player`);
+            const hasName = !!document.getElementById(`setup-${key}-pitcher-name`);
+            if (!hasPlayer && !hasName) return null;
+            const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+            const th = readHandChecks(`setup-${key}-pitcher-hand`, 'th');
+            const ba = readHandChecks(`setup-${key}-pitcher-hand`, 'ba');
+            return {
+                playerId: val(`setup-${key}-pitcher-player`),
+                name: val(`setup-${key}-pitcher-name`),
+                num: val(`setup-${key}-pitcher-num`),
+                grade: val(`setup-${key}-pitcher-grade`),
+                th: th !== null ? th : '右',
+                ba: ba !== null ? ba : '右'
+            };
+        }
+
+        function setupDiaCellHasContent(d) {
+            // 打順だけ選ばれていて選手がいないセルは「入力あり」とみなさない
+            return !!(d && (d.playerId || (d.name && d.name.trim())));
+        }
+
+        // ダイヤモンドの1セル分の入力欄HTML（打順リストの行と同じ項目）
+        function setupDiaCellHtml(key, cell, data, opts) {
+            const isPitcherSlot = !!opts.isPitcherSlot;
+            const rosterMode = getSetupSource(key) === 'roster';
+            const roster = getSetupRoster(key);
+            const showNum = isSetupTournamentOfficial();
+            const base = `setup-${key}-dia-${cell.key}`;
+            let mainHtml = '';
+            if (rosterMode) {
+                const playerOptions = `<option value="" ${!data.playerId ? 'selected' : ''}>選手を選択</option>` + (roster.players || []).map(p =>
+                    `<option value="${p.id}" ${p.id === data.playerId ? 'selected' : ''}>${physicalEscapeHtml(p.name)} (${p.grade || ''}/${p.bats || ''}打)${cohortLabel(p.cohort) ? ' ' + cohortLabel(p.cohort) : ''}${gradeColorLabel(p.gradeColor) ? ' ' + gradeColorLabel(p.gradeColor) : ''}</option>`
+                ).join('');
+                mainHtml = `<select id="${base}-player" class="w-full border border-slate-300 rounded px-1.5 py-1 font-bold bg-white text-slate-800">${playerOptions}</select>`;
+            } else {
+                mainHtml = `<input type="text" id="${base}-name" value="${physicalEscapeHtml(data.name || '')}" placeholder="選手名を入力" class="w-full border border-slate-300 rounded px-2 py-1 font-bold bg-white">`;
+            }
+            const orderHtml = isPitcherSlot
+                ? '<span class="text-[10px] font-extrabold text-amber-800 bg-amber-100 border border-amber-300 rounded px-1.5 py-1">打順なし・10人目</span>'
+                : `<select id="${base}-order" title="打順" class="border border-slate-300 rounded px-1 py-1 font-bold bg-white"><option value="" ${!data.order ? 'selected' : ''}>打順 未定</option>${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<option value="${n}" ${String(data.order) === String(n) ? 'selected' : ''}>${n}番</option>`).join('')}</select>`;
+            return `
+            <div class="bg-white border ${isPitcherSlot ? 'border-amber-300' : 'border-emerald-200'} rounded-lg p-1.5 space-y-1 text-xs" data-dia-cell="${cell.key}">
+                <div class="flex items-center justify-between gap-1">
+                    <span class="font-extrabold ${isPitcherSlot ? 'text-amber-900' : 'text-emerald-900'}">${cell.symbol}・${cell.label}</span>
+                    <span class="text-[9px] font-bold text-slate-400">${cell.num}</span>
+                </div>
+                ${mainHtml}
+                <div class="flex flex-wrap items-center gap-1">
+                    ${orderHtml}
+                    <select id="${base}-num" title="背番号（公式戦のみ）" class="setup-uniform-num w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white ${showNum ? '' : 'hidden'}">${uniformNumberOptionsHtml(uniformNumberDefault(data.num))}</select>
+                    <select id="${base}-grade" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(data.grade || '')}</select>
+                </div>
+                ${handChecksHtml(`${base}-hand`, data.th || '右', data.ba || '右')}
+            </div>`;
+        }
+
+        // 打順の入力欄の内容からダイヤモンドを描く
+        function renderSetupDiamond(key) {
+            const container = document.getElementById(`setup-${key}-diamond`);
+            if (!container) return;
+            const st = setupDiaState[key];
+            const dhKind = setupDiaDhKind(key);
+            const slots = [];
+            for (let i = 0; i < 9; i++) slots.push(readSetupRowSlot(key, i));
+            const pitcherSlot = dhKind === 'standard' ? readSetupPitcherSlot(key) : null;
+
+            // ポジションごとに、対応する打順の選手を割り当てる
+            const cellData = {};
+            const claimed = new Set();
+            st.fromSlot = {};
+            DIA_POS_ORDER.forEach(pk => {
+                const cell = DIA_POS_CELLS.find(c => c.key === pk);
+                if (pk === 'dh' && dhKind === 'none') return;
+                if (pk === 'p' && dhKind === 'standard') {
+                    if (pitcherSlot) {
+                        cellData[pk] = { playerId: pitcherSlot.playerId, name: pitcherSlot.name, num: pitcherSlot.num, grade: pitcherSlot.grade, th: pitcherSlot.th, ba: pitcherSlot.ba, order: '' };
+                        st.fromSlot[pk] = 'P';
+                    }
+                    return;
+                }
+                for (let i = 0; i < 9; i++) {
+                    if (claimed.has(i)) continue;
+                    if (slots[i].pos === cell.symbol) {
+                        cellData[pk] = { playerId: slots[i].playerId, name: slots[i].name, num: slots[i].num, grade: slots[i].grade, th: slots[i].th, ba: slots[i].ba, order: String(i + 1) };
+                        st.fromSlot[pk] = i;
+                        claimed.add(i);
+                        break;
+                    }
+                }
+            });
+            // ダイヤモンドに載らなかった打順（守備位置が未定・重複など）
+            const tray = [];
+            for (let i = 0; i < 9; i++) {
+                if (claimed.has(i)) continue;
+                const s = slots[i];
+                if (s.playerId || (s.name && s.name.trim()) || s.pos) {
+                    const roster = getSetupRoster(key);
+                    const mp = s.playerId && roster.players ? roster.players.find(x => x.id === s.playerId) : null;
+                    const nm = mp ? mp.name : (s.name && s.name.trim() ? s.name.trim() : '（選手未入力）');
+                    tray.push(`${i + 1}番 ${nm}（守備位置：${s.pos || '未定'}）`);
+                }
+            }
+
+            const empty = { playerId: '', name: '', num: '', grade: '', th: '右', ba: '右', order: '' };
+            const gridCells = DIA_POS_CELLS.filter(c => c.key !== 'dh').map(cell => {
+                if (cell.key === 'p' && dhKind === 'twoway') {
+                    return `
+                    <div class="bg-amber-50 border border-amber-300 rounded-lg p-1.5 space-y-1 text-xs" data-dia-cell="p">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="font-extrabold text-amber-900">投・投手</span>
+                            <span class="text-[9px] font-bold text-slate-400">1</span>
+                        </div>
+                        <p class="text-[10px] font-bold text-amber-800 leading-relaxed">二刀流のため、「指・指名打者」の選手が投手を兼ねます</p>
+                    </div>`;
+                }
+                const isP = cell.key === 'p' && dhKind === 'standard';
+                return setupDiaCellHtml(key, cell, cellData[cell.key] || empty, { isPitcherSlot: isP });
+            }).join('');
+            let dhHtml = '';
+            if (dhKind !== 'none') {
+                const dhCell = DIA_POS_CELLS.find(c => c.key === 'dh');
+                dhHtml = setupDiaCellHtml(key, dhCell, cellData['dh'] || empty, { isPitcherSlot: false });
+            }
+            container.innerHTML = `
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-2 space-y-2">
+                    <p class="text-[11px] font-bold text-emerald-900 leading-relaxed">ダイヤモンドの守備位置ごとに選手を入力してください。打順が分からない選手は「打順 未定」のままでも登録できます。</p>
+                    <div class="grid grid-cols-3 gap-1.5">${gridCells}</div>
+                    ${dhHtml}
+                    ${tray.length ? `<p class="text-[10px] font-bold text-slate-500 leading-relaxed">ダイヤモンドに表示されていない打順：${tray.map(t => physicalEscapeHtml(t)).join('、')}</p>` : ''}
+                </div>`;
+            st.dirty = false;
+        }
+
+        // ダイヤモンドの入力内容を、打順の入力欄（＋DH時の投手欄）へ書き戻す。
+        // 表示がダイヤモンドでない・未描画のときは何もしない。
+        function syncSetupDiamondToRows(key) {
+            const st = setupDiaState[key];
+            if (!st || st.mode !== 'pos') return;
+            const container = document.getElementById(`setup-${key}-diamond`);
+            if (!container || !container.querySelector('[data-dia-cell]')) return;
+            const dhKind = setupDiaDhKind(key);
+            const rosterRows = setupDiaRowIsRoster(key);
+            const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+            const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+
+            // セルの値をすべて読む
+            const cells = {};
+            DIA_POS_ORDER.forEach(pk => {
+                const base = `setup-${key}-dia-${pk}`;
+                if (!document.getElementById(`${base}-player`) && !document.getElementById(`${base}-name`)) { cells[pk] = null; return; }
+                const th = readHandChecks(`${base}-hand`, 'th');
+                const ba = readHandChecks(`${base}-hand`, 'ba');
+                cells[pk] = {
+                    playerId: val(`${base}-player`),
+                    name: val(`${base}-name`),
+                    num: val(`${base}-num`),
+                    grade: val(`${base}-grade`),
+                    order: val(`${base}-order`),
+                    th: th !== null ? th : '右',
+                    ba: ba !== null ? ba : '右'
+                };
+            });
+
+            // 作業用に打順の状態を複製する（書き戻し先の決定に使う）
+            const work = [];
+            for (let i = 0; i < 9; i++) work.push(readSetupRowSlot(key, i));
+            const claimed = {};
+            const writeSlot = (i, symbol, d) => {
+                setVal(`setup-${key}-pos-${i}`, symbol);
+                if (rosterRows) setVal(`setup-${key}-player-${i}`, d.playerId || '');
+                else setVal(`setup-${key}-name-${i}`, d.name || '');
+                setVal(`setup-${key}-num-${i}`, d.num || '');
+                setVal(`setup-${key}-grade-${i}`, d.grade || '');
+                setHandChecks(`setup-${key}-hand-${i}`, d.th, d.ba);
+                work[i] = { pos: symbol, playerId: d.playerId || '', name: d.name || '', num: d.num || '', grade: d.grade || '', th: d.th, ba: d.ba };
+                claimed[i] = true;
+            };
+
+            // DH使用時：投手セルは投手欄（打順なし・10人目）へ書き戻す
+            if (dhKind === 'standard' && cells['p']) {
+                const d = cells['p'];
+                if (setupDiaCellHasContent({ playerId: d.playerId, name: d.name, order: 'P' })) {
+                    if (document.getElementById(`setup-${key}-pitcher-player`)) setVal(`setup-${key}-pitcher-player`, d.playerId || '');
+                    if (document.getElementById(`setup-${key}-pitcher-name`)) setVal(`setup-${key}-pitcher-name`, d.name || '');
+                    setVal(`setup-${key}-pitcher-num`, d.num || '');
+                    setVal(`setup-${key}-pitcher-grade`, d.grade || '');
+                    setHandChecks(`setup-${key}-pitcher-hand`, d.th, d.ba);
+                } else if (st.fromSlot['p'] === 'P') {
+                    if (document.getElementById(`setup-${key}-pitcher-player`)) setVal(`setup-${key}-pitcher-player`, '');
+                    if (document.getElementById(`setup-${key}-pitcher-name`)) setVal(`setup-${key}-pitcher-name`, '');
+                }
+            }
+
+            const battingCells = DIA_POS_ORDER.filter(pk => cells[pk] && !(pk === 'p' && dhKind === 'standard') && !(pk === 'p' && dhKind === 'twoway'));
+            const doneCells = new Set();
+            // 1) 打順が選ばれているセルを、その打順へ
+            battingCells.forEach(pk => {
+                const d = cells[pk];
+                if (!setupDiaCellHasContent(d) || !d.order) return;
+                const cell = DIA_POS_CELLS.find(c => c.key === pk);
+                writeSlot(parseInt(d.order, 10) - 1, cell.symbol, d);
+                doneCells.add(pk);
+            });
+            // 2) 打順未定でも、元いた打順が空いていればそこへ
+            battingCells.forEach(pk => {
+                const d = cells[pk];
+                if (!setupDiaCellHasContent(d) || d.order) return;
+                const from = st.fromSlot[pk];
+                if (typeof from === 'number' && !claimed[from]) {
+                    const cell = DIA_POS_CELLS.find(c => c.key === pk);
+                    writeSlot(from, cell.symbol, d);
+                    doneCells.add(pk);
+                }
+            });
+            // 3) 残りは空いている打順へ（打順未定のまま一旦登録するケース）
+            battingCells.forEach(pk => {
+                const d = cells[pk];
+                if (!setupDiaCellHasContent(d) || d.order || doneCells.has(pk)) return;
+                for (let i = 0; i < 9; i++) {
+                    if (claimed[i]) continue;
+                    if (!work[i].pos && !work[i].playerId && !(work[i].name && work[i].name.trim())) {
+                        const cell = DIA_POS_CELLS.find(c => c.key === pk);
+                        writeSlot(i, cell.symbol, d);
+                        doneCells.add(pk);
+                        break;
+                    }
+                }
+            });
+            // 4) 空になったセルは、元の打順の守備位置だけ外す（選手自体は残す）
+            battingCells.forEach(pk => {
+                const d = cells[pk];
+                if (setupDiaCellHasContent(d)) return;
+                const from = st.fromSlot[pk];
+                if (typeof from === 'number' && !claimed[from]) {
+                    setVal(`setup-${key}-pos-${from}`, '');
+                    work[from].pos = '';
+                }
+            });
+            st.dirty = false;
+            refreshSetupLineupFeedback(false);
+        }
+
+        function onSetupDiaInput(key) {
+            setupDiaState[key].dirty = true;
+        }
+
+        // ダイヤモンド内の変更：登録チームから選手を選んだら、そのセルの
+        // 背番号・学年・利き手を選手の登録内容に合わせる（打順リストと同じ動き）
+        function onSetupDiaChange(key, ev) {
+            setupDiaState[key].dirty = true;
+            const t = ev && ev.target;
+            if (!t || !t.id) return;
+            const m = t.id.match(new RegExp(`^setup-${key}-dia-([a-z0-9]+)-player$`));
+            if (!m) return;
+            const pk = m[1];
+            const roster = getSetupRoster(key);
+            const p = roster.players ? roster.players.find(x => x.id === t.value) : null;
+            const base = `setup-${key}-dia-${pk}`;
+            const numEl = document.getElementById(`${base}-num`);
+            if (numEl) numEl.value = p ? uniformNumberDefault(p.number) : '';
+            const gradeEl = document.getElementById(`${base}-grade`);
+            if (gradeEl) gradeEl.value = p ? masterGradeValue(p, setupFiscalYear()) : '';
+            setHandChecks(`${base}-hand`, p ? (p.throws || '右') : '右', p ? (p.bats || '右') : '右');
+        }
+
+        function setSetupViewMode(key, mode) {
+            const st = setupDiaState[key];
+            if (mode === 'order' && st.mode === 'pos') syncSetupDiamondToRows(key);
+            st.mode = mode;
+            applySetupViewMode(key);
+        }
+
+        function applySetupViewMode(key) {
+            const st = setupDiaState[key];
+            const isPos = st.mode === 'pos';
+            const listEl = document.getElementById(`setup-${key}-lineup-list`);
+            const diaEl = document.getElementById(`setup-${key}-diamond`);
+            const pitcherEl = document.getElementById(`setup-${key}-pitcher-area`);
+            const btnOrder = document.getElementById(`setup-${key}-view-order`);
+            const btnPos = document.getElementById(`setup-${key}-view-pos`);
+            const dark = key === 'my' ? 'bg-indigo-900' : 'bg-slate-900';
+            if (btnOrder) btnOrder.className = `px-2.5 py-1 text-[11px] font-extrabold transition ${!isPos ? `${dark} text-white` : 'bg-white text-slate-600 hover:bg-slate-50'}`;
+            if (btnPos) btnPos.className = `px-2.5 py-1 text-[11px] font-extrabold transition ${isPos ? `${dark} text-white` : 'bg-white text-slate-600 hover:bg-slate-50'}`;
+            if (isPos) {
+                renderSetupDiamond(key);
+                if (listEl) listEl.classList.add('hidden');
+                if (pitcherEl) pitcherEl.classList.add('hidden');
+                if (diaEl) diaEl.classList.remove('hidden');
+            } else {
+                if (listEl) listEl.classList.remove('hidden');
+                if (pitcherEl) pitcherEl.classList.toggle('hidden', !pitcherEl.innerHTML.trim());
+                if (diaEl) diaEl.classList.add('hidden');
+            }
         }
 
         // ================= スタメン入力チェック（未入力・ポジション重複） =================
@@ -9376,6 +9763,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function confirmNewGameSetup(startImmediately = true) {
+            // 守備位置で登録（ダイヤモンド表示）中のチームは、ダイヤモンドの
+            // 入力内容を打順の入力欄へ書き戻してから、従来どおり処理する
+            syncSetupDiamondToRows('my');
+            syncSetupDiamondToRows('opp');
             const mySource = getSetupSource('my');
             const oppSource = getSetupSource('opp');
             const myRoster = getSetupRoster('my');
@@ -9942,10 +10333,253 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     benchArea.innerHTML = '';
                 }
             }
+            // 表示方法（打順／守備位置）を現在の状態に合わせて反映する
+            lineupEditDiaDirty = false;
+            lineupEditDiaModel = null;
+            applyLineupEditViewMode();
+        }
+
+        // ================= 守備位置で編集（ダイヤモンド表示） =================
+        // 試合中のスタメン編集でも「打順で編集」と「守備位置で編集」を
+        // 切り替えられる。テレビ中継で打順が回るたびに、そのポジションの
+        // 選手が分かった範囲で入力していく使い方を想定し、ダイヤモンドの
+        // 各ポジションに「その守備位置につく選手（打順から選択）」と、
+        // 打順リストと同じ項目（選手名・背番号・学年・利き手）を置く。
+        // 保存先は従来どおり打順リストの入力欄で、保存データ形式や
+        // 計算ロジックは変えない。守備位置が未定の選手はダイヤモンドに
+        // 載せず、そのまま残る（ポジション未選択でも保存できる従来仕様）。
+        let lineupEditViewMode = 'order';
+        let lineupEditDiaDirty = false;
+        let lineupEditDiaModel = null;
+
+        // 打順リストの入力欄から、ダイヤモンド用の作業モデルを作る
+        function buildLineupEditDiaModel() {
+            const team = gameState.teams[lineupEditTeamKey];
+            const model = { assign: {}, values: {}, pitcher: null, initAssign: {} };
+            lineupEditStarterIds.forEach((pid, idx) => {
+                const p = team.players.find(x => x.id === pid);
+                const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+                const th = readHandChecks(`edit-hand-${idx}`, 'th');
+                const ba = readHandChecks(`edit-hand-${idx}`, 'ba');
+                model.values[idx] = {
+                    order: p ? p.order : (idx + 1),
+                    name: val(`edit-name-${idx}`),
+                    num: val(`edit-num-${idx}`),
+                    grade: val(`edit-grade-${idx}`),
+                    th: th !== null ? th : '右',
+                    ba: ba !== null ? ba : '右'
+                };
+                const pos = val(`edit-pos-${idx}`);
+                const cell = DIA_POS_CELLS.find(c => c.symbol === pos);
+                if (cell && model.assign[cell.key] === undefined) {
+                    model.assign[cell.key] = idx;
+                    model.initAssign[idx] = cell.key;
+                }
+            });
+            if (lineupEditPitcherId) {
+                const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+                const th = readHandChecks('edit-pitcher-hand', 'th');
+                const ba = readHandChecks('edit-pitcher-hand', 'ba');
+                model.pitcher = {
+                    name: val('edit-pitcher-name'),
+                    num: val('edit-pitcher-num'),
+                    grade: val('edit-pitcher-grade'),
+                    th: th !== null ? th : '右',
+                    ba: ba !== null ? ba : '右'
+                };
+            }
+            return model;
+        }
+
+        // ダイヤモンドの入力欄の内容を作業モデルへ取り込む
+        function harvestLineupEditDiamond() {
+            if (!lineupEditDiaModel) return;
+            const model = lineupEditDiaModel;
+            const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+            DIA_POS_CELLS.forEach(cell => {
+                const pk = cell.key;
+                if (pk === 'p' && model.pitcher) {
+                    const th = readHandChecks('edit-dia-p-hand', 'th');
+                    const ba = readHandChecks('edit-dia-p-hand', 'ba');
+                    model.pitcher = {
+                        name: val('edit-dia-p-name'),
+                        num: val('edit-dia-p-num'),
+                        grade: val('edit-dia-p-grade'),
+                        th: th !== null ? th : '右',
+                        ba: ba !== null ? ba : '右'
+                    };
+                    return;
+                }
+                const assignEl = document.getElementById(`edit-dia-${pk}-assign`);
+                if (!assignEl) return;
+                const idx = assignEl.value === '' ? null : parseInt(assignEl.value, 10);
+                if (idx === null) { delete model.assign[pk]; return; }
+                model.assign[pk] = idx;
+                if (document.getElementById(`edit-dia-${pk}-name`)) {
+                    const prev = model.values[idx] || { order: idx + 1 };
+                    const th = readHandChecks(`edit-dia-${pk}-hand`, 'th');
+                    const ba = readHandChecks(`edit-dia-${pk}-hand`, 'ba');
+                    model.values[idx] = {
+                        order: prev.order,
+                        name: val(`edit-dia-${pk}-name`),
+                        num: val(`edit-dia-${pk}-num`),
+                        grade: val(`edit-dia-${pk}-grade`),
+                        th: th !== null ? th : '右',
+                        ba: ba !== null ? ba : '右'
+                    };
+                }
+            });
+        }
+
+        function renderLineupEditDiamond() {
+            const container = document.getElementById('lineup-edit-diamond');
+            if (!container) return;
+            if (!lineupEditDiaModel) lineupEditDiaModel = buildLineupEditDiaModel();
+            const model = lineupEditDiaModel;
+            const starterOptions = (selectedIdx) => `<option value="" ${selectedIdx === null || selectedIdx === undefined ? 'selected' : ''}>（なし）</option>` + lineupEditStarterIds.map((pid, idx) => {
+                const v = model.values[idx] || {};
+                const nm = (v.name || '').trim() || '（選手未入力）';
+                return `<option value="${idx}" ${selectedIdx === idx ? 'selected' : ''}>${v.order}番 ${physicalEscapeHtml(nm)}</option>`;
+            }).join('');
+            const cellsHtml = DIA_POS_CELLS.map(cell => {
+                const pk = cell.key;
+                if (pk === 'p' && model.pitcher) {
+                    const pv = model.pitcher;
+                    return `
+                    <div class="bg-white border border-amber-300 rounded-lg p-1.5 space-y-1 text-xs" data-dia-cell="p">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="font-extrabold text-amber-900">投・投手</span>
+                            <span class="text-[9px] font-bold text-slate-400">打順なし</span>
+                        </div>
+                        <input type="text" id="edit-dia-p-name" value="${physicalEscapeHtml(pv.name || '')}" placeholder="投手名を入力" class="w-full border border-amber-300 rounded px-2 py-1 font-bold bg-white">
+                        <div class="flex flex-wrap items-center gap-1">
+                            <select id="edit-dia-p-num" title="背番号" class="w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(uniformNumberDefault(pv.num))}</select>
+                            <select id="edit-dia-p-grade" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(pv.grade || '')}</select>
+                        </div>
+                        ${handChecksHtml('edit-dia-p-hand', pv.th || '右', pv.ba || '右')}
+                    </div>`;
+                }
+                const assignedIdx = (model.assign[pk] !== undefined && model.assign[pk] !== null) ? model.assign[pk] : null;
+                const v = assignedIdx !== null ? (model.values[assignedIdx] || {}) : null;
+                return `
+                <div class="bg-white border border-emerald-200 rounded-lg p-1.5 space-y-1 text-xs" data-dia-cell="${pk}">
+                    <div class="flex items-center justify-between gap-1">
+                        <span class="font-extrabold text-emerald-900">${cell.symbol}・${cell.label}</span>
+                        <span class="text-[9px] font-bold text-slate-400">${cell.num}</span>
+                    </div>
+                    <select id="edit-dia-${pk}-assign" class="w-full border border-slate-300 rounded px-1.5 py-1 font-bold bg-white text-slate-800">${starterOptions(assignedIdx)}</select>
+                    ${v ? `
+                    <input type="text" id="edit-dia-${pk}-name" value="${physicalEscapeHtml(v.name || '')}" placeholder="選手名を入力" class="w-full border border-slate-300 rounded px-2 py-1 font-bold bg-white">
+                    <div class="flex flex-wrap items-center gap-1">
+                        <span class="text-[10px] font-extrabold text-slate-500 bg-slate-100 border border-slate-200 rounded px-1.5 py-1">${v.order}番</span>
+                        <select id="edit-dia-${pk}-num" title="背番号" class="w-[4.3rem] shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${uniformNumberOptionsHtml(uniformNumberDefault(v.num))}</select>
+                        <select id="edit-dia-${pk}-grade" title="学年" class="w-14 shrink-0 border border-slate-300 rounded px-1 py-1 font-bold bg-white">${gradeSelectOptionsHtml(v.grade || '')}</select>
+                    </div>
+                    ${handChecksHtml(`edit-dia-${pk}-hand`, v.th || '右', v.ba || '右')}` : ''}
+                </div>`;
+            }).join('');
+            const assignedIdxSet = new Set(Object.values(model.assign));
+            const tray = lineupEditStarterIds.map((pid, idx) => ({ idx, v: model.values[idx] || {} })).filter(x => !assignedIdxSet.has(x.idx));
+            container.innerHTML = `
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-2 space-y-2">
+                    <p class="text-[11px] font-bold text-emerald-900 leading-relaxed">ダイヤモンドの守備位置ごとに、その位置につく選手を打順から選んで入力してください。守備位置が分からない選手は（なし）のままで保存できます。</p>
+                    <div class="grid grid-cols-3 gap-1.5">${cellsHtml}</div>
+                    ${tray.length ? `<p class="text-[10px] font-bold text-slate-500 leading-relaxed">守備位置が未定の選手：${tray.map(x => `${x.v.order}番 ${physicalEscapeHtml((x.v.name || '').trim() || '（選手未入力）')}`).join('、')}</p>` : ''}
+                </div>`;
+        }
+
+        // ダイヤモンドの内容を打順リストの入力欄へ書き戻す（保存は従来どおり
+        // saveLineupEdit が打順リストの欄を読む）
+        function syncLineupEditDiamondToList() {
+            if (lineupEditViewMode !== 'pos' || !lineupEditDiaModel) return;
+            harvestLineupEditDiamond();
+            const model = lineupEditDiaModel;
+            const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+            const assignedIdxSet = new Set(Object.values(model.assign));
+            Object.keys(model.assign).forEach(pk => {
+                const idx = model.assign[pk];
+                const cell = DIA_POS_CELLS.find(c => c.key === pk);
+                const v = model.values[idx];
+                if (!cell || !v) return;
+                setVal(`edit-pos-${idx}`, cell.symbol);
+                setVal(`edit-name-${idx}`, v.name || '');
+                setVal(`edit-num-${idx}`, v.num || '');
+                setVal(`edit-grade-${idx}`, v.grade || '');
+                setHandChecks(`edit-hand-${idx}`, v.th, v.ba);
+            });
+            // ダイヤモンドに載っていたのに外された選手は守備位置だけ外す
+            Object.keys(model.initAssign).forEach(idxKey => {
+                const idx = parseInt(idxKey, 10);
+                if (!assignedIdxSet.has(idx)) setVal(`edit-pos-${idx}`, '');
+            });
+            if (model.pitcher) {
+                setVal('edit-pitcher-name', model.pitcher.name || '');
+                setVal('edit-pitcher-num', model.pitcher.num || '');
+                setVal('edit-pitcher-grade', model.pitcher.grade || '');
+                setHandChecks('edit-pitcher-hand', model.pitcher.th, model.pitcher.ba);
+            }
+            lineupEditDiaDirty = false;
+        }
+
+        function onEditDiaInput() {
+            lineupEditDiaDirty = true;
+        }
+
+        function onEditDiaChange(ev) {
+            lineupEditDiaDirty = true;
+            const t = ev && ev.target;
+            if (!t || !t.id) return;
+            const m = t.id.match(/^edit-dia-([a-z0-9]+)-assign$/);
+            if (!m) return;
+            if (!lineupEditDiaModel) lineupEditDiaModel = buildLineupEditDiaModel();
+            harvestLineupEditDiamond();
+            const pk = m[1];
+            const idx = t.value === '' ? null : parseInt(t.value, 10);
+            if (idx !== null) {
+                // 同じ選手が別の守備位置に載っていたら、そちらを外す
+                Object.keys(lineupEditDiaModel.assign).forEach(other => {
+                    if (other !== pk && lineupEditDiaModel.assign[other] === idx) delete lineupEditDiaModel.assign[other];
+                });
+                lineupEditDiaModel.assign[pk] = idx;
+            } else {
+                delete lineupEditDiaModel.assign[pk];
+            }
+            renderLineupEditDiamond();
+        }
+
+        function setLineupEditViewMode(mode) {
+            if (mode === 'order' && lineupEditViewMode === 'pos') syncLineupEditDiamondToList();
+            lineupEditViewMode = mode;
+            applyLineupEditViewMode();
+        }
+
+        function applyLineupEditViewMode() {
+            const isPos = lineupEditViewMode === 'pos';
+            const listEl = document.getElementById('lineup-edit-list');
+            const diaEl = document.getElementById('lineup-edit-diamond');
+            const pitcherEl = document.getElementById('lineup-edit-pitcher-area');
+            const btnOrder = document.getElementById('lineup-edit-view-order');
+            const btnPos = document.getElementById('lineup-edit-view-pos');
+            if (btnOrder) btnOrder.className = `px-2.5 py-1 text-[11px] font-extrabold transition ${!isPos ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`;
+            if (btnPos) btnPos.className = `px-2.5 py-1 text-[11px] font-extrabold transition ${isPos ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`;
+            if (isPos) {
+                if (!lineupEditDiaModel) lineupEditDiaModel = buildLineupEditDiaModel();
+                renderLineupEditDiamond();
+                if (listEl) listEl.classList.add('hidden');
+                if (pitcherEl) pitcherEl.classList.add('hidden');
+                if (diaEl) diaEl.classList.remove('hidden');
+            } else {
+                if (listEl) listEl.classList.remove('hidden');
+                if (pitcherEl) pitcherEl.classList.remove('hidden');
+                if (diaEl) diaEl.classList.add('hidden');
+            }
         }
 
         function saveLineupEdit() {
             if (!hasCurrentGame()) return;
+            // 守備位置で編集（ダイヤモンド表示）中の場合は、ダイヤモンドの
+            // 内容を打順リストの入力欄へ書き戻してから従来どおり保存する
+            syncLineupEditDiamondToList();
             const team = gameState.teams[lineupEditTeamKey];
             const gameFY = fiscalYearOfDateStr(gameState.meta && gameState.meta.date);
             // 学年プルダウンが初期表示から変更された場合だけ入学年度を書き換える。
